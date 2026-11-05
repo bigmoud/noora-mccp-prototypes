@@ -4,13 +4,16 @@
   "name": "Sunita Devi",
   "label": "Husband reports the birth",
   "profile_before": {
-   "stage": "pregnant",
+   "name": "Sunita Devi",
+   "language": "Hindi",
+   "state": "Bihar",
+   "condition_area": "ANC_EDD",
    "edd": "2026-11-10",
    "baby_dob": null,
-   "language": "Hindi",
-   "location": "Gaya, Bihar",
-   "phone_holder": null,
-   "channel_pref": "text"
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
   },
   "messages": [
    {
@@ -38,13 +41,16 @@
   "name": "Priya Sharma",
   "label": "Month first, exact date later",
   "profile_before": {
-   "stage": "pregnant",
+   "name": "Priya Sharma",
+   "language": "Hindi",
+   "state": "Uttar Pradesh",
+   "condition_area": "ANC_EDD",
    "edd": "2027-01-28",
    "baby_dob": null,
-   "language": "Hindi",
-   "location": "Bareilly, Uttar Pradesh",
-   "phone_holder": null,
-   "channel_pref": "text"
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
   },
   "messages": [
    {
@@ -72,13 +78,16 @@
   "name": "Kavita",
   "label": "Mother-in-law, 'day after tomorrow'",
   "profile_before": {
-   "stage": "pregnant",
+   "name": "Kavita",
+   "language": "Hindi",
+   "state": "Uttar Pradesh",
+   "condition_area": "ANC_EDD",
    "edd": "2026-11-08",
    "baby_dob": null,
-   "language": "Hindi",
-   "location": "Sitapur, Uttar Pradesh",
-   "phone_holder": null,
-   "channel_pref": "text"
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
   },
   "messages": [
    {
@@ -106,13 +115,16 @@
   "name": "Anjali Verma",
   "label": "Due date stated, then corrected",
   "profile_before": {
-   "stage": "pregnant",
+   "name": "Anjali Verma",
+   "language": "English",
+   "state": "Madhya Pradesh",
+   "condition_area": "ANC_EDD",
    "edd": "2026-12-10",
    "baby_dob": null,
-   "language": "English",
-   "location": "Indore, Madhya Pradesh",
-   "phone_holder": null,
-   "channel_pref": "text"
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
   },
   "messages": [
    {
@@ -140,13 +152,16 @@
   "name": "Meena",
   "label": "Her sister is the one who's pregnant",
   "profile_before": {
-   "stage": "delivered",
+   "name": "Meena",
+   "language": "Hindi",
+   "state": "Rajasthan",
+   "condition_area": "PNC_DOB",
    "edd": null,
    "baby_dob": "2026-09-15",
-   "language": "Hindi",
-   "location": "Jaipur, Rajasthan",
-   "phone_holder": null,
-   "channel_pref": "text"
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
   },
   "messages": [
    {
@@ -174,13 +189,16 @@
   "name": "Rekha Kumari",
   "label": "Nothing to extract",
   "profile_before": {
-   "stage": "pregnant",
+   "name": "Rekha Kumari",
+   "language": "Hindi",
+   "state": "Bihar",
+   "condition_area": "ANC_EDD",
    "edd": "2027-02-02",
    "baby_dob": null,
-   "language": "Hindi",
-   "location": "Patna, Bihar",
-   "phone_holder": null,
-   "channel_pref": "text"
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
   },
   "messages": [
    {
@@ -208,13 +226,16 @@
   "name": "Pooja Yadav",
   "label": "Pregnancy loss",
   "profile_before": {
-   "stage": "pregnant",
+   "name": "Pooja Yadav",
+   "language": "Hindi",
+   "state": "Bihar",
+   "condition_area": "ANC_EDD",
    "edd": "2026-11-20",
    "baby_dob": null,
-   "language": "Hindi",
-   "location": "Muzaffarpur, Bihar",
-   "phone_holder": null,
-   "channel_pref": "text"
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
   },
   "messages": [
    {
@@ -236,13 +257,16 @@
   "name": "Lakshmi Bai",
   "label": "'Last Tuesday', home birth",
   "profile_before": {
-   "stage": "pregnant",
+   "name": "Lakshmi Bai",
+   "language": "Hindi",
+   "state": "Madhya Pradesh",
+   "condition_area": "ANC_EDD",
    "edd": "2026-11-12",
    "baby_dob": null,
-   "language": "Hindi",
-   "location": "Barwani, Madhya Pradesh",
-   "phone_holder": null,
-   "channel_pref": "text"
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
   },
   "messages": [
    {
@@ -270,13 +294,16 @@
   "name": "Mitali Das",
   "label": "Twins",
   "profile_before": {
-   "stage": "pregnant",
+   "name": "Mitali Das",
+   "language": "Bengali",
+   "state": "West Bengal",
+   "condition_area": "ANC_EDD",
    "edd": "2026-11-15",
    "baby_dob": null,
-   "language": "Bengali",
-   "location": "Nadia, West Bengal",
-   "phone_holder": null,
-   "channel_pref": "text"
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
   },
   "messages": [
    {
@@ -304,13 +331,16 @@
   "name": "Shabnam",
   "label": "Her own birth date, not the baby's",
   "profile_before": {
-   "stage": "pregnant",
+   "name": "Shabnam",
+   "language": "Urdu",
+   "state": "Uttar Pradesh",
+   "condition_area": "ANC_EDD",
    "edd": "2027-03-01",
    "baby_dob": null,
-   "language": "Urdu",
-   "location": "Moradabad, Uttar Pradesh",
-   "phone_holder": null,
-   "channel_pref": "text"
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
   },
   "messages": [
    {
@@ -338,13 +368,16 @@
   "name": "Rina Kumari",
   "label": "After birth: fever and pain",
   "profile_before": {
-   "stage": "delivered",
+   "name": "Rina Kumari",
+   "language": "Hindi",
+   "state": "Uttar Pradesh",
+   "condition_area": "PNC_DOB",
    "edd": null,
    "baby_dob": "2026-10-25",
-   "language": "Hindi",
-   "location": "Gorakhpur, Uttar Pradesh",
-   "phone_holder": null,
-   "channel_pref": "text"
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
   },
   "messages": [
    {
@@ -366,13 +399,16 @@
   "name": "Sita Devi",
   "label": "Language request, staying at her mother's",
   "profile_before": {
-   "stage": "pregnant",
+   "name": "Sita Devi",
+   "language": "Hindi",
+   "state": "Bihar",
+   "condition_area": "ANC_EDD",
    "edd": "2026-12-05",
    "baby_dob": null,
-   "language": "Hindi",
-   "location": "Patna, Bihar",
-   "phone_holder": null,
-   "channel_pref": "text"
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
   },
   "messages": [
    {
@@ -392,6 +428,199 @@
     "from": "family",
     "t": "2026-11-03 08:00",
     "text": "I have come to my mother's house in Siwan now. The delivery will be here."
+   }
+  ]
+ },
+ {
+  "id": "C13",
+  "name": "Geeta",
+  "label": "Says outright whose number it is",
+  "profile_before": {
+   "name": "Geeta",
+   "language": "Hindi",
+   "state": "Uttar Pradesh",
+   "condition_area": "ANC_EDD",
+   "edd": "2026-12-20",
+   "baby_dob": null,
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-03 09:12",
+    "text": "Namaste. This is my mother-in-law's number. I am Geeta, I don't have my own phone."
+   },
+   {
+    "i": 2,
+    "from": "family",
+    "t": "2026-11-03 09:13",
+    "text": "My feet have been swelling for two days."
+   }
+  ]
+ },
+ {
+  "id": "C14",
+  "name": "Ruby",
+  "label": "The writer changes mid-chat",
+  "profile_before": {
+   "name": "Ruby",
+   "language": "Hindi",
+   "state": "Bihar",
+   "condition_area": "ANC_EDD",
+   "edd": "2026-12-12",
+   "baby_dob": null,
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-02 13:40",
+    "text": "Hello, I am Ruby's husband. She has back pain at night."
+   },
+   {
+    "i": 2,
+    "from": "nurse",
+    "t": "2026-11-02 13:55",
+    "text": "Thank you. Is Ruby there? Can she tell us how many months along she is?"
+   },
+   {
+    "i": 3,
+    "from": "family",
+    "t": "2026-11-02 19:20",
+    "text": "Hi didi, this is Ruby now. I am in my 8th month. My husband keeps this phone at work, so I can only reply in the evening."
+   }
+  ]
+ },
+ {
+  "id": "C15",
+  "name": "Seema",
+  "label": "Born, then passed away",
+  "profile_before": {
+   "name": "Seema",
+   "language": "Hindi",
+   "state": "Bihar",
+   "condition_area": "ANC_EDD",
+   "edd": "2026-11-09",
+   "baby_dob": null,
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-04 08:30",
+    "text": "Didi, the baby was born on Sunday at the district hospital. He was very weak and he passed away yesterday."
+   }
+  ]
+ },
+ {
+  "id": "C16",
+  "name": "Anita",
+  "label": "Stillbirth worded as a birth",
+  "profile_before": {
+   "name": "Anita",
+   "language": "Hindi",
+   "state": "Madhya Pradesh",
+   "condition_area": "ANC_EDD",
+   "edd": "2026-11-07",
+   "baby_dob": null,
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-03 17:05",
+    "text": "The baby was born yesterday but she was not breathing. The doctors could not save her."
+   }
+  ]
+ },
+ {
+  "id": "C17",
+  "name": "Pinki",
+  "label": "'I lost the baby'",
+  "profile_before": {
+   "name": "Pinki",
+   "language": "Hindi",
+   "state": "Uttar Pradesh",
+   "condition_area": "ANC_EDD",
+   "edd": "2027-03-10",
+   "baby_dob": null,
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-01 21:10",
+    "text": "Didi I lost the baby. I had bleeding last week and the hospital said the pregnancy is over."
+   }
+  ]
+ },
+ {
+  "id": "C18",
+  "name": "Kiran",
+  "label": "Birth with no date",
+  "profile_before": {
+   "name": "Kiran",
+   "language": "Hindi",
+   "state": "Rajasthan",
+   "condition_area": "ANC_EDD",
+   "edd": "2026-11-08",
+   "baby_dob": null,
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-05 11:00",
+    "text": "Good news didi, we had a baby girl! Both of us are home now."
+   }
+  ]
+ },
+ {
+  "id": "C19",
+  "name": "Farida",
+  "label": "Hard birth, healthy baby",
+  "profile_before": {
+   "name": "Farida",
+   "language": "Urdu",
+   "state": "Uttar Pradesh",
+   "condition_area": "ANC_EDD",
+   "edd": "2026-11-10",
+   "baby_dob": null,
+   "medical_notes": "",
+   "high_risk_flags": [],
+   "consent": true,
+   "status": "active"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-02 10:15",
+    "text": "After a very hard night and an operation, our baby boy was born this morning. He is in the SNCU for a few days but the doctor says he will be fine."
    }
   ]
  }

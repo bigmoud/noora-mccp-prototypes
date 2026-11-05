@@ -82,12 +82,34 @@ def score():
     lasting_lost = sum(1 for c in out.values() for r in c["rows"] if r["status"] != "alert" and r["result"] in ("missed", "wrong_value"))
     stored_wrongly = sum(1 for c in out.values() for r in c["rows"] if r["result"] == "unsafe_ready") + totals.get("bad_write", 0)
     alerts_missed = sum(1 for c in out.values() for r in c["rows"] if r["status"] == "alert" and r["result"] == "missed")
+    # UPE write simulation: what "Save all ready facts" would do to condition_area.
+    # Rule from Noora: the switch ANC_EDD -> PNC_DOB happens only with a baby DOB, written together.
+    switches, loss_wrong, switch_blocked = {}, 0, 0
+    for cid, k in KEY.items():
+        items = EXT.get(cid, {}).get("items", [])
+        ready = {it.get("field"): it for it in items if it.get("status") == "ready"}
+        delivered = ready.get("stage", {}).get("value") == "delivered"
+        has_dob = "baby_dob" in ready
+        is_loss = any(r["field"] == "stage" and r["value"] == "loss" for r in k["key"])
+        should_switch = any(r["field"] == "stage" and r["value"] == "delivered" for r in k["key"]) and \
+            any(r["field"] == "baby_dob" and r["status"] == "ready" for r in k["key"])
+        would_switch = delivered and has_dob
+        if is_loss and (delivered or has_dob):
+            loss_wrong += 1
+        if delivered and not has_dob:
+            switch_blocked += 1
+        switches[cid] = {"would_switch": would_switch, "should_switch": should_switch}
+    switch_right = sum(1 for s in switches.values() if s["would_switch"] == s["should_switch"])
+    n_loss = sum(1 for k in KEY.values() if any(r["field"] == "stage" and r["value"] == "loss" for r in k["key"]))
     summary = {"key_items": n_key, "correct": totals.get("correct", 0), "totals": totals,
-               "lasting_facts_lost": lasting_lost, "stored_as_permanent_wrongly": stored_wrongly, "alerts_missed": alerts_missed}
+               "lasting_facts_lost": lasting_lost, "stored_as_permanent_wrongly": stored_wrongly, "alerts_missed": alerts_missed,
+               "loss_cases": n_loss, "loss_cases_wrongly_marked_birth": loss_wrong,
+               "postnatal_switch_right": switch_right, "chats": len(KEY), "switch_waiting_for_dob": switch_blocked}
     (HERE / "scores.json").write_text(json.dumps({"summary": summary, "cases": out}, indent=1, ensure_ascii=False))
     L = ["# Profile writer: first test run\n",
          f"**{summary['correct']} of {n_key}** answer-key items exactly right (value and status).  ",
          f"**Lasting facts lost:** {lasting_lost} · **Wrongly stored as permanent:** {stored_wrongly} · **Alerts missed:** {alerts_missed}  ",
+         f"**Loss cases marked as a birth:** {loss_wrong} of {n_loss} · **Postnatal switch decided right:** {switch_right} of {len(KEY)} chats · **Births held for a date of birth:** {switch_blocked}  ",
          f"All outcomes: {json.dumps(totals)}\n",
          "| Chat | Field | Expected | Got | Result |", "|---|---|---|---|---|"]
     for cid, c in out.items():

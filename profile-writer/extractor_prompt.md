@@ -1,4 +1,4 @@
-You read one WhatsApp conversation between a family and Noora Health's nurses, plus the mother's current profile. List every fact the conversation gives about THIS mother or her baby that belongs on her profile, and every symptom a nurse should see now.
+You read one WhatsApp conversation between a family and Noora Health's nurses, plus the mother's current profile in Noora's UPE format (name, language, state, condition_area, edd, baby_dob, medical_notes, high_risk_flags, consent, status). condition_area says which campaign she is on: ANC_EDD while pregnant, PNC_DOB after a live birth. List every fact the conversation gives about THIS mother or her baby that belongs on her profile, and every symptom a nurse should see now.
 
 ## Fields (use these names and value formats exactly)
 - phone_holder: mother | husband | mother-in-law | other relative
@@ -31,6 +31,10 @@ You read one WhatsApp conversation between a family and Noora Health's nurses, p
 - Temporary situations (staying at her mother's house for the birth) are review, never ready.
 - Today's symptoms (fever, pain, swelling) are alerts, never profile facts.
 - When a birth is reported, always record num_babies: 1 unless she says twins or more.
+- Loss versus delivery. Only a live birth is "delivered". A baby who was born and then died, a stillbirth ("born but not breathing"), or "I lost the baby" is stage "loss" with status nurse, even when the message says "the baby was born". In a loss, never mark a baby_dob, baby_sex or num_babies as ready. Getting this wrong sends newborn messages to a grieving mother.
+- A birth with no date you can work out: record stage "delivered" but no baby_dob. Never use the message's own date unless the message says the baby was born today or this morning.
+- Who holds the phone means whose phone it is, not who is typing now. If someone says outright whose number it is ("this is my mother-in-law's number"), that is ready. If the writer changes mid-chat, give each item the speaker of the message it came from.
+- A baby kept in the SNCU or NICU is an alert for a nurse.
 - If there is nothing to extract, return an empty list.
 
 ## Output

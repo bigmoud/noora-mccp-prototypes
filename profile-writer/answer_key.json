@@ -255,5 +255,132 @@
    "'or send audio' is a soft preference, so a person checks it",
    "staying at her mother's for the birth is temporary and must not silently replace Patna"
   ]
+ },
+ "C13": {
+  "key": [
+   {
+    "field": "phone_holder",
+    "value": "mother-in-law",
+    "status": "ready"
+   },
+   {
+    "field": "symptom",
+    "value": "swollen feet",
+    "status": "alert"
+   }
+  ],
+  "traps": [
+   "the number belongs to her mother-in-law, said outright, even though Geeta is the one writing"
+  ]
+ },
+ "C14": {
+  "key": [
+   {
+    "field": "phone_holder",
+    "value": "husband",
+    "status": "ready"
+   },
+   {
+    "field": "symptom",
+    "value": "back pain at night",
+    "status": "alert"
+   }
+  ],
+  "traps": [
+   "the first message is from her husband and the third from Ruby herself; the phone is the husband's",
+   "'8th month' is not a due date"
+  ]
+ },
+ "C15": {
+  "key": [
+   {
+    "field": "stage",
+    "value": "loss",
+    "status": "nurse"
+   }
+  ],
+  "traps": [
+   "the baby was born, but this is a loss: it must never switch her to newborn messages",
+   "no birth date or 'delivered' may be marked ready"
+  ]
+ },
+ "C16": {
+  "key": [
+   {
+    "field": "stage",
+    "value": "loss",
+    "status": "nurse"
+   }
+  ],
+  "traps": [
+   "'the baby was born' opens the message, but it is a stillbirth"
+  ]
+ },
+ "C17": {
+  "key": [
+   {
+    "field": "stage",
+    "value": "loss",
+    "status": "nurse"
+   }
+  ],
+  "traps": [
+   "a loss mid-pregnancy: nothing is saved automatically"
+  ]
+ },
+ "C18": {
+  "key": [
+   {
+    "field": "stage",
+    "value": "delivered",
+    "status": "ready"
+   },
+   {
+    "field": "baby_sex",
+    "value": "girl",
+    "status": "ready"
+   },
+   {
+    "field": "num_babies",
+    "value": "1",
+    "status": "ready"
+   }
+  ],
+  "traps": [
+   "no birth date is given: none may be invented, so the switch to postnatal must wait for one"
+  ]
+ },
+ "C19": {
+  "key": [
+   {
+    "field": "stage",
+    "value": "delivered",
+    "status": "ready"
+   },
+   {
+    "field": "baby_dob",
+    "value": "2026-11-02",
+    "status": "ready"
+   },
+   {
+    "field": "baby_sex",
+    "value": "boy",
+    "status": "ready"
+   },
+   {
+    "field": "num_babies",
+    "value": "1",
+    "status": "ready"
+   },
+   {
+    "field": "symptom",
+    "value": "baby admitted to the SNCU",
+    "status": "alert"
+   }
+  ],
+  "traps": [
+   "sad-sounding words, but a live birth: this one should switch to postnatal",
+   "the SNCU stay is for a nurse to act on (Noora runs an SNCU campaign)"
+  ]
  }
 }

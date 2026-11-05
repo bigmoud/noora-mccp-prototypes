@@ -9,14 +9,16 @@ These are **prototypes on simulated data**: one small, testable problem we can s
 ### `profile-writer/`: scan a chat, save what lasts
 Claude reads a family's WhatsApp conversation and pulls out facts about the mother and baby: stage, baby's date of birth, due date, who holds the phone, language, location and more. Each fact gets a status: one-click **ready**, **check first**, **nurse only**, or **alert** (never saved). Nurses save facts to the profile with one click, with the family's exact words as the source.
 
-- `conversations.json`: 12 simulated English conversations, each built around a trap (husband reports the birth, sister's pregnancy, corrected due date, pregnancy loss, twins and more).
+- `conversations.json`: 19 simulated English conversations, each built around a trap (husband reports the birth, whose phone it is said outright, the writer changing mid-chat, a sister's pregnancy, a corrected due date, four kinds of pregnancy loss, a birth with no date, twins and more).
 - `answer_key.json`: the hidden answer key. The extractor never sees it.
 - `extractor_prompt.md`: the extractor's instructions (also used by the page's live scan).
 - `score.py`: scores the extractions and writes `scores.json` and `results.md`.
 - `profile-writer.html`: the nurse page. It's built from `template.html` with the data embedded.
 - `runs/`: earlier runs, kept for comparison.
 
-Latest run (turn 2): **33 of 34** facts exactly right, 0 lasting facts lost, 0 wrong facts marked one-click ready, 0 nurse alerts missed. The full table and turn log are in `profile-writer/results.md`.
+Latest run (turn 3, 19 chats): **45 of 49** facts exactly right. 0 lasting facts lost, 0 wrong facts marked one-click ready, 0 nurse alerts missed, **0 of 4 pregnancy losses marked as a birth**, and the switch to postnatal decided right in 19 of 19 chats. The full table and turn log are in `profile-writer/results.md`.
+
+Profiles use the fields of Noora's UPE (User Profile) as Kripesh described them. Exact field names and allowed values are still to confirm from the onboarding doc. Following Noora's delivery flow, a birth moves `condition_area` from `ANC_EDD` to `PNC_DOB` only together with the baby's date of birth; the page enforces this, and a birth with no date stays on pregnancy messages until the family gives one.
 
 ```bash
 cd profile-writer && python3 score.py
@@ -35,6 +37,6 @@ cd stretch-eval && python3 run_eval.py --judge judge_labels.json
 An interactive page showing six fictional women moving through one approved, due-date-based timeline. It shows how late, out-of-order or missing answers fill personalization slots without ever holding up approved content.
 
 ## Rules we follow
-- Simulated or pod-written data only, until Noora agrees what can go to Claude (DPDP consent, state agreements).
+- Simulated, pod-written or de-identified/paraphrased data only. Noora has agreed that de-identified or paraphrased messages can go to Claude; real production messages stay inside Noora's systems.
 - Clinical content (stretches, warning signs, emergency numbers) is a placeholder until Noora's clinical team signs it off.
 - A human approves every write to a family's profile.

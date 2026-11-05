@@ -120,7 +120,7 @@ footer{font-size:12px;color:var(--ink-3);max-width:100ch}
   <header style="display:flex;flex-direction:column;gap:8px">
     <span class="eyebrow">Noora Health · prototype · simulated conversations only</span>
     <h1>Profile writer: scan a chat, save what lasts</h1>
-    <p class="lede">Claude reads each family's WhatsApp conversation and fills a table of facts about the mother and baby. Clear, lasting facts are one click to save. Unclear ones wait for a person. Symptoms go to a nurse and never into the profile. Every fact shows the exact words it came from.</p>
+    <p class="lede">Claude reads each family's WhatsApp conversation and fills a table of facts about the mother and baby, mapped onto the UPE profile MSEs use today. Clear, lasting facts are one click to save. Unclear ones wait for a person. Symptoms and losses go to a nurse and never into the profile. A birth switches her to postnatal messages only together with a date of birth.</p>
   </header>
 
   <section class="scorebar" id="scorebar" aria-label="Test score"></section>
@@ -177,10 +177,33 @@ let cur = CONV[0].id, mode = "saved", live = {}, extraMsgs = {}, sampleFn = null
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem("pw-saved") || "{}"); } catch (e) { saved = {}; }
 const persist = () => { try { localStorage.setItem("pw-saved", JSON.stringify(saved)); } catch (e) {} };
+/* The UPE as MSEs see it (field list from Kripesh; exact names to confirm from the onboarding doc). */
+const UPE = ["name","language","state","condition_area","edd","baby_dob","medical_notes","high_risk_flags","consent","status"];
+const UPE_LABEL = {name:"Name",language:"Language",state:"State",condition_area:"Condition area (campaign)",edd:"EDD",baby_dob:"Baby DOB",medical_notes:"Medical notes",high_risk_flags:"High-risk flags",consent:"Consent",status:"Status"};
+const TO_NOTES = ["delivery_place","baby_sex","num_babies","feeding"];   // no UPE field today: kept as a line in medical notes
+const PROPOSED = ["phone_holder","channel_pref"];                         // no UPE field today: proposed new fields
 function profileOf(cid){
-  const c = CONV.find(x => x.id === cid), p = {...c.profile_before}, src = {};
-  for (const [f, v] of Object.entries(saved[cid] || {})){ p[f] = v.value; src[f] = v; }
-  return {p, src};
+  const c = CONV.find(x => x.id === cid), p = {...c.profile_before}, src = {}, notes = [], proposed = {};
+  const s = saved[cid] || {};
+  if (s.edd){ p.edd = s.edd.value; src.edd = s.edd; }
+  if (s.language){ p.language = s.language.value; src.language = s.language; }
+  if (s.location){ const parts = String(s.location.value).split(",").map(x => x.trim()); p.state = parts[parts.length - 1]; src.state = s.location;
+    if (parts.length > 1) notes.push({text:`Location: ${s.location.value}`, s:s.location}); }
+  if (s.stage && s.stage.value === "delivered" && s.baby_dob){
+    p.condition_area = "PNC_DOB"; p.baby_dob = s.baby_dob.value; src.condition_area = s.stage; src.baby_dob = s.baby_dob;
+  }
+  for (const f of TO_NOTES) if (s[f]) notes.push({text:`${LABEL[f]}: ${s[f].value}`, s:s[f]});
+  for (const f of PROPOSED) if (s[f]) proposed[f] = s[f];
+  return {p, src, notes, proposed};
+}
+/* Noora's rule: the ANC_EDD -> PNC_DOB switch writes condition area and DOB together, never one alone. */
+function pairFor(items, it){
+  if (it.field !== "stage" && it.field !== "baby_dob") return null;
+  const stage = items.find(x => x.field === "stage" && x.value === "delivered" && x.status !== "nurse");
+  const dob = items.find(x => x.field === "baby_dob" && x.status !== "nurse");
+  if (it.field === "stage" && it.value !== "delivered") return null;
+  if (it.field === "baby_dob" && !stage) return null;
+  return {stage, dob};
 }
 
 /* ---------- facts for the current chat ---------- */
@@ -207,7 +230,9 @@ function drawScore(){
     <div class="score good"><b>${s.correct} of ${s.key_items}</b><span>answer-key facts exactly right</span></div>
     <div class="score ${s.lasting_facts_lost ? "bad" : "good"}"><b>${s.lasting_facts_lost}</b><span>lasting facts lost</span></div>
     <div class="score ${s.stored_as_permanent_wrongly ? "bad" : "good"}"><b>${s.stored_as_permanent_wrongly}</b><span>wrong facts marked one-click ready</span></div>
-    <div class="score ${s.alerts_missed ? "bad" : "good"}"><b>${s.alerts_missed}</b><span>nurse alerts missed</span></div>`;
+    <div class="score ${s.alerts_missed ? "bad" : "good"}"><b>${s.alerts_missed}</b><span>nurse alerts missed</span></div>
+    <div class="score ${s.loss_cases_wrongly_marked_birth ? "bad" : "good"}"><b>${s.loss_cases_wrongly_marked_birth} of ${s.loss_cases}</b><span>pregnancy losses marked as a birth</span></div>
+    <div class="score good"><b>${s.postnatal_switch_right} of ${s.chats}</b><span>chats where the switch to postnatal is decided right</span></div>`;
 }
 function drawList(){
   $("#list").innerHTML = CONV.map(c => {
@@ -258,9 +283,12 @@ function drawFacts(){
     const kr = showKey ? keyResultFor(cur, it) : null;
     const isSaved = done[it.field] && done[it.field].value === it.value;
     let btn;
+    const pair = pairFor(items, it);
     if (it.status === "alert") btn = `<button class="save alert" type="button" data-act="flag" data-i="${idx}">Flag to nurse</button>`;
     else if (it.status === "nurse") btn = `<button class="save nurse" type="button" data-act="flag" data-i="${idx}">Send to nurse</button>`;
     else if (isSaved) btn = `<button class="save done" type="button" disabled>✓ Saved</button>`;
+    else if (pair && !pair.dob) btn = `<button class="save" type="button" disabled title="The switch to postnatal needs a date of birth">Needs a date of birth</button>`;
+    else if (pair) btn = `<button class="save${pair.stage.status === "review" || pair.dob.status === "review" ? " check" : ""}" type="button" data-act="pair" data-i="${idx}">${pair.stage.status === "review" || pair.dob.status === "review" ? "Checked, save both" : "Save birth + date"}</button>`;
     else if (it.status === "review") btn = `<button class="save check" type="button" data-act="save" data-i="${idx}">Checked, save</button>`;
     else btn = `<button class="save" type="button" data-act="save" data-i="${idx}">Save</button>`;
     const old = it.replaces && it.replaces !== "null" ? `<span class="was">${esc(it.replaces)}</span>` : "";
@@ -276,20 +304,39 @@ function drawFacts(){
     : `<tr><td class="empty">Nothing to save from this chat. That's the right answer when a family only says thanks.</td></tr>`;
   t.querySelectorAll(".ev").forEach(b => b.onclick = () => { const it = items[+b.dataset.i]; drawPhone(it); document.getElementById("m-" + it.msg)?.scrollIntoView({block:"nearest", behavior:"smooth"}); });
   t.querySelectorAll("[data-act=save]").forEach(b => b.onclick = () => saveItem(items[+b.dataset.i]));
+  t.querySelectorAll("[data-act=pair]").forEach(b => b.onclick = () => savePair(pairFor(items, items[+b.dataset.i])));
+  const waiting = items.find(x => x.field === "stage" && x.value === "delivered") && !items.find(x => x.field === "baby_dob");
+  if (waiting && !$("#toast").textContent) $("#toast").textContent = "This birth has no date of birth yet, so she stays on pregnancy messages. Ask the family for the date of birth.";
   t.querySelectorAll("[data-act=flag]").forEach(b => b.onclick = () => { b.textContent = "✓ Sent"; b.disabled = true; $("#toast").textContent = `Sent to the nurse queue: ${items[+b.dataset.i].value}. Nothing was written to her profile.`; });
   $("#save-all").disabled = !items.some(it => it.status === "ready" && !(done[it.field] && done[it.field].value === it.value));
 }
 function drawProfile(){
-  const c = CONV.find(x => x.id === cur), {p, src} = profileOf(cur);
-  $("#pf-title").textContent = `${c.name}'s profile`;
-  $("#profile").innerHTML = FIELDS.map(f => {
+  const c = CONV.find(x => x.id === cur), {p, src, notes, proposed} = profileOf(cur);
+  const before = c.profile_before;
+  $("#pf-title").textContent = `${c.name}'s profile (UPE)`;
+  const show = v => Array.isArray(v) ? (v.length ? v.join(", ") : "none") : typeof v === "boolean" ? (v ? "yes" : "no") : v;
+  const cells = UPE.filter(f => f !== "medical_notes").map(f => {
     const v = p[f], s = src[f];
-    return `<div class="pf${s ? " new" : ""}"><span>${LABEL[f]}</span><b>${v == null || v === "" ? "—" : esc(v)}</b><small>${s ? `saved just now from msg ${s.msg}, said by ${esc(s.speaker)}` : v == null ? "not known" : "from onboarding / government record"}</small></div>`;
-  }).join("");
+    let val = v == null || v === "" ? "—" : esc(show(v));
+    if (f === "condition_area" && s) val = `<span class="was" style="display:inline;margin-right:6px">${esc(before.condition_area)}</span>${val}`;
+    const sub = s ? `saved just now from msg ${s.msg}, said by ${esc(s.speaker)}` : v == null || v === "" ? "not known" : "from onboarding / government record";
+    return `<div class="pf${s ? " new" : ""}"><span>${UPE_LABEL[f]}</span><b>${val}</b><small>${sub}</small></div>`;
+  });
+  const noteLines = notes.length ? notes.map(n => `<small style="display:block">${esc(n.text)} · msg ${n.s.msg}</small>`).join("") : `<small>nothing added</small>`;
+  cells.push(`<div class="pf${notes.length ? " new" : ""}" style="grid-column:1/-1"><span>${UPE_LABEL.medical_notes}</span>${noteLines}</div>`);
+  const prop = Object.entries(proposed);
+  cells.push(`<div class="pf${prop.length ? " new" : ""}" style="grid-column:1/-1"><span>Not in the UPE yet · proposed fields</span>${prop.length ? prop.map(([f, s]) => `<small style="display:block"><b style="display:inline">${esc(LABEL[f])}:</b> ${esc(s.value)} · msg ${s.msg}</small>`).join("") : `<small>Who holds the phone and text-or-voice have no UPE field today.</small>`}</div>`);
+  $("#profile").innerHTML = cells.join("");
 }
 function render(){ drawList(); drawPhone(); drawFacts(); drawProfile(); }
 
 /* ---------- actions ---------- */
+function savePair(pair){
+  if (!pair || !pair.stage || !pair.dob) return;
+  for (const it of [pair.stage, pair.dob]) (saved[cur] ||= {})[it.field] = {value:it.value, msg:it.msg, speaker:it.speaker || "unknown", evidence:it.evidence, at:new Date().toISOString()};
+  $("#toast").textContent = `Saved together: condition area ANC_EDD to PNC_DOB, baby DOB ${pair.dob.value}. Postnatal messages count from that date.`;
+  persist(); drawFacts(); drawProfile(); drawList();
+}
 function saveItem(it){
   (saved[cur] ||= {})[it.field] = {value:it.value, msg:it.msg, speaker:it.speaker || "unknown", evidence:it.evidence, at:new Date().toISOString()};
   if (it.field === "stage" && it.value === "delivered") $("#toast").textContent = "Saved. She now moves from pregnancy messages to postnatal ones.";
@@ -298,7 +345,11 @@ function saveItem(it){
 }
 $("#save-all").onclick = () => {
   const items = factsFor(cur) || []; let n = 0;
-  for (const it of items) if (it.status === "ready"){ (saved[cur] ||= {})[it.field] = {value:it.value, msg:it.msg, speaker:it.speaker || "unknown", evidence:it.evidence, at:new Date().toISOString()}; n++; }
+  const st = items.find(x => x.field === "stage" && x.value === "delivered" && x.status === "ready");
+  const dob = items.find(x => x.field === "baby_dob" && x.status === "ready");
+  for (const it of items) if (it.status === "ready"){
+    if ((it.field === "stage" || it.field === "baby_dob") && !(st && dob)) continue;  // the switch needs both
+    (saved[cur] ||= {})[it.field] = {value:it.value, msg:it.msg, speaker:it.speaker || "unknown", evidence:it.evidence, at:new Date().toISOString()}; n++; }
   persist(); $("#toast").textContent = `Saved ${n} ready fact${n === 1 ? "" : "s"}. Facts marked "Check first" or "Nurse only" were left for a person.`;
   drawFacts(); drawProfile();
 };
