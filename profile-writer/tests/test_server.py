@@ -55,5 +55,36 @@ class Access(unittest.TestCase):
         self.assertEqual(self.req("/webhook", "POST", {"Content-Type": "application/json"}, b"{}")[0], 401)
 
 
+class AutoAck(unittest.TestCase):
+    def setUp(self):
+        from app import privacy, whatsapp
+        self.sent = []
+        self._send = whatsapp.send_text
+        whatsapp.send_text = lambda phone, text: (self.sent.append((phone, text)) or (True, "wamid.test"))
+        self.addCleanup(setattr, whatsapp, "send_text", self._send)
+        self.uid = privacy.pseudonym("919800000001")
+        server.store.upsert_family(self.uid, "Live tester", "ANC_EDD")
+        server.store.set_contact(self.uid, "919800000001")
+        self.addCleanup(server.store.erase_family, self.uid)
+
+    def test_ack_once_per_cooldown_and_never_after_stop(self):
+        self.assertFalse(server.auto_ack(self.uid, "STOP", delay=0))
+        self.assertTrue(server.auto_ack(self.uid, "Meri delivery ho gayi", delay=0))
+        self.assertFalse(server.auto_ack(self.uid, "Aur ek baat", delay=0))  # within the cooldown
+        self.assertEqual(len(self.sent), 1)
+        self.assertNotIn("doctor", self.sent[0][1].lower())  # fixed text, nothing medical beyond 108
+        out = server.store.q("SELECT author FROM messages WHERE uid=? AND direction='out'", (self.uid,))
+        self.assertEqual([r["author"] for r in out], ["auto"])
+
+    def test_no_ack_for_numbers_off_the_allowlist(self):
+        from app import privacy
+        other = privacy.pseudonym("919811111111")
+        server.store.upsert_family(other, "Stranger", "ANC_EDD")
+        server.store.set_contact(other, "919811111111")
+        self.addCleanup(server.store.erase_family, other)
+        self.assertFalse(server.auto_ack(other, "hello", delay=0))
+        self.assertEqual(self.sent, [])
+
+
 if __name__ == "__main__":
     unittest.main()

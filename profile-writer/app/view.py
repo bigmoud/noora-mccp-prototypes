@@ -126,7 +126,8 @@ def chat(store: Store, uid: str, processing: set[str]) -> dict | None:
     phone = store.contact(uid)
     return {"uid": uid, "name": fam["name"] or fam["label"], "condition_area": area, "paused": bool(fam["paused"]),
             "phone": privacy.mask_phone(phone) if phone else "+91 ••••• " + uid[-5:].upper(),
-            "live": bool(phone), "messages": [{"id": m["id"], "dir": m["direction"], "text": m["text"], "ts": m["ts"]}
+            "live": bool(phone), "messages": [{"id": m["id"], "dir": m["direction"], "text": m["text"], "ts": m["ts"],
+                                               "auto": m["author"] == "auto"}
                                               for m in store.messages(uid, 80)],
             "notices": notices, "bio": cp.get("bio") or "", "draft": cp.get("reply") or "",
             "draft_language": cp.get("language") or "", "still_needed": cp.get("still_needed") or [],

@@ -321,8 +321,31 @@ class Handler(BaseHTTPRequestHandler):
                 store.audit(uid, "live_family_created")
                 publish("reset", {})
             threading.Thread(target=_process, args=(uid, m["text"], m["ts"], m["id"]), daemon=True).start()
+            threading.Thread(target=auto_ack, args=(uid, m["text"]), daemon=True).start()
         if dropped:
             store.audit(None, "dropped_not_allowlisted", count=dropped)
+
+
+def auto_ack(uid: str, text: str, delay: float = 1.5) -> bool:
+    """Send the fixed acknowledgment, at most once per cooldown. Not AI-written, not medical."""
+    time.sleep(delay)
+    if not settings.auto_ack or privacy.command(text):
+        return False
+    fam, phone = store.family(uid), store.contact(uid)
+    if not fam or not fam["consent"] or not phone or not privacy.is_allowed_number(phone):
+        return False
+    last_out = store.q("SELECT ts FROM messages WHERE uid=? AND direction='out' ORDER BY id DESC LIMIT 1", (uid,))
+    if last_out:
+        from datetime import datetime, timezone
+        age_h = (datetime.now(timezone.utc) - datetime.fromisoformat(last_out[0]["ts"])).total_seconds() / 3600
+        if age_h < (settings.auto_ack_cooldown_hours or 0):
+            return False
+    sent, detail = whatsapp.send_text(phone, settings.auto_ack_text)
+    store.audit(uid, "auto_ack", sent=sent, detail=detail[:80])
+    if sent:
+        store.add_message(uid, "out", "auto", settings.auto_ack_text, settings.auto_ack_text, now(), None)
+        publish("message", {"uid": uid})
+    return sent
 
 
 def _purge_loop():
