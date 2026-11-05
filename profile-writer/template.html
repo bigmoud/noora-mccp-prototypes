@@ -14,6 +14,9 @@
   --amber:#a86500; --amber-soft:#fdf1dc; --amber-line:#f0cf95;
   --rose:#b3372f; --rose-soft:#fbe6e3; --rose-line:#efb7b0;
   --blue:#2d5f9a; --blue-soft:#e4edf8; --hl:#fdeca6; --chat:#ede6dc; --out:#dcf3e4;
+  --wa-head:#008069; --wa-headink:#ffffff; --wa-bg:#efeae2; --wa-dot:rgba(84,101,111,.07); --wa-in:#ffffff; --wa-out:#d9fdd3;
+  --wa-ink:#111b21; --wa-meta:#667781; --wa-tick:#53bdeb; --wa-bar:#f0f2f5; --wa-field:#ffffff; --wa-chip:#ffffff;
+  --wa-notice:#ffeecd; --wa-notice-ink:#54656f; --wa-green:#00a884;
   --sans:"Public Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
@@ -22,13 +25,19 @@
   --teal:#4fc4a6; --teal-ink:#7fdcc3; --teal-soft:#16302a; --teal-line:#2c6b5b;
   --amber:#f0b24e; --amber-soft:#33270f; --amber-line:#6e5420;
   --rose:#f0928a; --rose-soft:#361b19; --rose-line:#7a3a35;
-  --blue:#8db6ea; --blue-soft:#1b2838; --hl:#5c4d12; --chat:#1e2522; --out:#1b3a2e; color-scheme:dark}}
+  --blue:#8db6ea; --blue-soft:#1b2838; --hl:#5c4d12; --chat:#1e2522; --out:#1b3a2e;
+  --wa-head:#202c33; --wa-headink:#e9edef; --wa-bg:#0b141a; --wa-dot:rgba(233,237,239,.035); --wa-in:#202c33; --wa-out:#005c4b;
+  --wa-ink:#e9edef; --wa-meta:#8696a0; --wa-tick:#53bdeb; --wa-bar:#202c33; --wa-field:#2a3942; --wa-chip:#182229;
+  --wa-notice:#182229; --wa-notice-ink:#ffd279; --wa-green:#00a884; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#111413; --panel:#191d1b; --ink:#e7ece9; --ink-2:#aeb7b2; --ink-3:#7c857f; --line:#2a302d;
   --teal:#4fc4a6; --teal-ink:#7fdcc3; --teal-soft:#16302a; --teal-line:#2c6b5b;
   --amber:#f0b24e; --amber-soft:#33270f; --amber-line:#6e5420;
   --rose:#f0928a; --rose-soft:#361b19; --rose-line:#7a3a35;
-  --blue:#8db6ea; --blue-soft:#1b2838; --hl:#5c4d12; --chat:#1e2522; --out:#1b3a2e; color-scheme:dark}
+  --blue:#8db6ea; --blue-soft:#1b2838; --hl:#5c4d12; --chat:#1e2522; --out:#1b3a2e;
+  --wa-head:#202c33; --wa-headink:#e9edef; --wa-bg:#0b141a; --wa-dot:rgba(233,237,239,.035); --wa-in:#202c33; --wa-out:#005c4b;
+  --wa-ink:#e9edef; --wa-meta:#8696a0; --wa-tick:#53bdeb; --wa-bar:#202c33; --wa-field:#2a3942; --wa-chip:#182229;
+  --wa-notice:#182229; --wa-notice-ink:#ffd279; --wa-green:#00a884; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.5}
@@ -44,7 +53,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .chip select{border:0;background:transparent;font-weight:600;color:var(--ink);padding:0 2px;max-width:220px}
 .grow{flex:1}
 .rollout{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:12px;padding:4px 6px 4px 12px;background:var(--bg);font-size:13px;color:var(--ink-2)}
-.rollout select{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:5px 8px;color:var(--ink)}
+.rollout select{max-width:250px;text-overflow:ellipsis;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:5px 8px;color:var(--ink)}
 .kill{border:1.5px solid var(--rose);color:var(--rose);background:var(--panel);border-radius:9px;padding:6px 14px;cursor:pointer;font-weight:600}
 .kill[aria-pressed="true"]{background:var(--rose);color:#fff}
 .tabs{max-width:1500px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:6px;overflow-x:auto}
@@ -121,6 +130,41 @@ th{color:var(--ink-3);font-weight:500;font-size:12px;text-transform:uppercase;le
 .scroll{overflow-x:auto}
 .grid2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px;align-items:start}
 .empty-state{color:var(--ink-3);font-size:14px;padding:8px 0}
+/* WhatsApp-style chat */
+.wa{border-radius:14px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column;background:var(--wa-bg);color:var(--wa-ink)}
+.wa-head{background:var(--wa-head);color:var(--wa-headink);display:flex;align-items:center;gap:10px;padding:9px 12px}
+.wa-av{width:38px;height:38px;border-radius:50%;background:#dfe5e7;color:#54656f;display:grid;place-items:center;font-weight:700;flex:none}
+.wa-name{font-weight:600;font-size:15.5px;line-height:1.2}
+.wa-sub{font-size:12.5px;opacity:.85}
+.wa-icons{margin-left:auto;display:flex;gap:18px;opacity:.9}
+.wa-icons svg{width:20px;height:20px;fill:currentColor}
+.wa-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:3px;min-height:300px;max-height:470px;overflow:auto;
+  background-color:var(--wa-bg);background-image:radial-gradient(var(--wa-dot) 1.4px,transparent 1.6px),radial-gradient(var(--wa-dot) 1.4px,transparent 1.6px);
+  background-size:26px 26px;background-position:0 0,13px 13px}
+.wa-day{align-self:center;background:var(--wa-chip);color:var(--wa-meta);font-size:12px;padding:4px 11px;border-radius:7px;margin:8px 0 6px;box-shadow:0 1px .5px rgba(11,20,26,.13);text-transform:uppercase;letter-spacing:.02em}
+.wa-notice{align-self:center;max-width:92%;text-align:center;background:var(--wa-notice);color:var(--wa-notice-ink);font-size:12.5px;padding:6px 12px;border-radius:7px;margin-bottom:4px;box-shadow:0 1px .5px rgba(11,20,26,.13)}
+.wa-msg{position:relative;max-width:82%;padding:6px 8px 8px 9px;border-radius:7.5px;font-size:14.2px;line-height:1.4;box-shadow:0 1px .5px rgba(11,20,26,.13);word-wrap:break-word;margin-top:2px}
+.wa-msg.first{margin-top:8px}
+.wa-msg.family{align-self:flex-start;background:var(--wa-in)}
+.wa-msg.nurse{align-self:flex-end;background:var(--wa-out)}
+.wa-msg.family.first{border-top-left-radius:0}
+.wa-msg.nurse.first{border-top-right-radius:0}
+.wa-msg.family.first::before,.wa-msg.nurse.first::before{content:"";position:absolute;top:0;width:8px;height:13px}
+.wa-msg.family.first::before{left:-8px;background:var(--wa-in);clip-path:polygon(100% 0,0 0,100% 100%)}
+.wa-msg.nurse.first::before{right:-8px;background:var(--wa-out);clip-path:polygon(0 0,100% 0,0 100%)}
+.wa-who{display:block;font-size:12.5px;font-weight:600;color:#06cf9c;margin-bottom:1px}
+.wa-msg.family .wa-who{color:#1f7aec}
+.wa-meta{float:right;margin:6px 0 -5px 10px;font-size:11px;color:var(--wa-meta);white-space:nowrap;display:inline-flex;align-items:center;gap:3px}
+.wa-meta svg{width:16px;height:11px;fill:var(--wa-tick)}
+.wa-msg mark{background:var(--hl)}
+.wa-bar{display:flex;align-items:center;gap:8px;background:var(--wa-bar);padding:8px 10px}
+.wa-bar input{flex:1;min-width:0;border:0;background:var(--wa-field);color:var(--wa-ink);border-radius:9px;padding:10px 12px;font-size:14.5px}
+.wa-bar input::placeholder{color:var(--wa-meta)}
+.wa-send{flex:none;width:42px;height:42px;border-radius:50%;border:0;background:var(--wa-green);display:grid;place-items:center;cursor:pointer}
+.wa-send svg{width:20px;height:20px;fill:#fff}
+.sim{border:1.5px dashed var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.sim .wa-bar{border-radius:10px}
+.wa-hint{font-size:12px;color:var(--ink-3);padding:0 2px}
 @media (max-width:1150px){.cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .cols>.card:nth-child(2){grid-column:1/-1;order:3}}
 @media (max-width:760px){.cols,.grid2{grid-template-columns:minmax(0,1fr)} .qgrid{grid-template-columns:minmax(0,1fr)}}
 </style>
@@ -140,6 +184,7 @@ th{color:var(--ink-3);font-weight:500;font-size:12px;text-transform:uppercase;le
     <option value="review">review all (nothing writes without a person)</option>
     <option value="shadow">shadow (log only, nothing written)</option>
   </select></label>
+  <button class="btn small" id="theme" type="button" aria-label="Switch light or dark">◐</button>
   <button class="kill" id="kill" type="button" aria-pressed="false">Kill switch: off</button>
 </div>
 <div class="tabs" role="tablist">
@@ -154,12 +199,18 @@ th{color:var(--ink-3);font-weight:500;font-size:12px;text-transform:uppercase;le
       <div class="card">
         <div class="h">WhatsApp conversation</div>
         <div class="fam" id="fam"></div>
-        <div class="chat" id="chat" aria-live="polite"></div>
-        <span class="lbl">Type as the family (simulator)</span>
-        <form class="row" id="famform"><input id="famin" placeholder="e.g. Meri wife ki delivery ho gayi…" aria-label="Message from the family" maxlength="500"><button class="btn pri" type="submit">Send</button></form>
-        <div class="chips" id="scen"></div>
-        <span class="lbl">Nurse reply (a person always presses Send; nothing is auto-sent)</span>
-        <form class="row" id="nurform"><input id="nurin" placeholder="Reply as the nurse…" aria-label="Nurse reply" maxlength="500"><button class="btn" type="submit">Send</button></form>
+        <div class="wa">
+          <div class="wa-head"><div class="wa-av" id="waav">?</div><div><div class="wa-name" id="waname"></div><div class="wa-sub" id="wasub"></div></div>
+            <div class="wa-icons" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11z"/></svg><svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></div></div>
+          <div class="wa-body" id="chat" aria-live="polite"></div>
+          <form class="wa-bar" id="nurform"><input id="nurin" placeholder="Reply as the nurse" aria-label="Nurse reply" maxlength="500"><button class="wa-send" type="submit" aria-label="Send nurse reply"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1.9 21 23 12 1.9 3 1.9 10l15 2-15 2z"/></svg></button></form>
+        </div>
+        <div class="wa-hint">A person always presses Send; nothing is auto-sent to families.</div>
+        <div class="sim">
+          <span class="lbl"><b>Simulator:</b> type as the family</span>
+          <form class="wa-bar" id="famform"><input id="famin" placeholder="e.g. Meri wife ki delivery ho gayi…" aria-label="Message from the family" maxlength="500"><button class="wa-send" type="submit" aria-label="Send as the family"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1.9 21 23 12 1.9 3 1.9 10l15 2-15 2z"/></svg></button></form>
+          <div class="chips" id="scen"></div>
+        </div>
       </div>
       <div class="card">
         <div class="h">What just happened to the last message</div>
@@ -486,11 +537,23 @@ function renderFamilies(){
   $("#famsel").onchange = e => { if (e.target.value) loadFamily(e.target.value); };
 }
 function renderChat(){
-  const f = fam(), lastQ = f.last?.rules?.map(d => d.p.quote).filter(Boolean) || [];
-  $("#chat").innerHTML = f.messages.map(m => {
+  const f = fam(), c = convOf(f.id), lastQ = f.last?.rules?.map(d => d.p.quote).filter(Boolean) || [];
+  const holder = f.profile.phone_holder?.value;
+  $("#waav").textContent = c.name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  $("#waname").textContent = `${c.name.split(" ")[0]}'s family (synthetic)`;
+  $("#wasub").textContent = `${holder && holder !== "mother" ? holder + "'s phone" : "family phone"} · ${f.pseudo}`;
+  const tick = '<svg viewBox="0 0 16 11" aria-label="Read"><path d="M11.07.65 10.4.1a.37.37 0 0 0-.52.06L4.6 6.7 2.35 4.6a.37.37 0 0 0-.52.02l-.6.62a.37.37 0 0 0 .01.52l3.04 2.84a.4.4 0 0 0 .58-.04l6.27-7.4a.37.37 0 0 0-.06-.51zm4 0L14.4.1a.37.37 0 0 0-.52.06L8.6 6.7l-.85-.8-.92 1.08 1.6 1.5a.4.4 0 0 0 .58-.04l6.27-7.4a.37.37 0 0 0-.06-.51z"/></svg>';
+  const dayLabel = d => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", {day:"numeric", month:"long", year:"numeric", timeZone:"UTC"});
+  let html = `<div class="wa-notice">🔒 Synthetic conversation for testing. These people and messages are invented.</div>`, lastDay = null, lastFrom = null;
+  for (const m of f.messages){
+    const day = m.t.slice(0, 10);
+    if (day !== lastDay){ html += `<div class="wa-day">${esc(dayLabel(day))}</div>`; lastDay = day; lastFrom = null; }
+    const first = m.from !== lastFrom; lastFrom = m.from;
     const body = f.last?.received?.text === m.text && lastQ.length ? hl(m.text, lastQ[0]) : esc(m.text);
-    return `<div class="bub ${m.from}">${body}<small>${m.from === "nurse" ? "Nurse" : "Family"} · ${esc(m.t)}</small></div>`;
-  }).join("");
+    const who = first && m.from === "nurse" ? `<span class="wa-who">Noora nurse</span>` : "";
+    html += `<div class="wa-msg ${m.from}${first ? " first" : ""}">${who}${body}<span class="wa-meta">${esc(m.t.slice(11, 16))}${m.from === "nurse" ? tick : ""}</span></div>`;
+  }
+  $("#chat").innerHTML = html;
   $("#chat").scrollTop = $("#chat").scrollHeight;
 }
 function renderSteps(){
@@ -656,6 +719,10 @@ $("#copyg").onclick = async () => { const txt = JSON.stringify(S.golden, null, 1
 (async () => {
   try { sampleFn = window.claude?.use ? await window.claude.use("sample") : null; } catch (e) { sampleFn = null; }
   if (!sampleFn) { const o = $("#mode").querySelector('option[value="live"]'); o.disabled = true; o.textContent += " · not available here"; if (S.mode === "live") { S.mode = "keywords"; } }
+})();
+(() => { let t = "light"; try { t = localStorage.getItem("pw-theme") || "light"; } catch (e) {}
+  document.documentElement.dataset.theme = t;
+  $("#theme").onclick = () => { const n = document.documentElement.dataset.theme === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = n; try { localStorage.setItem("pw-theme", n); } catch (e) {} };
 })();
 loadFamily(S.cur);
 </script>
