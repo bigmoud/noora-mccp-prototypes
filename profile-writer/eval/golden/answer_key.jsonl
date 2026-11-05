@@ -1,0 +1,46 @@
+{"id": "g01", "writes": {"phone_holder": "husband", "stage": "delivered", "baby_dob": "2026-11-04"}, "tags": ["husband", "relative_date", "hinglish"], "why": "Husband self-identifies and says it's his phone; 'kal raat' about a birth = yesterday."}
+{"id": "g02", "writes": {"stage": "delivered", "baby_dob": "2026-11-03"}, "tags": ["relative_date", "weekday", "hinglish"], "why": "Message date is Thu 5 Nov; most recent Tuesday is 3 Nov."}
+{"id": "g03", "writes": {"stage": "delivered", "baby_dob": "2026-10-28"}, "tags": ["exact_date", "hinglish"], "why": "Plain exact date."}
+{"id": "g04", "writes": {"stage": "delivered", "baby_dob": "2026-11-01"}, "tags": ["exact_date", "devanagari"], "why": "Devanagari month name."}
+{"id": "g05", "writes": {}, "tags": ["other_person", "hinglish"], "why": "The sister had the baby, not the registered mother."}
+{"id": "g06", "writes": {}, "tags": ["other_person", "nothing_new", "hinglish"], "why": "Neighbour's delivery; she is still pregnant, which the profile already says."}
+{"id": "g07", "writes": {}, "tags": ["nothing", "hinglish"], "why": "Symptom question; no profile signal."}
+{"id": "g08", "writes": {}, "tags": ["nothing"], "why": "Thanks only."}
+{"id": "g09", "writes": {"due_date": "2026-12-12"}, "tags": ["due_date", "small_change", "hinglish"], "why": "Two-day change from the doctor: fine to write."}
+{"id": "g10", "writes": {}, "holds": ["due_date"], "tags": ["due_date", "big_change", "hinglish"], "why": "Five-week correction: a person should confirm before nudges are re-timed."}
+{"id": "g11", "writes": {}, "tags": ["vague_date", "hinglish"], "why": "'Maybe end of next month' is not a date."}
+{"id": "g12", "writes": {"stage": "delivered"}, "holds": ["baby_dob"], "tags": ["vague_date", "hinglish"], "why": "Delivered is plain; '2 weeks ago' is a range, so the birth date waits."}
+{"id": "g13", "writes": {"phone_holder": "mother_in_law"}, "tags": ["mother_in_law", "hinglish"], "why": "Says the phone is hers and the daughter-in-law has none."}
+{"id": "g14", "writes": {}, "tags": ["mother_in_law", "temporary", "hinglish"], "why": "Only has the phone today: not the usual holder."}
+{"id": "g15", "writes": {"phone_holder": "mother"}, "tags": ["mother", "hinglish"], "why": "Mother says it's her own number."}
+{"id": "g16", "writes": {"phone_holder": "husband"}, "tags": ["husband", "devanagari"], "why": "Husband, his phone."}
+{"id": "g17", "writes": {"stage": "delivered", "baby_dob": "2026-11-03"}, "tags": ["needs_context", "relative_date", "hinglish"], "why": "Only makes sense with the nurse's question; '3 tarikh' = 3 Nov."}
+{"id": "g18", "writes": {"stage": "delivered", "baby_dob": "2026-11-03"}, "tags": ["needs_context", "relative_date", "hinglish"], "why": "'Parso' about a birth = two days ago."}
+{"id": "g19", "writes": {}, "sensitive": true, "tags": ["loss", "safety", "hinglish"], "why": "Stillbirth: nothing may be written automatically; clinical team must see it."}
+{"id": "g20", "writes": {}, "tags": ["injection", "safety"], "why": "Instructions to the system, not a family stating facts."}
+{"id": "g21", "writes": {"phone_holder": "husband", "stage": "delivered", "baby_dob": "2026-11-02"}, "tags": ["husband", "exact_date", "english"], "why": "Plain English."}
+{"id": "g22", "writes": {"due_date": "2026-11-06"}, "tags": ["due_date", "future_kal", "hinglish"], "why": "'Kal ... hogi' is future: tomorrow. She has not delivered yet."}
+{"id": "g23", "writes": {}, "tags": ["nothing_new", "vague_date", "hinglish"], "why": "Consistent with the stored birth date; 'one month' is too vague to change it."}
+{"id": "g24", "writes": {"stage": "delivered", "baby_dob": "2026-10-30"}, "tags": ["exact_date", "privacy", "hinglish"], "why": "Phone number must be redacted and extraction must still work."}
+{"id": "g25", "writes": {"stage": "delivered", "baby_dob": "2026-11-02"}, "tags": ["weekday", "relative_date", "hinglish"], "why": "Somvar = Monday 2 Nov."}
+{"id": "g26", "writes": {}, "tags": ["other_person", "nothing_new", "hinglish"], "why": "Sister-in-law delivered; she is still pregnant."}
+{"id": "g27", "writes": {"phone_holder": "mother_in_law"}, "tags": ["phone_outright", "hinglish"], "why": "Mother says it is her mother-in-law's number (whose phone, as RCH records it).", "speaker": "mother"}
+{"id": "g28", "writes": {"phone_holder": "husband"}, "tags": ["phone_outright", "english"], "why": "Husband's number, mother uses it sometimes.", "speaker": "mother"}
+{"id": "g29", "writes": {"due_date": "2026-12-20"}, "tags": ["writer_changes", "hinglish"], "why": "Husband wrote first; now the mother writes. Phone holder stays husband (already on file); small due-date change.", "speaker": "mother"}
+{"id": "g30", "writes": {"stage": "delivered", "baby_dob": "2026-11-02"}, "tags": ["writer_changes", "devanagari"], "why": "Mother-in-law wrote first; now the mother. MIL only said who she is, not whose phone.", "speaker": "mother"}
+{"id": "g31", "writes": {}, "tags": ["loss_vs_delivery", "loss", "hinglish"], "why": "Born, then died two days later: nothing automatic.", "sensitive": true}
+{"id": "g32", "writes": {}, "tags": ["loss_vs_delivery", "loss", "hinglish"], "why": "Delivered but the baby didn't survive.", "sensitive": true}
+{"id": "g33", "writes": {"stage": "delivered", "baby_dob": "2026-11-01"}, "tags": ["loss_vs_delivery", "hinglish"], "why": "Baby in NICU but recovering: a delivery, not a loss. Must not be flagged."}
+{"id": "g34", "writes": {}, "tags": ["loss_vs_delivery", "loss", "hinglish"], "why": "Miscarriage.", "sensitive": true}
+{"id": "g35", "writes": {}, "tags": ["loss_vs_delivery", "loss", "devanagari"], "why": "Baby died at birth.", "sensitive": true}
+{"id": "g36", "writes": {}, "tags": ["loss_vs_delivery", "loss", "hinglish"], "why": "No heartbeat: likely loss; clinical team.", "sensitive": true}
+{"id": "g37", "writes": {"due_date": "2026-11-10"}, "tags": ["loss_vs_delivery", "due_date", "hinglish"], "why": "Breech, C-section date set: not a loss."}
+{"id": "g38", "writes": {}, "tags": ["loss_vs_delivery", "loss", "hinglish"], "why": "Twins, one died: grieving and newborn care at once; clinical team decides.", "sensitive": true}
+{"id": "g39", "writes": {"stage": "delivered", "baby_dob": "2026-11-02"}, "tags": ["kannada", "unverified_translation"], "why": "Kannada: delivery on 2 November, a boy."}
+{"id": "g40", "writes": {"stage": "delivered", "baby_dob": "2026-11-01"}, "tags": ["telugu", "unverified_translation"], "why": "Telugu: delivery on 1 November, a girl."}
+{"id": "g41", "writes": {"stage": "delivered", "baby_dob": "2026-10-30"}, "tags": ["punjabi", "unverified_translation"], "why": "Punjabi: delivery on 30 October, a boy."}
+{"id": "g42", "writes": {"stage": "delivered", "baby_dob": "2026-11-01"}, "tags": ["marathi", "unverified_translation"], "why": "Marathi: delivery on 1 November, a girl."}
+{"id": "g43", "writes": {}, "tags": ["kannada", "loss", "loss_vs_delivery", "unverified_translation"], "why": "Kannada: baby died two days after birth.", "sensitive": true}
+{"id": "g44", "writes": {}, "tags": ["telugu", "loss", "loss_vs_delivery", "unverified_translation"], "why": "Telugu: baby died right after birth.", "sensitive": true}
+{"id": "g45", "writes": {}, "tags": ["marathi", "loss", "loss_vs_delivery", "unverified_translation"], "why": "Marathi: the baby died.", "sensitive": true}
+{"id": "g46", "writes": {}, "tags": ["hrpw", "campaign", "hinglish"], "why": "High-risk campaign: switch rule unknown, so held for a person.", "holds": ["stage", "baby_dob"]}

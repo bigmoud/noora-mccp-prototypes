@@ -1,0 +1,10 @@
+.env
+data/
+dist/
+__pycache__/
+eval/out/compare/
+eval/out/haiku-*/
+eval/out/runs/
+eval/out/runs.jsonl
+eval/golden/noora/*
+!eval/golden/noora/README.md
