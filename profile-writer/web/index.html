@@ -432,7 +432,7 @@ function renderChat(){
     const d = dayLabel(it.ts); if (d && d!==lastDay){ box.append(h("div",{class:"day"}, d)); lastDay = d; }
     if (it.k==="n"){ box.append(h("div",{class:"sys"}, it.n.text)); continue; }
     const m = it.m;
-    box.append(h("div",{class:"b "+m.dir}, m.text, h("span",{class:"t"}, hhmm(m.ts), m.dir==="out" ? svg(TICKS) : null)));
+    box.append(h("div",{class:"b "+m.dir}, m.text, h("span",{class:"t"}, m.auto ? "Automatic · " : "", hhmm(m.ts), m.dir==="out" ? svg(TICKS) : null)));
   }
   if (c.processing) box.append(h("div",{class:"typing"}, h("span",{class:"dots"}, h("i"),h("i"),h("i")), "Copilot is reading"));
   box.scrollTop = box.scrollHeight;

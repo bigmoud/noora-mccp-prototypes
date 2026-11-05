@@ -88,7 +88,15 @@ class Settings:
     wa_phone_number_id = os.environ.get("WHATSAPP_PHONE_NUMBER_ID", "")
     wa_app_secret = os.environ.get("WHATSAPP_APP_SECRET", "")
     wa_verify_token = os.environ.get("WHATSAPP_VERIFY_TOKEN", "")
-    wa_graph_version = os.environ.get("WHATSAPP_GRAPH_VERSION", "v21.0")
+    wa_graph_version = os.environ.get("WHATSAPP_GRAPH_VERSION", "v23.0")
+    # Fixed, non-clinical acknowledgment sent automatically on a family's message (never AI-written,
+    # never medical). Medical replies always wait for a nurse to press Send.
+    auto_ack = _bool("AUTO_ACK", True)
+    auto_ack_cooldown_hours = _float("AUTO_ACK_COOLDOWN_HOURS", 2.0)
+    auto_ack_text = os.environ.get("AUTO_ACK_TEXT",
+        "Namaste. Aapka sandesh mil gaya hai, hamari nurse jald hi jawab dengi. "
+        "Thank you, we have received your message and a nurse will reply soon. "
+        "In an emergency, please call 108.")
     # Comma-separated E.164 numbers without "+". Only these numbers are ever processed.
     allowed_numbers = {
         n.strip().lstrip("+") for n in os.environ.get("ALLOWED_TEST_NUMBERS", "").split(",") if n.strip()
