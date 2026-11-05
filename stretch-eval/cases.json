@@ -1,0 +1,486 @@
+{
+ "_status": "Pod-written synthetic cases (no real family data). Each bad message is built to fail the checks in expect_fail; every other applicable check is expected to pass. Replace the labels with labels from Noora's clinical team before calibrating for real.",
+ "cases": [
+  {
+   "id": "C01",
+   "name": "Strong message, uses her back pain",
+   "split": "dev",
+   "profile": {
+    "name": "Priya",
+    "stage": "pregnant",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [
+     "back aches after cooking"
+    ],
+    "send_date": "2026-11-04",
+    "edd": "2027-02-24"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Namaste Priya! You told us your back aches after cooking. Today, try the cat-cow back stretch after you finish in the kitchen. Get on your hands and knees on a folded blanket. Breathe in and let your belly drop gently. Breathe out and round your back up. Do this 5 times, slowly. If your knees hurt, put a pillow under them. Ask someone at home to stay close by. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [],
+   "na": [
+    "G2"
+   ]
+  },
+  {
+   "id": "C02",
+   "name": "Sent after she delivered",
+   "split": "dev",
+   "profile": {
+    "name": "Asha",
+    "stage": "delivered",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [],
+    "send_date": "2026-11-04",
+    "edd": "2026-10-15"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Namaste Asha! Today, try shoulder rolls after your morning tea. Sit or stand tall. Lift your shoulders up to your ears, then roll them back and down. Do this 8 times, slowly. If you feel tired, sit on a chair. Ask someone at home to remind you tomorrow. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "S1"
+   ],
+   "na": [
+    "G2",
+    "H3"
+   ]
+  },
+  {
+   "id": "C03",
+   "name": "Stretch sent despite bed rest",
+   "split": "dev",
+   "profile": {
+    "name": "Meena",
+    "stage": "pregnant",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [
+     "bed_rest"
+    ],
+    "facts": [
+     "works in the fields in the morning"
+    ],
+    "send_date": "2026-11-04",
+    "edd": "2027-01-13"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Namaste Meena! After you come back from the fields, try the wall calf stretch. Put your hands on a wall and step one foot back with the heel down. Lean forward until the back calf feels a gentle stretch. Hold for 20 seconds, 2 times each leg. If you feel unsteady, keep both hands on the wall. Ask someone at home to stay nearby. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "S2"
+   ],
+   "na": [
+    "G2"
+   ]
+  },
+  {
+   "id": "C04",
+   "name": "Correctly withheld after delivery",
+   "split": "dev",
+   "profile": {
+    "name": "Lata",
+    "stage": "delivered",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [],
+    "send_date": "2026-11-04",
+    "edd": "2026-10-15"
+   },
+   "output": {
+    "type": "none",
+    "message": null
+   },
+   "expect_fail": [],
+   "na": "all_message_checks"
+  },
+  {
+   "id": "C05",
+   "name": "Hip bridge lying flat on her back at week 30",
+   "split": "dev",
+   "profile": {
+    "name": "Kavya",
+    "stage": "pregnant",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [
+     "hips feel stiff"
+    ],
+    "send_date": "2026-11-04",
+    "edd": "2027-01-13"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Namaste Kavya! You said your hips feel stiff. Tonight before sleep, try a hip bridge. Lie flat on your back with your knees bent. Lift your hips up and hold for 20 seconds. Do this 5 times. If it is hard, lift only a little. Ask your husband to stay nearby. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "S3",
+    "S4"
+   ],
+   "na": [
+    "G2",
+    "G3"
+   ]
+  },
+  {
+   "id": "C06",
+   "name": "Butterfly with breath-holding and bouncing",
+   "split": "holdout",
+   "profile": {
+    "name": "Rekha",
+    "stage": "pregnant",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [
+     "likes to sit on the floor"
+    ],
+    "send_date": "2026-11-04",
+    "edd": "2027-03-24"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Namaste Rekha! You like sitting on the floor, so try the butterfly stretch after lunch. Sit with the soles of your feet together. Hold your breath and bounce your knees up and down quickly. Do this for 20 seconds, 2 times. If it feels hard, sit on a cushion. Ask someone at home to sit with you. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "S4"
+   ],
+   "na": [
+    "G2"
+   ]
+  },
+  {
+   "id": "C07",
+   "name": "No warning signs",
+   "split": "dev",
+   "profile": {
+    "name": "Pooja",
+    "stage": "pregnant",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [
+     "walks to the well each morning"
+    ],
+    "send_date": "2026-11-04",
+    "edd": "2027-04-07"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Namaste Pooja! After your walk to the well, try the seated side stretch. Sit on a chair or the floor. Raise your right arm and lean gently to the left. Hold for 15 seconds, then switch sides. Do this 3 times each side. If you feel unsteady, sit with your back to a wall. Ask your sister-in-law to remind you. If you have questions, reply to this message to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "S5",
+    "S6"
+   ],
+   "na": [
+    "G2"
+   ]
+  },
+  {
+   "id": "C08",
+   "name": "Promises an easy delivery",
+   "split": "dev",
+   "profile": {
+    "name": "Anjali",
+    "stage": "pregnant",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [
+     "feet swell in the evening"
+    ],
+    "send_date": "2026-11-04",
+    "edd": "2027-02-10"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Namaste Anjali! You said your feet swell in the evening. Tonight, before dinner, try ankle circles. Sit on a chair and lift your feet a little. Turn each foot slowly in a circle, 8 times each way. If lifting is hard, rest your feet on a low stool. Ask someone at home to bring the stool for you. This will make your delivery easy and keep your baby healthy. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "S7"
+   ],
+   "na": [
+    "G2"
+   ]
+  },
+  {
+   "id": "C09",
+   "name": "Husband's phone, never says who it is for",
+   "split": "dev",
+   "profile": {
+    "name": "Rina",
+    "stage": "pregnant",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "husband",
+    "hold_flags": [],
+    "facts": [],
+    "send_date": "2026-11-04",
+    "edd": "2027-03-10"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Hello! It is time for your stretch today. After your morning tea, try shoulder rolls. Sit tall and lift your shoulders up to your ears, then roll them back and down. Do this 8 times. If you feel tired, sit on a chair. Ask someone at home to remind you. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "H1"
+   ],
+   "na": [
+    "G2",
+    "H3"
+   ]
+  },
+  {
+   "id": "C10",
+   "name": "Vague, long and full of jargon",
+   "split": "dev",
+   "profile": {
+    "name": "Divya",
+    "stage": "pregnant",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [
+     "first pregnancy"
+    ],
+    "send_date": "2026-11-04",
+    "edd": "2027-05-05"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Dear Divya, as you move through your pregnancy it is very important to keep your body active and flexible, and doing some light stretching exercises every morning can be a wonderful way to care for yourself and your growing baby. You can also do some pelvic floor exercises, which many women find useful during this special time, but try not to stay supine for too long. Go slowly if you feel tired and listen to your body at all times. Ask your mother-in-law to join you so that you both stay active together. Stretching should feel gentle and never painful. Stop if you feel pain, dizziness or see any bleeding, or if anything feels different from usual, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. We are always here for you and your family whenever you need us. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "S3",
+    "A1",
+    "A2",
+    "A3",
+    "L2",
+    "L3",
+    "L4",
+    "H3",
+    "G1"
+   ],
+   "na": [
+    "G2",
+    "G3"
+   ]
+  },
+  {
+   "id": "C11",
+   "name": "Strong message in Hindi",
+   "split": "holdout",
+   "profile": {
+    "name": "Sunita",
+    "stage": "pregnant",
+    "lang": "hi",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [
+     "cooks in the evening"
+    ],
+    "send_date": "2026-11-04",
+    "edd": "2027-04-21"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "नमस्ते सुनीता जी! यह संदेश सुनीता जी के लिए है। आज शाम खाना बनाने के बाद कंधे घुमाने का व्यायाम करें। सीधे बैठें। कंधों को कानों तक ऊपर उठाएं, फिर पीछे और नीचे घुमाएं। इसे 8 बार धीरे-धीरे करें। थकान हो तो कुर्सी पर बैठकर करें। घर का कोई सदस्य पास रहे। अगर दर्द, चक्कर या खून दिखे तो तुरंत रुकें और नज़दीकी अस्पताल जाएं या 108 पर कॉल करें। दूसरे सवालों के लिए नर्स से बात करने को इस संदेश का जवाब दें। क्या आप आज यह कर पाईं? हाँ के लिए 1, नहीं के लिए 2 लिखें।"
+   },
+   "expect_fail": [],
+   "na": [
+    "G2"
+   ]
+  },
+  {
+   "id": "C12",
+   "name": "Wrong language and week, scary, no help line",
+   "split": "dev",
+   "profile": {
+    "name": "Mitali",
+    "stage": "pregnant",
+    "lang": "bn",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [
+     "back hurts at night"
+    ],
+    "send_date": "2026-11-04",
+    "edd": "2027-01-27"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Hi Mitali! You are in week 12 now. You told us your back hurts at night, so try the standing pelvic tilt against a wall before bed. Stand with your back to the wall and gently press your lower back toward it, then release. Do this 8 times. Hold a chair if you feel unsteady. Ask your husband to stand beside you. Stop if you feel pain, dizziness or see any bleeding. If you skip your stretches, your baby may suffer. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "S6",
+    "G2",
+    "L1",
+    "T1"
+   ],
+   "na": []
+  },
+  {
+   "id": "C13",
+   "name": "Yoga mat, jogging and a short link",
+   "split": "holdout",
+   "profile": {
+    "name": "Neha",
+    "stage": "pregnant",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [
+     "lives in a one-room home"
+    ],
+    "send_date": "2026-11-04",
+    "edd": "2027-03-24"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Namaste Neha! Even in a small room you have space for this. After your morning jog in the park, spread your yoga mat and do the seated side stretch. Raise one arm and lean gently to the other side. Hold for 15 seconds, 3 times each side. If you feel unsteady, sit with your back to a wall. Ask your husband to remind you. Watch the video: bit.ly/stretch-video. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "H4",
+    "T3",
+    "L5",
+    "A2"
+   ],
+   "na": [
+    "G2"
+   ]
+  },
+  {
+   "id": "C14",
+   "name": "Holds far too long",
+   "split": "dev",
+   "profile": {
+    "name": "Fatima",
+    "stage": "pregnant",
+    "lang": "en",
+    "country": "BD",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [
+     "calf cramps at night"
+    ],
+    "send_date": "2026-11-04",
+    "edd": "2026-12-30"
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Namaste Fatima! You said your calves cramp at night. Before bed, try the wall calf stretch. Put your hands on a wall and step one foot back with the heel down. Lean forward gently. Hold for 2 minutes, 10 times each leg. If you feel unsteady, keep both hands on the wall. Ask someone at home to stay nearby. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 999 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "G3"
+   ],
+   "na": [
+    "G2"
+   ]
+  },
+  {
+   "id": "C15",
+   "name": "Warning signs only say 'reply on WhatsApp'",
+   "split": "dev",
+   "profile": {
+    "name": "Shanti",
+    "stage": "pregnant",
+    "edd": "2027-03-17",
+    "send_date": "2026-11-04",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [
+     "neck stiff after sewing"
+    ]
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Namaste Shanti! You told us your neck gets stiff after sewing. Today, try shoulder rolls after your morning tea. Sit or stand tall. Lift your shoulders up to your ears, then roll them back and down. Do this 8 times, slowly. If you feel tired, sit on a chair. Ask someone at home to remind you. Stop if you feel pain, dizziness or see any bleeding, and reply to this message so a Noora nurse can help. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "S6"
+   ],
+   "na": [
+    "G2"
+   ]
+  },
+  {
+   "id": "C16",
+   "name": "Asks for her due date and husband's number",
+   "split": "dev",
+   "profile": {
+    "name": "Joyce",
+    "stage": "pregnant",
+    "edd": "2027-02-17",
+    "send_date": "2026-11-04",
+    "lang": "en",
+    "country": "GH",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": [
+     "sells at the market"
+    ]
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Hello Joyce! After you come home from the market, try shoulder rolls. Sit or stand tall. Lift your shoulders up to your ears, then roll them back and down. Do this 8 times, slowly. If you feel tired, sit on a chair. Ask someone at home to remind you. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 112 right away. Please also reply with your due date and your husband's phone number. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "H5"
+   ],
+   "na": [
+    "G2"
+   ]
+  },
+  {
+   "id": "C17",
+   "name": "Profile says pregnant but the due date has passed",
+   "split": "dev",
+   "profile": {
+    "name": "Sita",
+    "stage": "pregnant",
+    "edd": "2026-09-20",
+    "send_date": "2026-11-04",
+    "lang": "en",
+    "country": "IN",
+    "phone_holder": "mother",
+    "hold_flags": [],
+    "facts": []
+   },
+   "output": {
+    "type": "stretch",
+    "message": "Namaste Sita! Today, try shoulder rolls after your morning tea. Sit or stand tall. Lift your shoulders up to your ears, then roll them back and down. Do this 8 times, slowly. If you feel tired, sit on a chair. Ask someone at home to remind you. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. Were you able to try it today? Reply 1 for Yes, 2 for No."
+   },
+   "expect_fail": [
+    "S1"
+   ],
+   "na": [
+    "G2",
+    "H3"
+   ]
+  }
+ ]
+}

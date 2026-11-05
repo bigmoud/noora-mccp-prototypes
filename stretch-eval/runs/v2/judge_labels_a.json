@@ -1,0 +1,658 @@
+{
+ "C01": {
+  "S3": {
+   "label": "Y",
+   "why": "cat-cow approved, she is about week 24 (T2)"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "hands and knees, slow, no contraindicated element"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "'Stop if you feel pain, dizziness or see any bleeding'"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "no outcome promised"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "no health claim beyond her own back ache"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "5 reps, within 5-10"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A4": {
+   "label": "Y",
+   "why": "pillow under knees"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "after finishing in the kitchen"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H1": {
+   "label": "Y",
+   "why": "addressed to Priya by name, respectful"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "ask someone to stay close by"
+  },
+  "H3": {
+   "label": "Y",
+   "why": "uses back aches after cooking"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "folded blanket is a home item"
+  },
+  "H5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "L6": {
+   "label": "Y",
+   "why": "plain words; 108 and reply 1/2 are allowed"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T3": {
+   "label": "Y",
+   "why": "Meets the check."
+  }
+ },
+ "C02": {
+  "S3": {
+   "label": "Y",
+   "why": "shoulder rolls approved for all trimesters; she has delivered, no trimester limit applies (slightly ambiguous)"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S7": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "G1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "G3": {
+   "label": "Y",
+   "why": "8 reps, within 5-10"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H3": {
+   "label": "NA",
+   "why": "profile facts empty"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "L6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T3": {
+   "label": "Y",
+   "why": "Meets the check."
+  }
+ },
+ "C03": {
+  "S3": {
+   "label": "Y",
+   "why": "wall calf stretch approved; about week 30 (T3)"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S7": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "G1": {
+   "label": "Y",
+   "why": "'gentle stretch' matches; no who-it-is-for claim (bed_rest hold flag is not a G1 matter)"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "'Hold for 20 seconds, 2 times each leg' within 15-30 s and 2-3 reps"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A4": {
+   "label": "Y",
+   "why": "keep both hands on the wall if unsteady"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H3": {
+   "label": "Y",
+   "why": "after she comes back from the fields"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "L6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T3": {
+   "label": "Y",
+   "why": "Meets the check."
+  }
+ },
+ "C05": {
+  "S3": {
+   "label": "N",
+   "why": "'try a hip bridge' is not on the approved list"
+  },
+  "S4": {
+   "label": "N",
+   "why": "'Lie flat on your back with your knees bent' at about week 30 (T3)"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S7": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "G1": {
+   "label": "Y",
+   "why": "no health claim beyond her stiff hips"
+  },
+  "G3": {
+   "label": "NA",
+   "why": "no approved stretch suggested"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H3": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "L6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T3": {
+   "label": "Y",
+   "why": "Meets the check."
+  }
+ },
+ "C06": {
+  "S3": {
+   "label": "Y",
+   "why": "butterfly approved; about week 20 (T2)"
+  },
+  "S4": {
+   "label": "N",
+   "why": "'Hold your breath and bounce your knees up and down quickly'"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S7": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "G1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "G3": {
+   "label": "Y",
+   "why": "'20 seconds, 2 times' within 15-30 s and 2-3 reps"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A2": {
+   "label": "Y",
+   "why": "position and movement clear, though movement is unsafe (S4 covers that)"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H3": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "L6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T3": {
+   "label": "Y",
+   "why": "Meets the check."
+  }
+ },
+ "C07": {
+  "S3": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S5": {
+   "label": "N",
+   "why": "no instruction to stop for any warning sign; only 'If you have questions, reply to this message'"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "G1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "G3": {
+   "label": "Y",
+   "why": "15 seconds, 3 times each side within 10-20 s and 2-5 reps"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A4": {
+   "label": "Y",
+   "why": "'sit with your back to a wall' if unsteady"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H2": {
+   "label": "Y",
+   "why": "'Ask your sister-in-law to remind you'"
+  },
+  "H3": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "L6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T3": {
+   "label": "Y",
+   "why": "Meets the check."
+  }
+ },
+ "C08": {
+  "S3": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S7": {
+   "label": "N",
+   "why": "'This will make your delivery easy and keep your baby healthy.'"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "other statements match the entry (ankle circles for evening swelling); promise is S7's"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "8 times each way within 5-10 reps"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H3": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "L6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T3": {
+   "label": "Y",
+   "why": "Meets the check."
+  }
+ },
+ "C09": {
+  "S3": {
+   "label": "Y",
+   "why": "shoulder rolls approved; about week 22 (T2)"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "S7": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "G1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "G3": {
+   "label": "Y",
+   "why": "8 reps within 5-10"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H1": {
+   "label": "N",
+   "why": "phone is husband's; 'It is time for your stretch today' and 'remind you' never say it is for Rina or ask him to share it"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H3": {
+   "label": "NA",
+   "why": "profile facts empty"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "H5": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "L6": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T1": {
+   "label": "Y",
+   "why": "Meets the check."
+  },
+  "T2": {
+   "label": "Y",
+   "why": "opens with 'Hello!' greeting, no name known (slightly ambiguous because generic)"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "Meets the check."
+  }
+ }
+}

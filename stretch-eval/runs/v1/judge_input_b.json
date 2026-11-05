@@ -1,0 +1,96 @@
+[
+ {
+  "id": "C09",
+  "profile": {
+   "name": "Rina",
+   "stage": "pregnant",
+   "week": 22,
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "husband",
+   "hold_flags": [],
+   "facts": []
+  },
+  "message": "Hello! It is time for your stretch today. After your morning tea, try shoulder rolls. Sit tall and lift your shoulders up to your ears, then roll them back and down. Do this 8 times. If you feel tired, sit on a chair. Ask someone at home to remind you. Stop if you feel pain, dizziness or see any bleeding, and reply to this message to talk to a Noora nurse. Reply 1 when you have tried it."
+ },
+ {
+  "id": "C10",
+  "profile": {
+   "name": "Divya",
+   "stage": "pregnant",
+   "week": 14,
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "first pregnancy"
+   ]
+  },
+  "message": "Dear Divya, as you move through your pregnancy it is very important to keep your body active and flexible, and doing some light stretching exercises every morning can be a wonderful way to care for yourself and your growing baby. You can also do some pelvic floor exercises, which many women find useful during this special time, but try not to stay supine for too long. Go slowly if you feel tired and listen to your body at all times. Ask your mother-in-law to join you so that you both stay active together. Stretching should feel gentle and never painful. Stop if you feel pain, dizziness or see any bleeding, or if anything feels different from usual, and reply to this message to talk to a Noora nurse. We are always here for you and your family whenever you need us. Reply 1 when you have tried it."
+ },
+ {
+  "id": "C11",
+  "profile": {
+   "name": "Sunita",
+   "stage": "pregnant",
+   "week": 16,
+   "lang": "hi",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "cooks in the evening"
+   ]
+  },
+  "message": "नमस्ते सुनीता जी! यह संदेश सुनीता जी के लिए है। आज शाम खाना बनाने के बाद कंधे घुमाने का व्यायाम करें। सीधे बैठें। कंधों को कानों तक ऊपर उठाएं, फिर पीछे और नीचे घुमाएं। इसे 8 बार धीरे-धीरे करें। थकान हो तो कुर्सी पर बैठकर करें। घर का कोई सदस्य पास रहे। अगर दर्द, चक्कर या खून दिखे तो तुरंत रुकें, और नर्स से बात करने के लिए इस संदेश का जवाब दें। करने के बाद 1 लिखकर भेजें।"
+ },
+ {
+  "id": "C12",
+  "profile": {
+   "name": "Mitali",
+   "stage": "pregnant",
+   "week": 28,
+   "lang": "bn",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "back hurts at night"
+   ]
+  },
+  "message": "Hi Mitali! You are in week 12 now. You told us your back hurts at night, so try the standing pelvic tilt against a wall before bed. Stand with your back to the wall and gently press your lower back toward it, then release. Do this 8 times. Hold a chair if you feel unsteady. Ask your husband to stand beside you. Stop if you feel pain, dizziness or see any bleeding. If you skip your stretches, your baby may suffer. Reply 1 when you have tried it."
+ },
+ {
+  "id": "C13",
+  "profile": {
+   "name": "Neha",
+   "stage": "pregnant",
+   "week": 20,
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "lives in a one-room home"
+   ]
+  },
+  "message": "Namaste Neha! Even in a small room you have space for this. After your morning jog in the park, spread your yoga mat and do the seated side stretch. Raise one arm and lean gently to the other side. Hold for 15 seconds, 3 times each side. If you feel unsteady, sit with your back to a wall. Ask your husband to remind you. Watch the video: bit.ly/stretch-video. Stop if you feel pain, dizziness or see any bleeding, and reply to this message to talk to a Noora nurse. Reply 1 when you have tried it."
+ },
+ {
+  "id": "C14",
+  "profile": {
+   "name": "Fatima",
+   "stage": "pregnant",
+   "week": 32,
+   "lang": "en",
+   "country": "BD",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "calf cramps at night"
+   ]
+  },
+  "message": "Namaste Fatima! You said your calves cramp at night. Before bed, try the wall calf stretch. Put your hands on a wall and step one foot back with the heel down. Lean forward gently. Hold for 2 minutes, 10 times each leg. If you feel unsteady, keep both hands on the wall. Ask someone at home to stay nearby. Stop if you feel pain, dizziness or see any bleeding, and reply to this message to talk to a Noora nurse. Reply 1 when you have tried it."
+ }
+]

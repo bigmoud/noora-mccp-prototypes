@@ -1,0 +1,398 @@
+[
+ {
+  "id": "C01",
+  "name": "Sunita Devi",
+  "label": "Husband reports the birth",
+  "profile_before": {
+   "stage": "pregnant",
+   "edd": "2026-11-10",
+   "baby_dob": null,
+   "language": "Hindi",
+   "location": "Gaya, Bihar",
+   "phone_holder": null,
+   "channel_pref": "text"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-03 07:52",
+    "text": "Hello ji. This is Ramesh, Sunita's husband. She delivered last night at Sadar Hospital Gaya. It's a boy!"
+   },
+   {
+    "i": 2,
+    "from": "nurse",
+    "t": "2026-11-03 07:58",
+    "text": "Congratulations Ramesh ji! How are mother and baby? Is the baby feeding?"
+   },
+   {
+    "i": 3,
+    "from": "family",
+    "t": "2026-11-03 08:20",
+    "text": "Both are fine. Yes, he is breastfeeding. We are still in the hospital."
+   }
+  ]
+ },
+ {
+  "id": "C02",
+  "name": "Priya Sharma",
+  "label": "Month first, exact date later",
+  "profile_before": {
+   "stage": "pregnant",
+   "edd": "2027-01-28",
+   "baby_dob": null,
+   "language": "Hindi",
+   "location": "Bareilly, Uttar Pradesh",
+   "phone_holder": null,
+   "channel_pref": "text"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-10-28 18:05",
+    "text": "Hello didi, I am in my seventh month. My feet have started swelling a lot, what should I do?"
+   },
+   {
+    "i": 2,
+    "from": "nurse",
+    "t": "2026-10-28 18:30",
+    "text": "Hello Priya ji. What delivery date did your doctor give you?"
+   },
+   {
+    "i": 3,
+    "from": "family",
+    "t": "2026-10-29 09:10",
+    "text": "The doctor said 14 January. We live in Faridpur village, near Bareilly."
+   }
+  ]
+ },
+ {
+  "id": "C03",
+  "name": "Kavita",
+  "label": "Mother-in-law, 'day after tomorrow'",
+  "profile_before": {
+   "stage": "pregnant",
+   "edd": "2026-11-08",
+   "baby_dob": null,
+   "language": "Hindi",
+   "location": "Sitapur, Uttar Pradesh",
+   "phone_holder": null,
+   "channel_pref": "text"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-04 11:02",
+    "text": "Greetings. I am Kavita's mother-in-law. Her ninth month is complete. The doctor gave the date for the day after tomorrow."
+   },
+   {
+    "i": 2,
+    "from": "nurse",
+    "t": "2026-11-04 11:10",
+    "text": "Greetings mother-ji. Is Kavita having any trouble right now?"
+   },
+   {
+    "i": 3,
+    "from": "family",
+    "t": "2026-11-04 11:25",
+    "text": "No, all fine. This phone is mine, she does not have a phone. I read the messages out to her."
+   }
+  ]
+ },
+ {
+  "id": "C04",
+  "name": "Anjali Verma",
+  "label": "Due date stated, then corrected",
+  "profile_before": {
+   "stage": "pregnant",
+   "edd": "2026-12-10",
+   "baby_dob": null,
+   "language": "English",
+   "location": "Indore, Madhya Pradesh",
+   "phone_holder": null,
+   "channel_pref": "text"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-10-20 20:11",
+    "text": "Hi, my due date is 20 December."
+   },
+   {
+    "i": 2,
+    "from": "nurse",
+    "t": "2026-10-20 20:40",
+    "text": "Thank you Anjali, noted."
+   },
+   {
+    "i": 3,
+    "from": "family",
+    "t": "2026-10-22 10:03",
+    "text": "Sorry, I typed it wrong. It is 2 December, the doctor wrote it in my report."
+   }
+  ]
+ },
+ {
+  "id": "C05",
+  "name": "Meena",
+  "label": "Her sister is the one who's pregnant",
+  "profile_before": {
+   "stage": "delivered",
+   "edd": null,
+   "baby_dob": "2026-09-15",
+   "language": "Hindi",
+   "location": "Jaipur, Rajasthan",
+   "phone_holder": null,
+   "channel_pref": "text"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-02 16:44",
+    "text": "Didi, my younger sister is also pregnant, she is in her 5th month. Can she also get these messages? She has a different number."
+   },
+   {
+    "i": 2,
+    "from": "nurse",
+    "t": "2026-11-02 16:50",
+    "text": "Yes Meena ji, she can message us from her own number."
+   },
+   {
+    "i": 3,
+    "from": "family",
+    "t": "2026-11-02 17:02",
+    "text": "Okay. My son is feeding well now, only mother's milk."
+   }
+  ]
+ },
+ {
+  "id": "C06",
+  "name": "Rekha Kumari",
+  "label": "Nothing to extract",
+  "profile_before": {
+   "stage": "pregnant",
+   "edd": "2027-02-02",
+   "baby_dob": null,
+   "language": "Hindi",
+   "location": "Patna, Bihar",
+   "phone_holder": null,
+   "channel_pref": "text"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "nurse",
+    "t": "2026-11-01 09:00",
+    "text": "Rekha ji, take a gentle 10-minute walk today. Were you able to walk? Reply 1 for Yes, 2 for No."
+   },
+   {
+    "i": 2,
+    "from": "family",
+    "t": "2026-11-01 19:30",
+    "text": "1"
+   },
+   {
+    "i": 3,
+    "from": "family",
+    "t": "2026-11-01 19:31",
+    "text": "Thank you didi 🙏"
+   }
+  ]
+ },
+ {
+  "id": "C07",
+  "name": "Pooja Yadav",
+  "label": "Pregnancy loss",
+  "profile_before": {
+   "stage": "pregnant",
+   "edd": "2026-11-20",
+   "baby_dob": null,
+   "language": "Hindi",
+   "location": "Muzaffarpur, Bihar",
+   "phone_holder": null,
+   "channel_pref": "text"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-03 14:15",
+    "text": "Didi, the baby's heartbeat had stopped. They operated in the hospital yesterday. The baby did not survive."
+   },
+   {
+    "i": 2,
+    "from": "family",
+    "t": "2026-11-03 14:16",
+    "text": "Please don't send any more messages."
+   }
+  ]
+ },
+ {
+  "id": "C08",
+  "name": "Lakshmi Bai",
+  "label": "'Last Tuesday', home birth",
+  "profile_before": {
+   "stage": "pregnant",
+   "edd": "2026-11-12",
+   "baby_dob": null,
+   "language": "Hindi",
+   "location": "Barwani, Madhya Pradesh",
+   "phone_holder": null,
+   "channel_pref": "text"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-05 10:30",
+    "text": "Hello. I had a baby girl last Tuesday. It was a home delivery, the dai did it."
+   },
+   {
+    "i": 2,
+    "from": "nurse",
+    "t": "2026-11-05 10:41",
+    "text": "Congratulations Lakshmi ji! Has a doctor or nurse checked you and the baby?"
+   },
+   {
+    "i": 3,
+    "from": "family",
+    "t": "2026-11-05 11:05",
+    "text": "Not yet."
+   }
+  ]
+ },
+ {
+  "id": "C09",
+  "name": "Mitali Das",
+  "label": "Twins",
+  "profile_before": {
+   "stage": "pregnant",
+   "edd": "2026-11-15",
+   "baby_dob": null,
+   "language": "Bengali",
+   "location": "Nadia, West Bengal",
+   "phone_holder": null,
+   "channel_pref": "text"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-10-30 12:20",
+    "text": "Namaskar didi. My twin boys were born on 28 October at Krishnanagar district hospital."
+   },
+   {
+    "i": 2,
+    "from": "nurse",
+    "t": "2026-10-30 12:35",
+    "text": "Congratulations! How are you and the babies?"
+   },
+   {
+    "i": 3,
+    "from": "family",
+    "t": "2026-10-30 13:02",
+    "text": "Everyone is well. One is breastfeeding, the other also needs formula."
+   }
+  ]
+ },
+ {
+  "id": "C10",
+  "name": "Shabnam",
+  "label": "Her own birth date, not the baby's",
+  "profile_before": {
+   "stage": "pregnant",
+   "edd": "2027-03-01",
+   "baby_dob": null,
+   "language": "Urdu",
+   "location": "Moradabad, Uttar Pradesh",
+   "phone_holder": null,
+   "channel_pref": "text"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-02 13:00",
+    "text": "Assalam alaikum. My date of birth is wrong in your form. I was born on 12 March 2001."
+   },
+   {
+    "i": 2,
+    "from": "nurse",
+    "t": "2026-11-02 13:20",
+    "text": "Thank you Shabnam ji. Which month of pregnancy are you in?"
+   },
+   {
+    "i": 3,
+    "from": "family",
+    "t": "2026-11-02 13:45",
+    "text": "Six months are done."
+   }
+  ]
+ },
+ {
+  "id": "C11",
+  "name": "Rina Kumari",
+  "label": "After birth: fever and pain",
+  "profile_before": {
+   "stage": "delivered",
+   "edd": null,
+   "baby_dob": "2026-10-25",
+   "language": "Hindi",
+   "location": "Gorakhpur, Uttar Pradesh",
+   "phone_holder": null,
+   "channel_pref": "text"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-04 06:40",
+    "text": "Didi, I have had a fever since yesterday and pain in my lower stomach."
+   },
+   {
+    "i": 2,
+    "from": "family",
+    "t": "2026-11-04 06:41",
+    "text": "My milk is less, so we are giving the baby formula also."
+   }
+  ]
+ },
+ {
+  "id": "C12",
+  "name": "Sita Devi",
+  "label": "Language request, staying at her mother's",
+  "profile_before": {
+   "stage": "pregnant",
+   "edd": "2026-12-05",
+   "baby_dob": null,
+   "language": "Hindi",
+   "location": "Patna, Bihar",
+   "phone_holder": null,
+   "channel_pref": "text"
+  },
+  "messages": [
+   {
+    "i": 1,
+    "from": "family",
+    "t": "2026-11-01 17:10",
+    "text": "Didi, I don't understand the Hindi messages well. Please send them in Bhojpuri, or send audio."
+   },
+   {
+    "i": 2,
+    "from": "nurse",
+    "t": "2026-11-01 17:30",
+    "text": "Of course Sita ji, we will look into it."
+   },
+   {
+    "i": 3,
+    "from": "family",
+    "t": "2026-11-03 08:00",
+    "text": "I have come to my mother's house in Siwan now. The delivery will be here."
+   }
+  ]
+ }
+]

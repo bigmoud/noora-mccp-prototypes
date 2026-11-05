@@ -1,0 +1,446 @@
+{
+ "C09": {
+  "S3": {
+   "label": "Y",
+   "why": "shoulder rolls approved"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "no contraindicated element"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "stop if pain, dizziness, bleeding"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "no outcome promise"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "no extra health claims"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "8 reps within 5-10"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "names shoulder rolls"
+  },
+  "A2": {
+   "label": "Y",
+   "why": "sit tall, lift to ears, roll back and down"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "sit on a chair if tired"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "after morning tea"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Reply 1 when tried"
+  },
+  "H1": {
+   "label": "N",
+   "why": "Opens with 'Hello!' and never says it is for Rina or asks the husband to share it with her; 'Ask someone at home to remind you' does not say who it is for"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "someone at home reminds her"
+  },
+  "H3": {
+   "label": "NA",
+   "why": "facts list empty"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "no equipment"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "no blame"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "'Hello!' greeting opens, though no name (borderline)"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "morning tea, chair"
+  }
+ },
+ "C10": {
+  "S3": {
+   "label": "N",
+   "why": "'pelvic floor exercises' is not on the approved list"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "no stretch instructions given that add a contraindicated element; warns against staying supine"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "stop if pain, dizziness or bleeding"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "no outcome promise"
+  },
+  "G1": {
+   "label": "N",
+   "why": "'very important to keep your body active and flexible' and 'pelvic floor exercises, which many women find useful' are not in the knowledge bank"
+  },
+  "G3": {
+   "label": "NA",
+   "why": "no approved stretch suggested"
+  },
+  "A1": {
+   "label": "N",
+   "why": "'some light stretching exercises' and 'pelvic floor exercises' name no specific stretch"
+  },
+  "A2": {
+   "label": "N",
+   "why": "no starting position or movement described"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "'Go slowly if you feel tired'"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "'every morning'"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Reply 1 when tried"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "addressed 'Dear Divya', reads fine to a relative"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "asks mother-in-law to join"
+  },
+  "H3": {
+   "label": "N",
+   "why": "'first pregnancy' fact not used"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "no equipment"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "no blame or fear"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "'Dear Divya'"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "nothing Western or gym-based"
+  }
+ },
+ "C11": {
+  "S3": {
+   "label": "Y",
+   "why": "shoulder rolls approved"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "slow, no contraindicated element"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "stop for pain, dizziness, bleeding"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "no outcome promise"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "no extra claims"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "8 reps within 5-10"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "shoulder rolls"
+  },
+  "A2": {
+   "label": "Y",
+   "why": "sit straight, lift to ears, back and down"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "sit on chair if tired"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "after cooking in the evening"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "send 1 after doing it"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "states message is for Sunita ji"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "a family member stays nearby"
+  },
+  "H3": {
+   "label": "Y",
+   "why": "uses cooks in the evening"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "no equipment"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "no blame"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "Namaste Sunita ji"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "cooking, chair"
+  }
+ },
+ "C12": {
+  "S3": {
+   "label": "Y",
+   "why": "standing pelvic tilt approved for trimester 3 (week 28)"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "gentle, chair for support"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "stop for pain, dizziness, bleeding"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "no outcome promise"
+  },
+  "G1": {
+   "label": "N",
+   "why": "'You are in week 12 now' contradicts her profile (week 28); wrong stage claim"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "8 reps within 5-10"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "standing pelvic tilt"
+  },
+  "A2": {
+   "label": "Y",
+   "why": "back to wall, press lower back toward it, release"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "hold a chair if unsteady"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "before bed"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Reply 1"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "addressed to Mitali by name, husband reading is fine"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "husband stands beside her"
+  },
+  "H3": {
+   "label": "Y",
+   "why": "uses back hurts at night"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "wall and chair only"
+  },
+  "T1": {
+   "label": "N",
+   "why": "'If you skip your stretches, your baby may suffer.'"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "'Hi Mitali!'"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "wall, chair, bedtime"
+  }
+ },
+ "C13": {
+  "S3": {
+   "label": "Y",
+   "why": "seated side stretch approved"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "no contraindicated element"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "stop for pain, dizziness, bleeding"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "no outcome promise"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "no extra claims"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "hold 15s within 10-20, 3 reps within 2-5"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "seated side stretch"
+  },
+  "A2": {
+   "label": "N",
+   "why": "never says to sit or what position to start in; only 'Raise one arm and lean gently'; also points to a video"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "sit with back to a wall if unsteady"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "after morning jog"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Reply 1"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "Namaste Neha, addressed to her"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "husband reminds her"
+  },
+  "H3": {
+   "label": "Y",
+   "why": "uses one-room home"
+  },
+  "H4": {
+   "label": "N",
+   "why": "'spread your yoga mat' and 'Watch the video: bit.ly/stretch-video'"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "no blame"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "Namaste Neha"
+  },
+  "T3": {
+   "label": "N",
+   "why": "'morning jog in the park' and 'yoga mat' assume a Western lifestyle"
+  }
+ },
+ "C14": {
+  "S3": {
+   "label": "Y",
+   "why": "wall calf stretch approved"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "no contraindicated element named; hands on wall for support"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "stop for pain, dizziness, bleeding"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "no outcome promise"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "cramp tie-in matches helps entry"
+  },
+  "G3": {
+   "label": "N",
+   "why": "'Hold for 2 minutes, 10 times each leg' exceeds 15-30s hold, 2-3 reps and 15 min session"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "wall calf stretch"
+  },
+  "A2": {
+   "label": "Y",
+   "why": "hands on wall, step back with heel down, lean forward"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "both hands on wall if unsteady"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "before bed"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "Reply 1"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "addressed to Fatima by name"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "someone stays nearby"
+  },
+  "H3": {
+   "label": "Y",
+   "why": "uses calf cramps at night"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "wall only"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "no blame"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "names Fatima"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "wall, bedtime; 'Namaste' is an odd greeting for Bangladesh but not a setting issue"
+  }
+ }
+}

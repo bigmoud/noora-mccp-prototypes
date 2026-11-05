@@ -1,0 +1,658 @@
+{
+ "C10": {
+  "S3": {
+   "label": "N",
+   "why": "names 'pelvic floor exercises', not on the approved list; otherwise only 'light stretching exercises'"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "'try not to stay supine for too long' is advice against lying flat, adds no contraindicated element"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G1": {
+   "label": "N",
+   "why": "'pelvic floor exercises, which many women find useful' is a health claim not in the knowledge bank"
+  },
+  "G3": {
+   "label": "NA",
+   "why": "no specific approved stretch suggested"
+  },
+  "A1": {
+   "label": "N",
+   "why": "'some light stretching exercises' and 'pelvic floor exercises' - no one named stretch"
+  },
+  "A2": {
+   "label": "N",
+   "why": "no starting position or movement described"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "'Go slowly if you feel tired' offers an easier way"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "'every morning'"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "'Ask your mother-in-law to join you' gives a relative a concrete role"
+  },
+  "H3": {
+   "label": "N",
+   "why": "uses no fact from profile ('first pregnancy' not used)"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "no equipment, cost or space needed"
+  },
+  "H5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "L6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "meets the check"
+  }
+ },
+ "C11": {
+  "S3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "L6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "meets the check"
+  }
+ },
+ "C12": {
+  "S3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "L6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T1": {
+   "label": "N",
+   "why": "'If you skip your stretches, your baby may suffer.'"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "meets the check"
+  }
+ },
+ "C13": {
+  "S3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H4": {
+   "label": "N",
+   "why": "'spread your yoga mat' and 'Watch the video' assume equipment/data"
+  },
+  "H5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "L6": {
+   "label": "N",
+   "why": "contains a link 'bit.ly/stretch-video' that cannot be read aloud sensibly"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T3": {
+   "label": "N",
+   "why": "'morning jog in the park' and 'yoga mat' assume a Western/urban lifestyle, odd for a one-room home"
+  }
+ },
+ "C14": {
+  "S3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G3": {
+   "label": "N",
+   "why": "'Hold for 2 minutes, 10 times each leg' exceeds hold 15-30 s, 2-3 reps and 15 minute session cap"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "L6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "meets the check"
+  }
+ },
+ "C15": {
+  "S3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "L6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "meets the check"
+  }
+ },
+ "C16": {
+  "S3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H5": {
+   "label": "N",
+   "why": "'Please also reply with your due date and your husband's phone number.'"
+  },
+  "L6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "meets the check"
+  }
+ },
+ "C17": {
+  "S3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "S7": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "G3": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "A6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H3": {
+   "label": "NA",
+   "why": "profile facts empty; nothing beyond stage and name"
+  },
+  "H4": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "H5": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "L6": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T1": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T2": {
+   "label": "Y",
+   "why": "meets the check"
+  },
+  "T3": {
+   "label": "Y",
+   "why": "meets the check"
+  }
+ }
+}

@@ -1,0 +1,521 @@
+<meta charset="utf-8">
+<title>mCCP Spine and Slots</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a week-by-week swimlane of six women on top; below it, one woman's week opened up:
+   the phone (what she receives), her profile slots, and the decision trace. */
+:root{
+  --bg:#f3f6f4; --panel:#ffffff; --ink:#14211c; --ink-2:#4b5c55; --ink-3:#7d8c86; --line:#d9e2dd;
+  --teal:#0f6e5c; --teal-soft:#dff1ec; --marigold:#d98a00; --marigold-soft:#fdf0d6;
+  --rose:#b8423a; --rose-soft:#fbe5e2; --plum:#6b4aa8; --plum-soft:#ece6f8; --grey:#a9b5b0;
+  --chat:#e7ddd2; --bubble-in:#ffffff; --bubble-out:#d9fdd3;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1513; --panel:#16201c; --ink:#e6eeea; --ink-2:#a9bab3; --ink-3:#77887f; --line:#26332e;
+  --teal:#4cc3a6; --teal-soft:#14302a; --marigold:#f0b14a; --marigold-soft:#33270f;
+  --rose:#f08a80; --rose-soft:#351b19; --plum:#b49cf0; --plum-soft:#251d38; --grey:#4d5a55;
+  --chat:#1c2622; --bubble-in:#22302b; --bubble-out:#1d4a3d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1513; --panel:#16201c; --ink:#e6eeea; --ink-2:#a9bab3; --ink-3:#77887f; --line:#26332e;
+  --teal:#4cc3a6; --teal-soft:#14302a; --marigold:#f0b14a; --marigold-soft:#33270f;
+  --rose:#f08a80; --rose-soft:#351b19; --plum:#b49cf0; --plum-soft:#251d38; --grey:#4d5a55;
+  --chat:#1c2622; --bubble-in:#22302b; --bubble-out:#1d4a3d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(28px,4.4vw,44px);font-weight:700;line-height:1.05}
+h2{font-size:20px;font-weight:500}
+h3{font-size:16px;font-weight:500}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.lede{color:var(--ink-2);max-width:72ch}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.rule{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.rule b{font-family:var(--display);font-weight:500;font-size:15px}
+.rule span{font-size:13.5px;color:var(--ink-2)}
+
+/* swimlane */
+.lane-wrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.lane-scroll{overflow-x:auto}
+.lane{display:grid;grid-template-columns:150px repeat(23,minmax(26px,1fr));gap:3px;min-width:780px;align-items:center}
+.lane .wk{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);text-align:center}
+.lane .who{font-size:13px;font-weight:700;padding-right:8px;cursor:pointer;background:none;border:0;text-align:left;padding-left:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lane .who small{display:block;font-weight:400;color:var(--ink-3);font-size:11px}
+.cell{height:30px;border-radius:5px;border:0;cursor:pointer;position:relative;padding:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.cell.default{background:color-mix(in srgb,var(--grey) 45%,transparent)}
+.cell.personal{background:var(--teal);color:#fff}
+.cell.consult{background:var(--rose);color:#fff}
+.cell.checkin{background:var(--marigold);color:#fff}
+.cell.postnatal{background:var(--plum);color:#fff}
+.cell .q{position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--marigold);box-shadow:0 0 0 1.5px var(--panel)}
+.cell .r{position:absolute;bottom:2px;left:3px;font-size:9px;line-height:1}
+.cell.sel{outline:2.5px solid var(--ink);outline-offset:1px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12.5px;color:var(--ink-2)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-2px}
+
+/* detail */
+.detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,380px) minmax(0,1fr);gap:16px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.person{display:flex;flex-direction:column;gap:6px}
+.person .name{font-family:var(--display);font-size:24px;font-weight:700;line-height:1.1}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--ink-2);background:var(--bg)}
+.behaviour{font-size:13.5px;color:var(--ink-2);border-left:3px solid var(--marigold);padding-left:10px;border-radius:0}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper input{flex:1;accent-color:var(--teal)}
+.stepper .btn{border:1px solid var(--line);background:var(--bg);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px}
+.weekbig{font-family:var(--display);font-size:20px;font-weight:700;min-width:120px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stat{background:var(--bg);border-radius:10px;padding:8px 10px}
+.stat b{display:block;font-family:var(--mono);font-size:18px}
+.stat span{font-size:12px;color:var(--ink-3)}
+
+/* phone */
+.phone{background:var(--chat);border-radius:22px;border:6px solid var(--ink);padding:10px;display:flex;flex-direction:column;gap:8px;min-height:420px}
+.phonebar{display:flex;align-items:center;gap:8px;padding:2px 4px 8px;border-bottom:1px solid color-mix(in srgb,var(--ink) 15%,transparent)}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.phonebar b{font-size:13.5px}
+.phonebar span{display:block;font-size:11px;color:var(--ink-3)}
+.bub{max-width:92%;padding:8px 10px;border-radius:10px;font-size:13.5px;line-height:1.45;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+.bub.in{align-self:flex-start;background:var(--bubble-in);border-top-left-radius:2px}
+.bub.out{align-self:flex-end;background:var(--bubble-out);border-top-right-radius:2px}
+.bub .meta{display:block;font-size:10.5px;color:var(--ink-3);margin-top:4px;text-align:right}
+.bub.sys{align-self:center;background:color-mix(in srgb,var(--panel) 70%,transparent);font-size:11.5px;color:var(--ink-2);text-align:center;max-width:100%}
+mark{background:var(--teal-soft);color:inherit;border-bottom:2px solid var(--teal);padding:0 1px;border-radius:2px;cursor:help}
+mark.q{background:var(--marigold-soft);border-bottom-color:var(--marigold)}
+mark.safe{background:var(--rose-soft);border-bottom-color:var(--rose)}
+.voice{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2);margin-bottom:6px}
+.voice .wave{flex:1;height:14px;background:repeating-linear-gradient(90deg,var(--teal) 0 2px,transparent 2px 5px);opacity:.6;border-radius:2px}
+
+/* slots */
+table.slots{width:100%;border-collapse:collapse;font-size:13px}
+table.slots th,table.slots td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+table.slots th{font-weight:400;color:var(--ink-3);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em}
+.val{font-weight:700}
+.val.unk{color:var(--ink-3);font-weight:400;font-style:italic}
+.src{font-size:11.5px;color:var(--ink-3)}
+.pill{display:inline-block;font-size:11px;font-family:var(--mono);padding:1px 7px;border-radius:999px;white-space:nowrap}
+.pill.open{background:var(--marigold-soft);color:var(--marigold)}
+.pill.done{background:var(--teal-soft);color:var(--teal)}
+.pill.stop{background:color-mix(in srgb,var(--grey) 35%,transparent);color:var(--ink-2)}
+.pill.wait{background:var(--bg);color:var(--ink-3);border:1px solid var(--line)}
+.trace{display:flex;flex-direction:column;gap:8px;padding:0;margin:0;list-style:none}
+.trace li{font-size:13.5px;padding:8px 10px;border-radius:8px;background:var(--bg);border-left:3px solid var(--grey)}
+.trace li.k-in{border-left-color:var(--teal)}
+.trace li.k-late{border-left-color:var(--marigold)}
+.trace li.k-safe{border-left-color:var(--rose)}
+.trace li.k-skip{border-left-color:var(--plum)}
+.trace li b{font-weight:700}
+footer{font-size:12.5px;color:var(--ink-3);max-width:90ch}
+@media (max-width:1060px){.detail{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .detail .phonecol{grid-column:1/-1;order:-1;max-width:420px;width:100%;justify-self:center}}
+@media (max-width:640px){.detail{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:no-preference){.cell{transition:transform .1s}.cell:hover{transform:scale(1.08)}}
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <span class="eyebrow">Noora Health · mCCP outbound campaigns · illustrative model</span>
+    <h1>Spine and slots: one approved timeline, six different women</h1>
+    <p class="lede">Every week, each woman gets the clinically approved message for her pregnancy week (the spine). What we know about her fills optional slots that change the wording, never the schedule. Pick a woman and a week to see what she receives, what Noora knows, and why.</p>
+  </header>
+
+  <section class="rules" aria-label="The rules the model follows">
+    <div class="rule"><b>The spine never waits</b><span>The approved, EDD-based message goes out every week, with or without answers. Unknown means default wording, never "no".</span></div>
+    <div class="rule"><b>One question per message</b><span>Picked from a priority queue. Skipped if Noora already knows the answer. Asked at most twice, two weeks apart, then dropped.</span></div>
+    <div class="rule"><b>Every question has its own reply codes</b><span>So a late or out-of-order answer (“A” three weeks later) still lands in the right slot. Free text is read for facts, too.</span></div>
+    <div class="rule"><b>Safety can pause content</b><span>Bleeding pauses stretches until a nurse clears her. A passed due date with no birth news pauses pregnancy content and asks “Has your baby arrived?”</span></div>
+  </section>
+
+  <section class="lane-wrap" aria-label="All six women, week by week">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:baseline">
+      <h2>Weeks 20–42 for all six women</h2>
+      <span class="eyebrow">click any square</span>
+    </div>
+    <div class="lane-scroll"><div class="lane" id="lane"></div></div>
+    <div class="legend">
+      <span><i style="background:color-mix(in srgb,var(--grey) 45%,transparent)"></i>Default stretch message</span>
+      <span><i style="background:var(--teal)"></i>Personalized stretch message</span>
+      <span><i style="background:var(--rose)"></i>Stretches paused for safety</span>
+      <span><i style="background:var(--marigold)"></i>Due date passed: birth check-in</span>
+      <span><i style="background:var(--plum)"></i>Switched to postnatal track</span>
+      <span><i style="background:var(--marigold);border-radius:50%;width:9px;height:9px"></i>Profile question asked</span>
+      <span>↩ she replied that week</span>
+    </div>
+  </section>
+
+  <section class="detail" aria-label="Selected woman and week">
+    <div class="card" id="person"></div>
+    <div class="phonecol"><div class="phone" id="phone" aria-live="polite"></div></div>
+    <div class="card">
+      <h3>What Noora knows this week</h3>
+      <table class="slots" id="slots"></table>
+      <h3>Question queue</h3>
+      <table class="slots" id="queue"></table>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Why this message looks this way">
+    <h2 id="trace-title">Why this week's message looks this way</h2>
+    <ul class="trace" id="trace"></ul>
+  </section>
+
+  <footer>All six women, their replies and the message wording are invented for this model; real messages go out in each woman's own language and need clinical sign-off. Stretch choices follow the placeholder knowledge bank in the eval (shoulder rolls, seated side stretch, ankle circles, cat-cow, wall calf stretch, standing pelvic tilt). Emergency numbers shown (108, 999, 119, 112) must be confirmed with each country team.</footer>
+</div>
+
+<script>
+/* ------------------------------------------------------------------ data */
+const W0 = 20, W1 = 42, WEEKS = Array.from({length: W1 - W0 + 1}, (_, i) => W0 + i);
+const EDD_WEEK = 40;
+
+const STRETCH = {
+  shoulder:{name:"shoulder rolls", how:"Sit or stand tall. Lift your shoulders up to your ears, then roll them back and down.", dose:"Do this 8 times, slowly."},
+  side:{name:"the seated side stretch", how:"Sit on a chair or the floor. Raise one arm and lean gently to the other side, then switch.", dose:"Hold for 15 seconds, 3 times each side."},
+  ankle:{name:"ankle circles", how:"Sit and lift your feet a little. Turn each foot slowly in a circle.", dose:"8 circles each way."},
+  catcow:{name:"the cat-cow back stretch", how:"On your hands and knees on a folded blanket, breathe in and let your belly drop gently, then breathe out and round your back up.", dose:"Do this 5 times, slowly."},
+  calf:{name:"the wall calf stretch", how:"Put your hands on a wall and step one foot back with the heel down. Lean forward gently.", dose:"Hold for 20 seconds, 2 times each leg."},
+  tilt:{name:"the standing pelvic tilt", how:"Stand with your back against a wall, knees soft. Gently press your lower back toward the wall, then release.", dose:"Do this 8 times."}
+};
+// The approved spine: default stretch by week (trimester-appropriate)
+const SPINE = w => w < 28 ? ["shoulder","side","ankle","catcow"][w % 4] : ["ankle","calf","tilt","side"][w % 4];
+const FOR_DISCOMFORT = {back: w => w < 28 ? "catcow" : "tilt", feet: () => "ankle", cramps: () => "calf"};
+
+const Q = {
+  delivered:{label:"Has the baby arrived?", text:"Has your baby arrived? Reply K if yes, L if not yet.", codes:{K:"yes",L:"no"}, max:4, gap:1, eligible:w=>w>=38},
+  phone:{label:"Who reads these messages", text:"Who usually reads these messages? Reply A if it's you, B if your husband, C if another family member.", codes:{A:"mother",B:"husband",C:"relative"}, max:2, gap:2, eligible:()=>true},
+  discomfort:{label:"Any aches", text:"Does anything ache these days? Reply D for back, E for swollen feet, F for leg cramps, G for nothing.", codes:{D:"back",E:"feet",F:"cramps",G:"none"}, max:2, gap:2, eligible:()=>true},
+  routine:{label:"Best time to rest", text:"When is it easiest to rest for 5 minutes? Reply H for morning, I for afternoon, J for evening.", codes:{H:"morning",I:"afternoon",J:"evening"}, max:2, gap:2, eligible:()=>true},
+  helper:{label:"Who can help her", text:"Who at home could stay near you while you stretch? Just reply with who it is.", codes:{}, max:2, gap:2, eligible:()=>true}
+};
+const QORDER = ["delivered","phone","discomfort","routine","helper"];
+const CUE = {morning:"after your morning tea", afternoon:"after lunch", evening:"after you finish cooking in the evening"};
+const SLOT_LABEL = {phone:"Who reads messages", discomfort:"Aches", routine:"Best time", helper:"Who helps", voice:"Prefers voice notes", delivered:"Baby arrived", hold:"Medical hold"};
+
+const PEOPLE = [
+ {id:"priya", name:"Priya Kumari", short:"Priya", age:24, place:"Gaya, Bihar · India", lang:"Hindi", country:"IN", er:"108", parity:"First pregnancy", phone:"Her own phone", edu:"Studied to class 10", enrol:"Enrolled at the district hospital (facility)",
+  behaviour:"Answers almost everything within a day, and sometimes offers facts before Noora asks.",
+  events:[
+   {w:21,text:"A"},{w:22,text:"D"},{w:22,text:"1"},{w:23,text:"J"},{w:23,text:"1"},
+   {w:24,text:"My mother-in-law helps me with everything"},{w:25,text:"1"},{w:27,text:"1"},{w:30,text:"1"},{w:33,text:"1"},
+   {w:37,text:"Baby arrived early last night! A girl"}]},
+ {id:"rina", name:"Rina Majhi", short:"Rina", age:19, place:"Koraput, Odisha · India", lang:"Odia", country:"IN", er:"108", parity:"First pregnancy", phone:"Her husband's phone", edu:"Reads a little", enrol:"From the government RCH portal (push)",
+  behaviour:"Almost never replies. Her husband once sends an Odia voice note, which can't be transcribed reliably, so a nurse listens.",
+  events:[
+   {w:23,via:"audio",text:"(Voice note in Odia from her husband)",note:"Odia audio can't be transcribed reliably, so it goes to a nurse."},
+   {w:24,via:"nurse",text:"Nurse listened: “This is my phone. I read the messages to her. She likes the voice messages.”",set:{phone:"husband",voice:"yes"}},
+   {w:39,via:"nurse",text:"Husband called the helpline: baby boy born yesterday.",set:{delivered:"yes"}}]},
+ {id:"mitali", name:"Mitali Das", short:"Mitali", age:31, place:"Nadia, West Bengal · India", lang:"Bengali", country:"IN", er:"108", parity:"Third pregnancy", phone:"A family phone, shared", edu:"Studied to class 8", enrol:"From the government RCH portal (push)",
+  behaviour:"Replies late and out of order: answers a question from three weeks ago, and tells Noora things in her own words.",
+  events:[
+   {w:23,text:"A"},{w:25,text:"My back hurts at night"},{w:26,text:"2"},{w:27,text:"2"},{w:29,text:"1"},{w:31,text:"G"},{w:39,text:"L"},{w:41,text:"K"}]},
+ {id:"siti", name:"Siti Rahayu", short:"Siti", age:27, place:"Klaten, Central Java · Indonesia", lang:"Bahasa Indonesia", country:"ID", er:"119", parity:"Second pregnancy", phone:"Her own phone", edu:"Finished high school", enrol:"Enrolled at the puskesmas (facility)",
+  behaviour:"Sells at the market all day and replies at night. Says when she can rest before Noora asks, and admits when she skipped.",
+  events:[
+   {w:21,text:"A"},{w:21,text:"I can only rest at night after the market"},{w:23,text:"E"},{w:24,text:"2"},{w:25,text:"2"},{w:26,text:"1"},{w:28,text:"1"},{w:39,text:"L"},{w:41,text:"K"}]},
+ {id:"joyce", name:"Joyce Mensah", short:"Joyce", age:34, place:"Kumasi, Ashanti · Ghana", lang:"English and Twi", country:"GH", er:"112", parity:"Second pregnancy", phone:"Her own phone", edu:"Finished secondary school", enrol:"Enrolled at the regional hospital (facility)",
+  behaviour:"Engaged and quick to answer. Mid-pregnancy she reports bleeding, so stretches pause until a nurse clears her.",
+  events:[
+   {w:21,text:"A"},{w:22,text:"F"},{w:22,text:"1"},{w:24,text:"I"},{w:25,text:"1"},
+   {w:29,text:"Small bleeding since this morning, is that normal?"},
+   {w:31,via:"nurse",text:"Nurse note: seen at the clinic, scan normal, doctor says gentle stretching is fine again.",set:{hold:"cleared"}},
+   {w:33,text:"1"},{w:39,text:"K"}]},
+ {id:"fatima", name:"Fatima Akter", short:"Fatima", age:22, place:"Sylhet · Bangladesh", lang:"Bengali", country:"BD", er:"999", parity:"First pregnancy", phone:"Her own phone", edu:"Studied to class 5", enrol:"Enrolled at the upazila health complex (facility)",
+  behaviour:"Never replies. Every question is asked twice and then dropped, and she still gets the full approved spine.",
+  events:[
+   {w:42,via:"record",text:"Government birth record received: baby born in week 41.",set:{delivered:"yes"}}]}
+];
+
+/* --------------------------------------------------------------- engine */
+function readReply(text){
+  const t = text.trim(), u = t.toUpperCase();
+  if (/^[12]$/.test(t)) return {kind:"practice", value: t === "1" ? "yes" : "no"};
+  for (const f of QORDER){ if (Q[f].codes[u]) return {kind:"code", field:f, value:Q[f].codes[u], code:u}; }
+  const low = t.toLowerCase(), facts = [];
+  if (/bleed|blood/.test(low)) facts.push({field:"hold", value:"suspected", why:"mentions bleeding"});
+  if (/baby (has )?(arrived|born|came)|delivered|gave birth/.test(low)) facts.push({field:"delivered", value:"yes", why:"says the baby arrived"});
+  if (/\bback\b/.test(low)) facts.push({field:"discomfort", value:"back", why:"mentions her back"});
+  if (/swell|feet/.test(low)) facts.push({field:"discomfort", value:"feet", why:"mentions swollen feet"});
+  if (/cramp/.test(low)) facts.push({field:"discomfort", value:"cramps", why:"mentions cramps"});
+  if (/night|evening/.test(low)) facts.push({field:"routine", value:"evening", why:"mentions night or evening"});
+  else if (/morning/.test(low)) facts.push({field:"routine", value:"morning", why:"mentions morning"});
+  const helper = low.match(/(mother-in-law|husband|sister-in-law|sister|mother|daughter)/);
+  if (helper && /help/.test(low)) facts.push({field:"helper", value:helper[1], why:`says her ${helper[1]} helps`});
+  return {kind:"free", facts};
+}
+
+function simulate(p){
+  const slots = {phone:null, discomfort:null, routine:null, helper:null, voice:null, delivered:null, hold:null};
+  const src = {};
+  const qs = {}; QORDER.forEach(f => qs[f] = {asked:[], answered:null, status:"waiting"});
+  const practice = [];
+  const weeks = [];
+  let postnatalSince = null;
+
+  const learn = (field, value, source, w, trace, extraKind) => {
+    const had = slots[field];
+    slots[field] = value; src[field] = {source, w};
+    if (qs[field]){
+      const q = qs[field];
+      if (!q.answered){
+        q.answered = w; q.status = "answered";
+        if (q.asked.length === 0){
+          trace.push({k:"k-skip", t:`<b>${SLOT_LABEL[field]}</b> learned before Noora asked (${source}). That question is now skipped for good.`});
+        } else {
+          const lastAsk = q.asked[q.asked.length - 1];
+          const newer = QORDER.filter(f => f !== field && qs[f].asked.some(a => a > lastAsk));
+          if (newer.length || w - lastAsk > 1){
+            trace.push({k:"k-late", t:`<b>Late or out-of-order answer.</b> The ${SLOT_LABEL[field].toLowerCase()} question was asked in week ${lastAsk}${newer.length ? `, and Noora has asked about ${newer.map(f=>SLOT_LABEL[f].toLowerCase()).join(", ")} since` : ""}. Its own reply code still puts the answer in the right slot.`});
+          }
+        }
+      }
+    }
+    if (!extraKind) trace.push({k:"k-in", t:`<b>${SLOT_LABEL[field]}</b> → ${value} <span class="src">(${source}, week ${w})</span>`});
+  };
+
+  for (const w of WEEKS){
+    const trace = [], incoming = [];
+    // 1. replies and other data that arrived since last week's message
+    for (const e of p.events.filter(e => e.w === w)){
+      const via = e.via || "reply";
+      incoming.push({text:e.text, via});
+      if (via === "audio"){ trace.push({k:"k-late", t:`<b>Voice note received.</b> ${e.note}`}); continue; }
+      if (via === "nurse" || via === "record"){
+        for (const [f, v] of Object.entries(e.set || {})){
+          if (f === "hold" && v === "cleared"){ slots.hold = "cleared"; src.hold = {source:"nurse note", w}; trace.push({k:"k-safe", t:`<b>Hold cleared by a nurse.</b> Stretches can start again.`}); continue; }
+          learn(f, v, via === "nurse" ? "nurse chat" : "government record", w, trace);
+        }
+        continue;
+      }
+      const r = readReply(e.text);
+      if (r.kind === "practice"){
+        practice.push({w, v:r.value});
+        trace.push({k:"k-in", t:`<b>Practice reply:</b> “${e.text}” = ${r.value === "yes" ? "did the stretch" : "didn't manage it"} (answers the 1/2 question).`});
+      } else if (r.kind === "code"){
+        learn(r.field, r.value, `reply “${r.code}”`, w, trace);
+      } else {
+        if (!r.facts.length) trace.push({k:"", t:`Free-text reply had no profile facts. A nurse sees it in the inbox.`});
+        for (const f of r.facts){
+          if (f.field === "hold"){
+            slots.hold = "suspected"; src.hold = {source:"her message", w};
+            trace.push({k:"k-safe", t:`<b>Possible danger sign:</b> her message ${f.why}. It goes to a nurse as urgent, she is told right away to go to a health centre or call ${p.er}, and stretches pause.`});
+          } else if (slots[f.field] == null || f.field === "delivered"){
+            learn(f.field, f.value, `read from her words: ${f.why}`, w, trace);
+          }
+        }
+      }
+    }
+    if (slots.delivered === "yes" && postnatalSince == null) postnatalSince = w;
+
+    // 2. decide what goes out this week
+    const out = {kind:"default", parts:[], question:null, voice: slots.voice === "yes"};
+    const add = (t, tag, tip) => out.parts.push({t, tag, tip});
+    const usedSlots = new Set();
+
+    if (postnatalSince != null){
+      out.kind = "postnatal";
+      if (w === postnatalSince){
+        add(`Congratulations, ${p.short}! `);
+        add(`Your pregnancy stretches stop now, and your messages for you and your baby start this week. `, "slot", "Baby arrived = yes, so the pregnancy spine ends");
+        trace.push({k:"k-skip", t:`<b>Switched to the postnatal track.</b> No pregnancy message goes out after the birth is known (rubric check S1).`});
+      } else add(`(Postnatal track: messages for her and her baby.)`);
+      weeks.push({w, incoming, out, slots:{...slots}, src:{...src}, qs:JSON.parse(JSON.stringify(qs)), trace});
+      continue;
+    }
+
+    if (slots.delivered === "no" && w >= EDD_WEEK && w - src.delivered.w >= 1){
+      slots.delivered = null; qs.delivered.answered = null; qs.delivered.status = "open";
+      trace.push({k:"k-safe", t:`<b>“Not yet” is a week old and her due date has passed,</b> so Noora asks again instead of assuming she is still pregnant.`});
+    }
+    const pastEdd = w >= EDD_WEEK && slots.delivered !== "no";
+    const onHold = slots.hold === "suspected";
+
+    if (slots.phone && slots.phone !== "mother"){
+      add(`This message is for ${p.short}. Please share it with her. `, "slot", `Who reads messages = ${slots.phone} (${src.phone.source}, week ${src.phone.w})`); usedSlots.add("phone");
+    }
+    if (onHold){
+      out.kind = "consult";
+      add(`Hello ${p.short}. Please don't do any stretches for now. `);
+      add(`A nurse is looking at what you told us. If the bleeding continues or you feel pain or dizziness, go to your nearest health centre or call ${p.er} right away. `, "safe", "Medical hold: suspected bleeding");
+      add(`We'll message you as soon as a nurse says it's safe to start again.`);
+      trace.push({k:"k-safe", t:`<b>Stretches paused.</b> She still gets a message this week, but no stretch and no profile question until a nurse clears her.`});
+    } else if (pastEdd && slots.delivered == null){
+      out.kind = "checkin";
+      add(`Hello ${p.short}. We hope you and your family are well. `);
+      add(`Your due date has passed, so pregnancy stretches are paused until we hear from you. `, "safe", "Due date passed and no birth news, so pregnancy-only content pauses");
+      out.question = "delivered";
+      trace.push({k:"k-safe", t:`<b>Due date passed with no birth news.</b> Pregnancy content pauses and the message asks only whether the baby has arrived. This is how the 405-families problem is avoided.`});
+    } else {
+      // stretch message: spine + slots
+      let key = SPINE(w), why = `approved spine stretch for week ${w}`;
+      if (slots.discomfort && FOR_DISCOMFORT[slots.discomfort]){
+        key = FOR_DISCOMFORT[slots.discomfort](w); why = `swapped for her ${slots.discomfort === "back" ? "back ache" : slots.discomfort === "feet" ? "swollen feet" : "leg cramps"}`; usedSlots.add("discomfort");
+      }
+      const s = STRETCH[key];
+      add(`Hello ${p.short}! `);
+      if (usedSlots.has("discomfort")) add(`You told us about your ${slots.discomfort === "back" ? "back ache" : slots.discomfort === "feet" ? "swollen feet" : "leg cramps"}. `, "slot", `Aches = ${slots.discomfort} (${src.discomfort.source}, week ${src.discomfort.w})`);
+      add(`Today, try ${s.name}`, usedSlots.has("discomfort") ? "slot" : null, usedSlots.has("discomfort") ? `Stretch ${why}` : null);
+      if (slots.routine){ add(` ${CUE[slots.routine]}`, "slot", `Best time = ${slots.routine} (${src.routine.source}, week ${src.routine.w})`); usedSlots.add("routine"); }
+      add(`. ${s.how} ${s.dose} `);
+      const lastTwo = practice.slice(-2);
+      if (lastTwo.length === 2 && lastTwo.every(x => x.v === "no") && lastTwo[1].w >= w - 2){
+        add(`Even 2 or 3 slow rounds is a good start. `, "slot", "Practice replies = No, No (weeks " + lastTwo.map(x=>x.w).join(" and ") + "), so it offers a smaller step"); usedSlots.add("practice");
+      }
+      if (slots.helper){ add(`Ask your ${slots.helper} to stay close by. `, "slot", `Who helps = ${slots.helper} (${src.helper.source}, week ${src.helper.w})`); usedSlots.add("helper"); }
+      else add(`Ask someone at home to stay close by. `);
+      add(`Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call ${p.er} right away. `, "safe", "Safety line: always present (rubric S5, S6)");
+      add(`Were you able to try it today? Reply 1 for Yes, 2 for No.`);
+      out.kind = usedSlots.size ? "personal" : "default";
+      trace.unshift({k:"", t:`<b>Spine:</b> ${s.name.replace(/^the /,"")}, ${why}.${usedSlots.size ? ` <b>Slots used:</b> ${[...usedSlots].map(x=>x==="practice"?"practice replies":SLOT_LABEL[x].toLowerCase()).join(", ")}.` : " <b>No slots filled</b>, so the default wording goes out unchanged."}`});
+      // pick one profile question
+      for (const f of QORDER){
+        const q = qs[f];
+        if (slots[f] != null || q.answered) continue;
+        if (!Q[f].eligible(w)) continue;
+        if (q.asked.length >= Q[f].max){ continue; }
+        const last = q.asked[q.asked.length - 1];
+        if (last != null && w - last < Q[f].gap) continue;
+        out.question = f; break;
+      }
+    }
+    if (out.question){
+      const q = qs[out.question]; q.asked.push(w); q.status = "open";
+      if (out.kind !== "checkin") trace.push({k:"", t:`<b>Question this week:</b> ${Q[out.question].label.toLowerCase()} (ask ${q.asked.length} of ${Q[out.question].max}). Highest-priority slot that is still empty and eligible.`});
+    }
+    // questions that hit the limit
+    for (const f of QORDER){
+      const q = qs[f];
+      if (!q.answered && q.asked.length >= Q[f].max && q.status !== "dropped" && out.question !== f){
+        q.status = "dropped";
+        trace.push({k:"", t:`<b>${Q[f].label}</b> dropped after ${q.asked.length} asks with no answer. Messages keep the default wording for it.`});
+      }
+    }
+    if (out.voice) trace.push({k:"", t:`Sent as a <b>${p.lang} voice note</b> as well as text, because a nurse learned she prefers voice.`});
+    weeks.push({w, incoming, out, slots:{...slots}, src:{...src}, qs:JSON.parse(JSON.stringify(qs)), trace});
+  }
+  return weeks;
+}
+
+const SIM = Object.fromEntries(PEOPLE.map(p => [p.id, simulate(p)]));
+
+/* --------------------------------------------------------------- render */
+let cur = {p:"mitali", w:25};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function drawLane(){
+  const lane = $("#lane"); lane.replaceChildren();
+  lane.append(Object.assign(document.createElement("span"), {className:"wk", textContent:"week"}));
+  WEEKS.forEach(w => lane.append(Object.assign(document.createElement("span"), {className:"wk", textContent:w})));
+  for (const p of PEOPLE){
+    const who = document.createElement("button");
+    who.className = "who"; who.type = "button"; who.innerHTML = `${esc(p.short)}<small>${esc(p.lang)} · ${esc(p.place.split("·")[1].trim())}</small>`;
+    who.onclick = () => select(p.id, cur.w);
+    lane.append(who);
+    for (const wk of SIM[p.id]){
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = `cell ${wk.out.kind}` + (p.id === cur.p && wk.w === cur.w ? " sel" : "");
+      b.title = `${p.short}, week ${wk.w}: ${({default:"default stretch",personal:"personalized stretch",consult:"stretches paused",checkin:"birth check-in",postnatal:"postnatal"})[wk.out.kind]}${wk.out.question ? ", asks: " + Q[wk.out.question].label.toLowerCase() : ""}${wk.incoming.length ? ", she replied" : ""}`;
+      b.setAttribute("aria-label", b.title);
+      if (wk.out.question) b.append(Object.assign(document.createElement("span"), {className:"q"}));
+      if (wk.incoming.length) b.append(Object.assign(document.createElement("span"), {className:"r", textContent:"↩"}));
+      b.onclick = () => select(p.id, wk.w);
+      lane.append(b);
+    }
+  }
+}
+
+function drawPerson(){
+  const p = PEOPLE.find(x => x.id === cur.p), weeks = SIM[p.id];
+  const upto = weeks.filter(x => x.w <= cur.w);
+  const sent = upto.length, pers = upto.filter(x => x.out.kind === "personal").length;
+  const asked = upto.filter(x => x.out.question).length;
+  const replies = upto.reduce((n, x) => n + x.incoming.filter(i => i.via === "reply").length, 0);
+  $("#person").innerHTML = `
+    <div class="person">
+      <span class="eyebrow">Selected woman</span>
+      <span class="name">${esc(p.name)}, ${p.age}</span>
+      <span style="color:var(--ink-2)">${esc(p.place)}</span>
+      <div class="tags">${[p.lang, p.parity, p.phone, p.edu, p.enrol].map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+    </div>
+    <p class="behaviour">${esc(p.behaviour)}</p>
+    <div class="stepper">
+      <button class="btn" type="button" id="prev" aria-label="Previous week">‹</button>
+      <span class="weekbig">Week ${cur.w}</span>
+      <button class="btn" type="button" id="next" aria-label="Next week">›</button>
+    </div>
+    <input type="range" id="wk" min="${W0}" max="${W1}" value="${cur.w}" step="1" aria-label="Pregnancy week">
+    <div class="stats">
+      <div class="stat"><b>${sent}</b><span>messages so far</span></div>
+      <div class="stat"><b>${sent ? Math.round(100 * pers / sent) : 0}%</b><span>personalized</span></div>
+      <div class="stat"><b>${asked}</b><span>profile questions asked</span></div>
+      <div class="stat"><b>${replies}</b><span>replies from her</span></div>
+    </div>`;
+  $("#prev").onclick = () => select(cur.p, Math.max(W0, cur.w - 1));
+  $("#next").onclick = () => select(cur.p, Math.min(W1, cur.w + 1));
+  $("#wk").oninput = e => select(cur.p, +e.target.value, true);
+}
+
+function drawPhone(){
+  const p = PEOPLE.find(x => x.id === cur.p), wk = SIM[p.id].find(x => x.w === cur.w);
+  const ph = $("#phone"); const bits = [];
+  bits.push(`<div class="phonebar"><span class="avatar">N</span><div><b>Noora Care Companion</b><span>WhatsApp · ${esc(p.lang)}${wk.out.voice ? " · voice + text" : ""}</span></div></div>`);
+  bits.push(`<div class="bub sys">Week ${wk.w} of pregnancy${wk.w >= EDD_WEEK ? " · due date passed" : ""}</div>`);
+  for (const i of wk.incoming){
+    const label = i.via === "reply" ? "" : i.via === "audio" ? "Voice note: " : "";
+    if (i.via === "nurse" || i.via === "record") bits.push(`<div class="bub sys">${esc(i.text)}</div>`);
+    else bits.push(`<div class="bub out">${label}${esc(i.text)}<span class="meta">${i.via === "audio" ? "voice note · " : ""}from her phone</span></div>`);
+  }
+  let html = "";
+  if (wk.out.voice) html += `<div class="voice">▶ <span class="wave"></span> 0:42</div>`;
+  for (const part of wk.out.parts){
+    const t = esc(part.t);
+    html += part.tag ? `<mark class="${part.tag === "safe" ? "safe" : ""}" title="${esc(part.tip || "")}">${t}</mark>` : t;
+  }
+  if (wk.out.question) html += ` <mark class="q" title="Profile question: ${esc(Q[wk.out.question].label)}">${esc(Q[wk.out.question].text)}</mark>`;
+  bits.push(`<div class="bub in">${html}<span class="meta">Noora · week ${wk.w}</span></div>`);
+  ph.innerHTML = bits.join("");
+}
+
+function drawSlots(){
+  const wk = SIM[cur.p].find(x => x.w === cur.w);
+  const rows = Object.keys(SLOT_LABEL).map(k => {
+    const v = wk.slots[k], s = wk.src[k];
+    return `<tr><td>${SLOT_LABEL[k]}</td><td>${v == null ? `<span class="val unk">not known yet</span>` : `<span class="val">${esc(v)}</span><div class="src">${esc(s.source)} · week ${s.w}</div>`}</td></tr>`;
+  });
+  $("#slots").innerHTML = `<thead><tr><th>Slot</th><th>Value and source</th></tr></thead><tbody>${rows.join("")}</tbody>`;
+  const qrows = QORDER.map((f, i) => {
+    const q = wk.qs[f];
+    const st = q.answered ? `<span class="pill done">answered wk ${q.answered}</span>` : q.status === "dropped" ? `<span class="pill stop">dropped</span>` : q.asked.length ? `<span class="pill open">open</span>` : `<span class="pill wait">not asked</span>`;
+    return `<tr><td>${i + 1}. ${Q[f].label}</td><td>${st}<div class="src">${q.asked.length ? "asked wk " + q.asked.join(", ") : f === "delivered" ? "only from week 38" : "—"}</div></td></tr>`;
+  });
+  $("#queue").innerHTML = `<thead><tr><th>Priority</th><th>Status</th></tr></thead><tbody>${qrows.join("")}</tbody>`;
+}
+
+function drawTrace(){
+  const p = PEOPLE.find(x => x.id === cur.p), wk = SIM[p.id].find(x => x.w === cur.w);
+  $("#trace-title").textContent = `Why ${p.short}'s week ${cur.w} message looks this way`;
+  $("#trace").innerHTML = wk.trace.map(t => `<li class="${t.k}">${t.t}</li>`).join("") || `<li>Nothing new this week.</li>`;
+}
+
+function select(pid, w, fromSlider){
+  cur = {p:pid, w};
+  drawLane(); drawPhone(); drawSlots(); drawTrace();
+  if (!fromSlider) drawPerson();
+  else { document.querySelector(".weekbig").textContent = `Week ${w}`; drawPersonStatsOnly(); }
+}
+function drawPersonStatsOnly(){
+  const slider = $("#wk"); const v = slider.value; drawPerson(); const s = $("#wk"); s.value = v; s.focus();
+}
+select(cur.p, cur.w);
+</script>

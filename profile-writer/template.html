@@ -1,0 +1,341 @@
+<meta charset="utf-8">
+<title>Noora Profile Writer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a nurse's inbox. Conversations on the left, the chat in the middle, and on the right
+   the facts scanned from the chat (one-click save) above the mother's profile. */
+:root{
+  --bg:#f2f5f4; --panel:#ffffff; --ink:#15211d; --ink-2:#4d5d57; --ink-3:#7f8d88; --line:#dce4e0;
+  --teal:#0f6e5c; --teal-soft:#dff1ec; --amber:#b86e00; --amber-soft:#fcefd8; --rose:#b8423a; --rose-soft:#fbe5e2;
+  --plum:#6b4aa8; --plum-soft:#ece6f8; --chat:#ebe4da; --in:#ffffff; --out:#d9fdd3; --hl:#fff1a8;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1513; --panel:#17201d; --ink:#e6eeea; --ink-2:#a9bab3; --ink-3:#77887f; --line:#28342f;
+  --teal:#4cc3a6; --teal-soft:#14302a; --amber:#f0b14a; --amber-soft:#33270f; --rose:#f08a80; --rose-soft:#351b19;
+  --plum:#b49cf0; --plum-soft:#251d38; --chat:#1b2420; --in:#22302b; --out:#1d4a3d; --hl:#5a4e12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1513; --panel:#17201d; --ink:#e6eeea; --ink-2:#a9bab3; --ink-3:#77887f; --line:#28342f;
+  --teal:#4cc3a6; --teal-soft:#14302a; --amber:#f0b14a; --amber-soft:#33270f; --rose:#f08a80; --rose-soft:#351b19;
+  --plum:#b49cf0; --plum-soft:#251d38; --chat:#1b2420; --in:#22302b; --out:#1d4a3d; --hl:#5a4e12; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14.5px;line-height:1.5;margin:0}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.wrap{max-width:1360px;margin:0 auto;padding-block:22px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1{font-size:clamp(24px,3.4vw,34px);font-weight:700}
+h2{font-size:17px;font-weight:500}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.lede{color:var(--ink-2);max-width:80ch}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.scorebar{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.score{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.score b{display:block;font-family:var(--display);font-size:24px;font-weight:700;line-height:1.1}
+.score span{font-size:12.5px;color:var(--ink-2)}
+.score.bad b{color:var(--rose)} .score.good b{color:var(--teal)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;background:none;padding:6px 12px;cursor:pointer;font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--teal);color:#fff}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.toggle{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--ink-2);cursor:pointer}
+
+.app{display:grid;grid-template-columns:250px minmax(0,1fr) minmax(0,1.25fr);gap:14px;align-items:start}
+.list{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.conv{border:0;border-bottom:1px solid var(--line);background:none;text-align:left;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.conv:last-child{border-bottom:0}
+.conv b{font-size:14px}
+.conv span{font-size:12px;color:var(--ink-3)}
+.conv .res{font-family:var(--mono);font-size:11px}
+.conv[aria-current="true"]{background:var(--teal-soft)}
+
+.phone{background:var(--chat);border-radius:14px;border:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:8px;min-height:420px}
+.phonebar{display:flex;gap:10px;align-items:center;padding-bottom:8px;border-bottom:1px solid color-mix(in srgb,var(--ink) 12%,transparent)}
+.av{width:34px;height:34px;border-radius:50%;background:var(--plum);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.phonebar b{display:block}
+.phonebar span{font-size:12px;color:var(--ink-3)}
+.bub{max-width:88%;padding:7px 10px;border-radius:9px;font-size:14px;box-shadow:0 1px 0 rgba(0,0,0,.07);position:relative}
+.bub.family{align-self:flex-start;background:var(--in)}
+.bub.nurse{align-self:flex-end;background:var(--out)}
+.bub .meta{display:block;font-size:10.5px;color:var(--ink-3);margin-top:3px;text-align:right}
+.bub .num{position:absolute;left:-22px;top:6px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+.bub.flash{outline:2px solid var(--amber);outline-offset:2px}
+mark{background:var(--hl);color:inherit;border-radius:2px;padding:0 1px}
+.compose{display:flex;gap:8px;margin-top:auto;padding-top:8px}
+.compose input{flex:1;min-width:0;border:1px solid var(--line);background:var(--panel);border-radius:20px;padding:7px 12px}
+
+.right{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.cardhead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:400;color:var(--ink-3);font-size:11px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.field{font-weight:700;white-space:nowrap}
+.value{font-weight:700}
+.was{display:block;font-size:11.5px;color:var(--ink-3);text-decoration:line-through}
+.ev{font-size:12px;color:var(--ink-2);cursor:pointer;border:0;background:none;padding:0;text-align:left}
+.ev:hover{text-decoration:underline}
+.why{display:block;font-size:11.5px;color:var(--ink-3)}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.s-ready{background:var(--teal-soft);color:var(--teal)}
+.s-review{background:var(--amber-soft);color:var(--amber)}
+.s-nurse{background:var(--plum-soft);color:var(--plum)}
+.s-alert{background:var(--rose-soft);color:var(--rose)}
+.conf{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:2px}
+.key{display:block;margin-top:4px;font-size:11.5px}
+.k-ok{color:var(--teal)} .k-bad{color:var(--rose)} .k-meh{color:var(--amber)}
+.save{border:1px solid var(--teal);background:var(--teal);color:#fff;border-radius:7px;padding:4px 10px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+.save.check{background:var(--panel);color:var(--amber);border-color:var(--amber)}
+.save.done{background:var(--panel);color:var(--teal)}
+.save.nurse{background:var(--panel);color:var(--plum);border-color:var(--plum)}
+.save.alert{background:var(--panel);color:var(--rose);border-color:var(--rose)}
+.profile{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.pf{background:var(--bg);border-radius:9px;padding:8px 10px;min-width:0}
+.pf span{display:block;font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+.pf b{display:block;overflow-wrap:anywhere}
+.pf small{display:block;font-size:11px;color:var(--ink-3)}
+.pf.new{background:var(--teal-soft)}
+.note{font-size:12.5px;color:var(--ink-2)}
+.empty{font-size:13px;color:var(--ink-3);padding:6px 0}
+.toast{font-size:12.5px;color:var(--teal);min-height:1.2em}
+footer{font-size:12px;color:var(--ink-3);max-width:100ch}
+@media (max-width:1100px){.app{grid-template-columns:220px minmax(0,1fr)} .right{grid-column:1/-1}}
+@media (max-width:700px){.app{grid-template-columns:minmax(0,1fr)} .list{flex-direction:row;overflow-x:auto} .conv{min-width:170px;border-bottom:0;border-right:1px solid var(--line)} .bub .num{display:none}}
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <span class="eyebrow">Noora Health · prototype · simulated conversations only</span>
+    <h1>Profile writer: scan a chat, save what lasts</h1>
+    <p class="lede">Claude reads each family's WhatsApp conversation and fills a table of facts about the mother and baby. Clear, lasting facts are one click to save. Unclear ones wait for a person. Symptoms go to a nurse and never into the profile. Every fact shows the exact words it came from.</p>
+  </header>
+
+  <section class="scorebar" id="scorebar" aria-label="Test score"></section>
+
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="Where the scanned facts come from">
+      <button type="button" id="mode-saved" aria-pressed="true">Saved test run</button>
+      <button type="button" id="mode-live" aria-pressed="false">Scan live with Claude</button>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <label class="toggle"><input type="checkbox" id="show-key" checked> Compare with answer key</label>
+      <button class="btn" type="button" id="reset">Reset all profiles</button>
+    </div>
+  </div>
+
+  <div class="app">
+    <nav class="list" id="list" aria-label="Conversations"></nav>
+    <section class="phone" id="phone" aria-label="Conversation"></section>
+    <div class="right">
+      <section class="card" aria-label="Facts scanned from this chat">
+        <div class="cardhead">
+          <h2>Scanned from this chat</h2>
+          <button class="btn primary" type="button" id="save-all">Save all ready facts</button>
+        </div>
+        <div class="tablewrap"><table id="facts"></table></div>
+        <p class="toast" id="toast" role="status"></p>
+      </section>
+      <section class="card" aria-label="Mother's profile">
+        <div class="cardhead"><h2 id="pf-title">Profile</h2><span class="note">Saved here in your browser for this demo</span></div>
+        <div class="profile" id="profile"></div>
+      </section>
+    </div>
+  </div>
+
+  <footer>Every conversation, name and place here is invented for testing. In the saved test run, the facts were extracted by Claude (Sonnet) from the conversations alone; the answer key was written separately and never shown to it. Live scanning uses the same instructions and runs on your own Claude account.</footer>
+</div>
+
+<script>
+const CONV = __CONV__;
+const EXT = __EXT__;
+const SCORES = __SCORES__;
+const PROMPT = __PROMPT__;
+
+const FIELDS = ["stage","baby_dob","edd","phone_holder","language","channel_pref","location","delivery_place","baby_sex","num_babies","feeding","stop_messages"];
+const LABEL = {stage:"Stage",baby_dob:"Baby's date of birth",edd:"Due date",phone_holder:"Who holds the phone",language:"Language",channel_pref:"Text or voice",location:"Location",delivery_place:"Where she delivered",baby_sex:"Baby",num_babies:"Number of babies",feeding:"Feeding",stop_messages:"Stop messages",symptom:"Alert for a nurse"};
+const STATUS = {ready:"Ready to save",review:"Check first",nurse:"Nurse only",alert:"Alert, not saved"};
+const RESULT = {correct:["k-ok","✓ matches answer key"],held_too_much:["k-meh","held, key says one click is fine"],unsafe_ready:["k-bad","✗ key says a person must check this"],wrong_value:["k-bad","✗ wrong value"],wrong_status:["k-meh","right value, wrong status"],bad_write:["k-bad","✗ should not be saved"],extra:["k-meh","extra suggestion, not in key"]};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let cur = CONV[0].id, mode = "saved", live = {}, extraMsgs = {}, sampleFn = null, scanning = false;
+
+/* ---------- profiles (per-viewer demo state) ---------- */
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem("pw-saved") || "{}"); } catch (e) { saved = {}; }
+const persist = () => { try { localStorage.setItem("pw-saved", JSON.stringify(saved)); } catch (e) {} };
+function profileOf(cid){
+  const c = CONV.find(x => x.id === cid), p = {...c.profile_before}, src = {};
+  for (const [f, v] of Object.entries(saved[cid] || {})){ p[f] = v.value; src[f] = v; }
+  return {p, src};
+}
+
+/* ---------- facts for the current chat ---------- */
+function factsFor(cid){
+  if (mode === "live") return live[cid] || null;
+  return EXT[cid]?.items || [];
+}
+function keyResultFor(cid, item){
+  if (mode !== "saved") return null;
+  const c = SCORES.cases[cid]; if (!c) return null;
+  for (const r of c.rows) if (r.got && JSON.stringify(r.got) === JSON.stringify(item)) return {res:r.result, want:r};
+  for (const e of c.extras) if (JSON.stringify(e.got) === JSON.stringify(item)) return {res:e.result};
+  return null;
+}
+function missedFor(cid){
+  if (mode !== "saved") return [];
+  return (SCORES.cases[cid]?.rows || []).filter(r => r.result === "missed");
+}
+
+/* ---------- render ---------- */
+function drawScore(){
+  const s = SCORES.summary;
+  $("#scorebar").innerHTML = `
+    <div class="score good"><b>${s.correct} of ${s.key_items}</b><span>answer-key facts exactly right</span></div>
+    <div class="score ${s.lasting_facts_lost ? "bad" : "good"}"><b>${s.lasting_facts_lost}</b><span>lasting facts lost</span></div>
+    <div class="score ${s.stored_as_permanent_wrongly ? "bad" : "good"}"><b>${s.stored_as_permanent_wrongly}</b><span>wrong facts marked one-click ready</span></div>
+    <div class="score ${s.alerts_missed ? "bad" : "good"}"><b>${s.alerts_missed}</b><span>nurse alerts missed</span></div>`;
+}
+function drawList(){
+  $("#list").innerHTML = CONV.map(c => {
+    const rows = SCORES.cases[c.id]?.rows || [], ex = SCORES.cases[c.id]?.extras || [];
+    const ok = rows.filter(r => r.result === "correct").length;
+    const bad = rows.filter(r => ["missed","wrong_value","unsafe_ready"].includes(r.result)).length + ex.filter(e => e.result === "bad_write").length;
+    return `<button class="conv" type="button" data-id="${c.id}" aria-current="${c.id === cur}">
+      <b>${esc(c.name)}</b><span>${esc(c.label)}</span>
+      <span class="res ${bad ? "k-bad" : "k-ok"}">${rows.length ? `${ok}/${rows.length} right` : "nothing to save"}${bad ? ` · ${bad} problem${bad>1?"s":""}` : ""}</span></button>`;
+  }).join("");
+  document.querySelectorAll(".conv").forEach(b => b.onclick = () => { cur = b.dataset.id; render(); });
+}
+function messagesOf(cid){
+  const c = CONV.find(x => x.id === cid);
+  return [...c.messages, ...(extraMsgs[cid] || [])];
+}
+function drawPhone(highlight){
+  const c = CONV.find(x => x.id === cur), msgs = messagesOf(cur);
+  const items = factsFor(cur) || [];
+  $("#phone").innerHTML = `
+    <div class="phonebar"><span class="av">${esc(c.name[0])}</span><div><b>${esc(c.name)}</b><span>${esc(c.profile_before.location)} · ${esc(c.profile_before.language)} on file</span></div></div>
+    ${msgs.map(m => {
+      let text = esc(m.text);
+      if (highlight && highlight.msg === m.i && highlight.evidence){
+        const e = esc(highlight.evidence); if (text.includes(e)) text = text.replace(e, `<mark>${e}</mark>`);
+      }
+      return `<div class="bub ${m.from}${highlight && highlight.msg === m.i ? " flash" : ""}" id="m-${m.i}"><span class="num">${m.i}</span>${text}<span class="meta">${m.from === "nurse" ? "Noora nurse" : "family"} · ${esc(m.t)}</span></div>`;
+    }).join("")}
+    <form class="compose" id="compose"><input id="newmsg" placeholder="Type a message as the family, then scan live…" aria-label="New message from the family" maxlength="400"><button class="btn" type="submit">Send</button></form>`;
+  $("#compose").onsubmit = e => {
+    e.preventDefault(); const v = $("#newmsg").value.trim(); if (!v) return;
+    const list = extraMsgs[cur] ||= []; const n = CONV.find(x => x.id === cur).messages.length + list.length + 1;
+    list.push({i:n, from:"family", t:new Date().toISOString().slice(0,16).replace("T"," "), text:v});
+    if (mode !== "live") setMode("live");
+    delete live[cur]; render(); scanLive();
+  };
+}
+function drawFacts(){
+  const items = factsFor(cur), showKey = $("#show-key").checked && mode === "saved";
+  const t = $("#facts");
+  if (mode === "live" && !items){
+    t.innerHTML = `<tr><td class="empty">${scanning ? "Claude is reading the conversation…" : sampleFn ? `<button class="btn primary" type="button" id="scan">Scan this chat with Claude</button>` : "Live scanning needs Claude, which isn't available in this view. Use the saved test run."}</td></tr>`;
+    const b = $("#scan"); if (b) b.onclick = scanLive;
+    $("#save-all").disabled = true; return;
+  }
+  const done = saved[cur] || {};
+  const rows = items.map((it, idx) => {
+    const kr = showKey ? keyResultFor(cur, it) : null;
+    const isSaved = done[it.field] && done[it.field].value === it.value;
+    let btn;
+    if (it.status === "alert") btn = `<button class="save alert" type="button" data-act="flag" data-i="${idx}">Flag to nurse</button>`;
+    else if (it.status === "nurse") btn = `<button class="save nurse" type="button" data-act="flag" data-i="${idx}">Send to nurse</button>`;
+    else if (isSaved) btn = `<button class="save done" type="button" disabled>✓ Saved</button>`;
+    else if (it.status === "review") btn = `<button class="save check" type="button" data-act="save" data-i="${idx}">Checked, save</button>`;
+    else btn = `<button class="save" type="button" data-act="save" data-i="${idx}">Save</button>`;
+    const old = it.replaces && it.replaces !== "null" ? `<span class="was">${esc(it.replaces)}</span>` : "";
+    return `<tr>
+      <td><span class="field">${esc(LABEL[it.field] || it.field)}</span><br><span class="pill s-${esc(it.status)}">${STATUS[it.status] || esc(it.status)}</span></td>
+      <td>${old}<span class="value">${esc(it.value)}</span><span class="conf">${esc(it.confidence || "")} confidence · said by ${esc(it.speaker || "unknown")}</span></td>
+      <td><button class="ev" type="button" data-i="${idx}">“${esc(it.evidence)}”</button><span class="why">${esc(it.why || "")}</span>${kr ? `<span class="key ${RESULT[kr.res][0]}">${RESULT[kr.res][1]}${kr.want && kr.res !== "correct" ? ` (key: ${esc(kr.want.value)}, ${esc(kr.want.status)})` : ""}</span>` : ""}</td>
+      <td>${btn}</td></tr>`;
+  });
+  const missed = showKey ? missedFor(cur).map(r => `<tr><td><span class="field">${esc(LABEL[r.field] || r.field)}</span></td><td colspan="3"><span class="key k-bad">✗ Missed. The answer key expected ${esc(r.value)} (${esc(r.status)}).</span></td></tr>`) : [];
+  t.innerHTML = rows.length || missed.length
+    ? `<thead><tr><th>Field</th><th>Value</th><th>Her words</th><th></th></tr></thead><tbody>${rows.join("")}${missed.join("")}</tbody>`
+    : `<tr><td class="empty">Nothing to save from this chat. That's the right answer when a family only says thanks.</td></tr>`;
+  t.querySelectorAll(".ev").forEach(b => b.onclick = () => { const it = items[+b.dataset.i]; drawPhone(it); document.getElementById("m-" + it.msg)?.scrollIntoView({block:"nearest", behavior:"smooth"}); });
+  t.querySelectorAll("[data-act=save]").forEach(b => b.onclick = () => saveItem(items[+b.dataset.i]));
+  t.querySelectorAll("[data-act=flag]").forEach(b => b.onclick = () => { b.textContent = "✓ Sent"; b.disabled = true; $("#toast").textContent = `Sent to the nurse queue: ${items[+b.dataset.i].value}. Nothing was written to her profile.`; });
+  $("#save-all").disabled = !items.some(it => it.status === "ready" && !(done[it.field] && done[it.field].value === it.value));
+}
+function drawProfile(){
+  const c = CONV.find(x => x.id === cur), {p, src} = profileOf(cur);
+  $("#pf-title").textContent = `${c.name}'s profile`;
+  $("#profile").innerHTML = FIELDS.map(f => {
+    const v = p[f], s = src[f];
+    return `<div class="pf${s ? " new" : ""}"><span>${LABEL[f]}</span><b>${v == null || v === "" ? "—" : esc(v)}</b><small>${s ? `saved just now from msg ${s.msg}, said by ${esc(s.speaker)}` : v == null ? "not known" : "from onboarding / government record"}</small></div>`;
+  }).join("");
+}
+function render(){ drawList(); drawPhone(); drawFacts(); drawProfile(); }
+
+/* ---------- actions ---------- */
+function saveItem(it){
+  (saved[cur] ||= {})[it.field] = {value:it.value, msg:it.msg, speaker:it.speaker || "unknown", evidence:it.evidence, at:new Date().toISOString()};
+  if (it.field === "stage" && it.value === "delivered") $("#toast").textContent = "Saved. She now moves from pregnancy messages to postnatal ones.";
+  else $("#toast").textContent = `Saved ${LABEL[it.field] || it.field}: ${it.value}, with her words as the source.`;
+  persist(); drawFacts(); drawProfile(); drawList();
+}
+$("#save-all").onclick = () => {
+  const items = factsFor(cur) || []; let n = 0;
+  for (const it of items) if (it.status === "ready"){ (saved[cur] ||= {})[it.field] = {value:it.value, msg:it.msg, speaker:it.speaker || "unknown", evidence:it.evidence, at:new Date().toISOString()}; n++; }
+  persist(); $("#toast").textContent = `Saved ${n} ready fact${n === 1 ? "" : "s"}. Facts marked "Check first" or "Nurse only" were left for a person.`;
+  drawFacts(); drawProfile();
+};
+$("#reset").onclick = () => { saved = {}; persist(); $("#toast").textContent = "All profiles reset to what onboarding knew."; render(); };
+$("#show-key").onchange = () => drawFacts();
+function setMode(m){
+  mode = m;
+  $("#mode-saved").setAttribute("aria-pressed", String(m === "saved"));
+  $("#mode-live").setAttribute("aria-pressed", String(m === "live"));
+  $("#show-key").closest("label").hidden = m !== "saved";
+  render();
+}
+$("#mode-saved").onclick = () => setMode("saved");
+$("#mode-live").onclick = () => setMode("live");
+
+async function scanLive(){
+  if (!sampleFn || scanning) return;
+  scanning = true; drawFacts();
+  const c = CONV.find(x => x.id === cur);
+  const convo = {id:c.id, profile_before:profileOf(cur).p, messages:messagesOf(cur)};
+  try{
+    const r = await sampleFn.json(PROMPT + "\n\n## The conversation\n" + JSON.stringify(convo, null, 1), {modelTier:"default"});
+    live[cur] = Array.isArray(r?.items) ? r.items.filter(it => it && it.field && it.status) : [];
+    $("#toast").textContent = `Claude found ${live[cur].length} item${live[cur].length === 1 ? "" : "s"} in this chat.`;
+  }catch(e){
+    live[cur] = null;
+    $("#toast").textContent = e?.code === "not_granted" || e?.code === "sampling_disabled" ? "Live scanning is turned off for you. The saved test run still works."
+      : e?.code === "rate_limited" ? "Too many scans at once. Wait a minute, then scan again." : "The scan didn't finish. Try again.";
+  }
+  scanning = false; drawFacts();
+}
+
+(async () => {
+  try { sampleFn = window.claude?.use ? await window.claude.use("sample") : null; } catch (e) { sampleFn = null; }
+  if (!sampleFn) { $("#mode-live").disabled = true; $("#mode-live").title = "Live scanning needs this page opened in Claude"; }
+  if (mode === "live") drawFacts();
+})();
+
+drawScore(); render();
+</script>

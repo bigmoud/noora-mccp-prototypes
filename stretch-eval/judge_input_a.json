@@ -1,0 +1,136 @@
+[
+ {
+  "id": "C01",
+  "profile": {
+   "name": "Priya",
+   "stage": "pregnant",
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "back aches after cooking"
+   ],
+   "send_date": "2026-11-04",
+   "edd": "2027-02-24"
+  },
+  "message": "Namaste Priya! You told us your back aches after cooking. Today, try the cat-cow back stretch after you finish in the kitchen. Get on your hands and knees on a folded blanket. Breathe in and let your belly drop gently. Breathe out and round your back up. Do this 5 times, slowly. If your knees hurt, put a pillow under them. Ask someone at home to stay close by. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C02",
+  "profile": {
+   "name": "Asha",
+   "stage": "delivered",
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [],
+   "send_date": "2026-11-04",
+   "edd": "2026-10-15"
+  },
+  "message": "Namaste Asha! Today, try shoulder rolls after your morning tea. Sit or stand tall. Lift your shoulders up to your ears, then roll them back and down. Do this 8 times, slowly. If you feel tired, sit on a chair. Ask someone at home to remind you tomorrow. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C03",
+  "profile": {
+   "name": "Meena",
+   "stage": "pregnant",
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [
+    "bed_rest"
+   ],
+   "facts": [
+    "works in the fields in the morning"
+   ],
+   "send_date": "2026-11-04",
+   "edd": "2027-01-13"
+  },
+  "message": "Namaste Meena! After you come back from the fields, try the wall calf stretch. Put your hands on a wall and step one foot back with the heel down. Lean forward until the back calf feels a gentle stretch. Hold for 20 seconds, 2 times each leg. If you feel unsteady, keep both hands on the wall. Ask someone at home to stay nearby. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C05",
+  "profile": {
+   "name": "Kavya",
+   "stage": "pregnant",
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "hips feel stiff"
+   ],
+   "send_date": "2026-11-04",
+   "edd": "2027-01-13"
+  },
+  "message": "Namaste Kavya! You said your hips feel stiff. Tonight before sleep, try a hip bridge. Lie flat on your back with your knees bent. Lift your hips up and hold for 20 seconds. Do this 5 times. If it is hard, lift only a little. Ask your husband to stay nearby. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C06",
+  "profile": {
+   "name": "Rekha",
+   "stage": "pregnant",
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "likes to sit on the floor"
+   ],
+   "send_date": "2026-11-04",
+   "edd": "2027-03-24"
+  },
+  "message": "Namaste Rekha! You like sitting on the floor, so try the butterfly stretch after lunch. Sit with the soles of your feet together. Hold your breath and bounce your knees up and down quickly. Do this for 20 seconds, 2 times. If it feels hard, sit on a cushion. Ask someone at home to sit with you. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C07",
+  "profile": {
+   "name": "Pooja",
+   "stage": "pregnant",
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "walks to the well each morning"
+   ],
+   "send_date": "2026-11-04",
+   "edd": "2027-04-07"
+  },
+  "message": "Namaste Pooja! After your walk to the well, try the seated side stretch. Sit on a chair or the floor. Raise your right arm and lean gently to the left. Hold for 15 seconds, then switch sides. Do this 3 times each side. If you feel unsteady, sit with your back to a wall. Ask your sister-in-law to remind you. If you have questions, reply to this message to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C08",
+  "profile": {
+   "name": "Anjali",
+   "stage": "pregnant",
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "feet swell in the evening"
+   ],
+   "send_date": "2026-11-04",
+   "edd": "2027-02-10"
+  },
+  "message": "Namaste Anjali! You said your feet swell in the evening. Tonight, before dinner, try ankle circles. Sit on a chair and lift your feet a little. Turn each foot slowly in a circle, 8 times each way. If lifting is hard, rest your feet on a low stool. Ask someone at home to bring the stool for you. This will make your delivery easy and keep your baby healthy. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C09",
+  "profile": {
+   "name": "Rina",
+   "stage": "pregnant",
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "husband",
+   "hold_flags": [],
+   "facts": [],
+   "send_date": "2026-11-04",
+   "edd": "2027-03-10"
+  },
+  "message": "Hello! It is time for your stretch today. After your morning tea, try shoulder rolls. Sit tall and lift your shoulders up to your ears, then roll them back and down. Do this 8 times. If you feel tired, sit on a chair. Ask someone at home to remind you. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ }
+]

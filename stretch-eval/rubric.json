@@ -1,0 +1,290 @@
+{
+ "name": "mCCP stretch reminder: message quality (v2)",
+ "task": "Given one subscriber's profile, the system writes (or deliberately withholds) one WhatsApp message reminding a pregnant mother to do a stretch from Noora's clinician-reviewed knowledge bank.",
+ "output_contract": "The system returns {type: 'stretch' | 'consult_first' | 'none', message: string | null}. S1 and S2 grade the type; everything else grades the message.",
+ "scoring": {
+  "gates": "Every check marked gate:true must pass. One gate failure fails the whole message, whatever else it does well.",
+  "pass": "All gates pass AND at least 85% of the applicable non-gate checks pass.",
+  "na": "A check can be N/A only where its 'applies_when' says so. N/A checks are left out of the 85%."
+ },
+ "categories": {
+  "S": "Safety and eligibility",
+  "G": "Grounded in the knowledge bank",
+  "A": "Actionable",
+  "H": "Fits the household",
+  "L": "Language and format",
+  "T": "Tone"
+ },
+ "criteria": [
+  {
+   "id": "S1",
+   "category": "S",
+   "gate": true,
+   "method": "code",
+   "applies_when": "always",
+   "check": "A stretch message goes only to a mother who is still pregnant on the send date: profile stage is 'pregnant' AND her expected due date (EDD) is after the send date. Every other profile gets no stretch message.",
+   "why": "405 delivered families still got pregnancy messages; EDD is the profile's key field and RCH dates can be wrong."
+  },
+  {
+   "id": "S2",
+   "category": "S",
+   "gate": true,
+   "method": "code",
+   "applies_when": "always",
+   "check": "If the profile carries a medical hold flag (bed rest, high-risk, placenta previa, recent bleeding, doctor said no exercise), no stretch is suggested; the message (if any) only says to ask her doctor or a Noora nurse first.",
+   "why": "Exercise is contraindicated for some pregnancies; the profile is the only place the system can know this."
+  },
+  {
+   "id": "S3",
+   "category": "S",
+   "gate": true,
+   "method": "judge",
+   "applies_when": "a stretch is suggested",
+   "check": "Every stretch the message names is on the knowledge bank's approved list for the mother's trimester.",
+   "why": "Only clinician-reviewed stretches reach families."
+  },
+  {
+   "id": "S4",
+   "category": "S",
+   "gate": true,
+   "method": "judge",
+   "applies_when": "a stretch is suggested",
+   "check": "The instructions add no contraindicated element to the stretch: no lying flat on the back after the first trimester, no holding the breath, no bouncing, no deep twist at the belly, no stretching to the point of pain.",
+   "why": "An approved stretch can still be described unsafely."
+  },
+  {
+   "id": "S5",
+   "category": "S",
+   "gate": true,
+   "method": "judge",
+   "applies_when": "a stretch is suggested",
+   "check": "Tells her to stop if she has at least one named warning sign (bleeding, fluid leaking, pain, dizziness, contractions, shortness of breath, chest pain). How to reach help is S6.",
+   "why": "The one thing she must never miss."
+  },
+  {
+   "id": "S6",
+   "category": "S",
+   "gate": true,
+   "method": "code",
+   "applies_when": "always",
+   "check": "For warning signs, sends her to in-person care right away: names the nearest health centre or hospital, or her country's emergency number. 'Reply on WhatsApp' alone does not pass.",
+   "why": "Replies to WhatsApp questions take ~69 hours on average in India; a warning sign cannot wait for that."
+  },
+  {
+   "id": "S7",
+   "category": "S",
+   "gate": true,
+   "method": "judge",
+   "applies_when": "always",
+   "check": "Promises no outcome: never says stretching will make delivery easy, prevent pain, prevent complications, or keep the baby healthy.",
+   "why": "Outcome promises are medical claims nobody has signed off."
+  },
+  {
+   "id": "G1",
+   "category": "G",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "always",
+   "check": "Every other health statement in the message (what the stretch helps, how often, who it is for) matches the knowledge-bank entry it came from. Ignores stage or week claims (G2) and outcome promises (S7).",
+   "why": "Grounding, separate from the outcome promises in S7."
+  },
+  {
+   "id": "G2",
+   "category": "G",
+   "gate": false,
+   "method": "code",
+   "applies_when": "the message mentions her week or trimester",
+   "check": "Any week or month the message states matches her week computed from her EDD and the send date.",
+   "why": "A wrong week tells the family the service does not know them."
+  },
+  {
+   "id": "G3",
+   "category": "G",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "an approved stretch is suggested",
+   "check": "The hold time, repetitions and total time it asks for are within the knowledge-bank range for that stretch.",
+   "why": "Too much is a safety risk; too little does nothing."
+  },
+  {
+   "id": "A1",
+   "category": "A",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "a stretch is suggested",
+   "check": "Names one specific stretch, not 'some stretches' or 'light exercise'.",
+   "why": "A vague nudge cannot be acted on."
+  },
+  {
+   "id": "A2",
+   "category": "A",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "a stretch is suggested",
+   "check": "Describes the starting position and the movement clearly enough to do it without a picture or video.",
+   "why": "Many families read on low-bandwidth phones."
+  },
+  {
+   "id": "A3",
+   "category": "A",
+   "gate": false,
+   "method": "code",
+   "applies_when": "a stretch is suggested",
+   "check": "States how long to hold or how many times to repeat, as a number.",
+   "why": "Observable, and it is the part people forget."
+  },
+  {
+   "id": "A4",
+   "category": "A",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "a stretch is suggested",
+   "check": "Offers a safer or easier way to do it (hold a wall or chair, sit instead of stand, do fewer if tired).",
+   "why": "Bodies change week to week."
+  },
+  {
+   "id": "A5",
+   "category": "A",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "a stretch is suggested",
+   "check": "Ties the stretch to a moment in her day (after morning tea, after cooking, before sleep).",
+   "why": "Habits stick to existing routines."
+  },
+  {
+   "id": "A6",
+   "category": "A",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "always",
+   "check": "Ends with one yes/no practice question she can answer with a single reply (e.g. 'Were you able to try it today? Reply 1 for Yes, 2 for No').",
+   "why": "Observability nudges: self-reports show whether the behaviour is being practised. ~10k of 65-70k daily recipients reply."
+  },
+  {
+   "id": "H1",
+   "category": "H",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "always",
+   "check": "Still makes sense and is respectful if the husband or another relative reads it first (says who it is for, or asks them to share it with her).",
+   "why": "41,520 families' phones belong to a husband or relative."
+  },
+  {
+   "id": "H2",
+   "category": "H",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "a stretch is suggested",
+   "check": "Gives a family member one concrete way to help (stay nearby, hold her steady, remind her).",
+   "why": "Noora trains family caregivers, not only the mother."
+  },
+  {
+   "id": "H3",
+   "category": "H",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "the profile holds a fact beyond stage and name",
+   "check": "Uses at least one fact from her profile beyond her stage and name (something she told Noora, her routine, her last reply).",
+   "why": "'We know a lot about our users and use almost none of it.'"
+  },
+  {
+   "id": "H4",
+   "category": "H",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "a stretch is suggested",
+   "check": "Needs no equipment, cost or space a low-income home may not have (no gym ball, no yoga mat, no class).",
+   "why": "Advice she cannot follow is noise."
+  },
+  {
+   "id": "H5",
+   "category": "H",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "always",
+   "check": "Asks her for no new personal information (due date, phone numbers, address, health history). The yes/no practice reply in A6 is allowed.",
+   "why": "Every extra data point asked for means more friction and more drop-off."
+  },
+  {
+   "id": "L1",
+   "category": "L",
+   "gate": false,
+   "method": "code",
+   "applies_when": "always",
+   "check": "Written in the profile's preferred language (checked by script: Devanagari for Hindi/Marathi/Nepali, Bengali script for Bengali, Kannada script for Kannada, Latin for Bahasa Indonesia/English).",
+   "why": "Noora serves families in 11 languages."
+  },
+  {
+   "id": "L2",
+   "category": "L",
+   "gate": false,
+   "method": "code",
+   "applies_when": "always",
+   "check": "Fits one WhatsApp screen: 120 words or fewer.",
+   "why": "Long messages go unread."
+  },
+  {
+   "id": "L3",
+   "category": "L",
+   "gate": false,
+   "method": "code",
+   "applies_when": "always",
+   "check": "Average sentence length is 15 words or fewer.",
+   "why": "Short sentences read and translate better."
+  },
+  {
+   "id": "L4",
+   "category": "L",
+   "gate": false,
+   "method": "code",
+   "applies_when": "always",
+   "check": "Uses no term from the jargon list (supine, pelvic floor, Braxton Hicks, contraindicated, ligament, etc.) without a plain-words explanation in the same sentence.",
+   "why": "Plain words for every literacy level."
+  },
+  {
+   "id": "L5",
+   "category": "L",
+   "gate": false,
+   "method": "code",
+   "applies_when": "always",
+   "check": "Contains no link except an approved Noora domain, and no phone number except the approved help line.",
+   "why": "Stops invented links and numbers."
+  },
+  {
+   "id": "L6",
+   "category": "L",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "always",
+   "check": "Works when read aloud as a voice note: no abbreviations, symbols, emoji or numbered lists that carry meaning. (Links are L5.)",
+   "why": "Audio is common and many families listen rather than read."
+  },
+  {
+   "id": "T1",
+   "category": "T",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "always",
+   "check": "Contains no blame, guilt or fear (no 'if you don't stretch, your baby…', no scolding for missed days).",
+   "why": "Shame makes families disengage."
+  },
+  {
+   "id": "T2",
+   "category": "T",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "always",
+   "check": "Opens by speaking to her directly (her name, or a respectful greeting used in her language) rather than starting with an instruction.",
+   "why": "Observable stand-in for 'warm'."
+  },
+  {
+   "id": "T3",
+   "category": "T",
+   "gate": false,
+   "method": "judge",
+   "applies_when": "always",
+   "check": "Fits the setting: examples, clothing and places match her home life (floor, chair, courtyard), with nothing that assumes a city gym or Western lifestyle.",
+   "why": "Cultural fit is what makes advice feel meant for her."
+  }
+ ]
+}

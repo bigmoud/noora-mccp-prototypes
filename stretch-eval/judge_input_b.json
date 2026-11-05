@@ -1,0 +1,136 @@
+[
+ {
+  "id": "C10",
+  "profile": {
+   "name": "Divya",
+   "stage": "pregnant",
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "first pregnancy"
+   ],
+   "send_date": "2026-11-04",
+   "edd": "2027-05-05"
+  },
+  "message": "Dear Divya, as you move through your pregnancy it is very important to keep your body active and flexible, and doing some light stretching exercises every morning can be a wonderful way to care for yourself and your growing baby. You can also do some pelvic floor exercises, which many women find useful during this special time, but try not to stay supine for too long. Go slowly if you feel tired and listen to your body at all times. Ask your mother-in-law to join you so that you both stay active together. Stretching should feel gentle and never painful. Stop if you feel pain, dizziness or see any bleeding, or if anything feels different from usual, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. We are always here for you and your family whenever you need us. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C11",
+  "profile": {
+   "name": "Sunita",
+   "stage": "pregnant",
+   "lang": "hi",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "cooks in the evening"
+   ],
+   "send_date": "2026-11-04",
+   "edd": "2027-04-21"
+  },
+  "message": "नमस्ते सुनीता जी! यह संदेश सुनीता जी के लिए है। आज शाम खाना बनाने के बाद कंधे घुमाने का व्यायाम करें। सीधे बैठें। कंधों को कानों तक ऊपर उठाएं, फिर पीछे और नीचे घुमाएं। इसे 8 बार धीरे-धीरे करें। थकान हो तो कुर्सी पर बैठकर करें। घर का कोई सदस्य पास रहे। अगर दर्द, चक्कर या खून दिखे तो तुरंत रुकें और नज़दीकी अस्पताल जाएं या 108 पर कॉल करें। दूसरे सवालों के लिए नर्स से बात करने को इस संदेश का जवाब दें। क्या आप आज यह कर पाईं? हाँ के लिए 1, नहीं के लिए 2 लिखें।"
+ },
+ {
+  "id": "C12",
+  "profile": {
+   "name": "Mitali",
+   "stage": "pregnant",
+   "lang": "bn",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "back hurts at night"
+   ],
+   "send_date": "2026-11-04",
+   "edd": "2027-01-27"
+  },
+  "message": "Hi Mitali! You are in week 12 now. You told us your back hurts at night, so try the standing pelvic tilt against a wall before bed. Stand with your back to the wall and gently press your lower back toward it, then release. Do this 8 times. Hold a chair if you feel unsteady. Ask your husband to stand beside you. Stop if you feel pain, dizziness or see any bleeding. If you skip your stretches, your baby may suffer. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C13",
+  "profile": {
+   "name": "Neha",
+   "stage": "pregnant",
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "lives in a one-room home"
+   ],
+   "send_date": "2026-11-04",
+   "edd": "2027-03-24"
+  },
+  "message": "Namaste Neha! Even in a small room you have space for this. After your morning jog in the park, spread your yoga mat and do the seated side stretch. Raise one arm and lean gently to the other side. Hold for 15 seconds, 3 times each side. If you feel unsteady, sit with your back to a wall. Ask your husband to remind you. Watch the video: bit.ly/stretch-video. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C14",
+  "profile": {
+   "name": "Fatima",
+   "stage": "pregnant",
+   "lang": "en",
+   "country": "BD",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "calf cramps at night"
+   ],
+   "send_date": "2026-11-04",
+   "edd": "2026-12-30"
+  },
+  "message": "Namaste Fatima! You said your calves cramp at night. Before bed, try the wall calf stretch. Put your hands on a wall and step one foot back with the heel down. Lean forward gently. Hold for 2 minutes, 10 times each leg. If you feel unsteady, keep both hands on the wall. Ask someone at home to stay nearby. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 999 right away. For other questions, reply here to talk to a Noora nurse. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C15",
+  "profile": {
+   "name": "Shanti",
+   "stage": "pregnant",
+   "edd": "2027-03-17",
+   "send_date": "2026-11-04",
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "neck stiff after sewing"
+   ]
+  },
+  "message": "Namaste Shanti! You told us your neck gets stiff after sewing. Today, try shoulder rolls after your morning tea. Sit or stand tall. Lift your shoulders up to your ears, then roll them back and down. Do this 8 times, slowly. If you feel tired, sit on a chair. Ask someone at home to remind you. Stop if you feel pain, dizziness or see any bleeding, and reply to this message so a Noora nurse can help. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C16",
+  "profile": {
+   "name": "Joyce",
+   "stage": "pregnant",
+   "edd": "2027-02-17",
+   "send_date": "2026-11-04",
+   "lang": "en",
+   "country": "GH",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": [
+    "sells at the market"
+   ]
+  },
+  "message": "Hello Joyce! After you come home from the market, try shoulder rolls. Sit or stand tall. Lift your shoulders up to your ears, then roll them back and down. Do this 8 times, slowly. If you feel tired, sit on a chair. Ask someone at home to remind you. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 112 right away. Please also reply with your due date and your husband's phone number. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ },
+ {
+  "id": "C17",
+  "profile": {
+   "name": "Sita",
+   "stage": "pregnant",
+   "edd": "2026-09-20",
+   "send_date": "2026-11-04",
+   "lang": "en",
+   "country": "IN",
+   "phone_holder": "mother",
+   "hold_flags": [],
+   "facts": []
+  },
+  "message": "Namaste Sita! Today, try shoulder rolls after your morning tea. Sit or stand tall. Lift your shoulders up to your ears, then roll them back and down. Do this 8 times, slowly. If you feel tired, sit on a chair. Ask someone at home to remind you. Stop if you feel pain, dizziness or see any bleeding, and go to your nearest health centre or call 108 right away. Were you able to try it today? Reply 1 for Yes, 2 for No."
+ }
+]

@@ -1,0 +1,422 @@
+{
+ "C01": {
+  "items": [
+   {
+    "field": "phone_holder",
+    "value": "husband",
+    "status": "ready",
+    "speaker": "husband",
+    "evidence": "This is Ramesh, Sunita's husband.",
+    "msg": 1,
+    "confidence": "medium",
+    "why": "Message comes from the husband's phone.",
+    "replaces": null
+   },
+   {
+    "field": "stage",
+    "value": "delivered",
+    "status": "ready",
+    "speaker": "husband",
+    "evidence": "She delivered last night at Sadar Hospital Gaya.",
+    "msg": 1,
+    "confidence": "high",
+    "why": "Husband reports the birth.",
+    "replaces": "pregnant"
+   },
+   {
+    "field": "baby_dob",
+    "value": "2026-11-02",
+    "status": "ready",
+    "speaker": "husband",
+    "evidence": "She delivered last night",
+    "msg": 1,
+    "confidence": "high",
+    "why": "Last night in a 3 Nov message is 2 Nov.",
+    "replaces": null
+   },
+   {
+    "field": "delivery_place",
+    "value": "government hospital",
+    "status": "ready",
+    "speaker": "husband",
+    "evidence": "Sadar Hospital Gaya",
+    "msg": 1,
+    "confidence": "medium",
+    "why": "Sadar Hospital is a government hospital.",
+    "replaces": null
+   },
+   {
+    "field": "baby_sex",
+    "value": "boy",
+    "status": "ready",
+    "speaker": "husband",
+    "evidence": "It's a boy!",
+    "msg": 1,
+    "confidence": "high",
+    "why": "Stated directly.",
+    "replaces": null
+   },
+   {
+    "field": "num_babies",
+    "value": "1",
+    "status": "ready",
+    "speaker": "husband",
+    "evidence": "It's a boy!",
+    "msg": 1,
+    "confidence": "medium",
+    "why": "A single boy is mentioned.",
+    "replaces": null
+   },
+   {
+    "field": "feeding",
+    "value": "breastfeeding",
+    "status": "ready",
+    "speaker": "husband",
+    "evidence": "Yes, he is breastfeeding.",
+    "msg": 3,
+    "confidence": "high",
+    "why": "Stated directly.",
+    "replaces": null
+   }
+  ]
+ },
+ "C02": {
+  "items": [
+   {
+    "field": "symptom",
+    "value": "Feet swelling a lot in seventh month of pregnancy",
+    "status": "alert",
+    "speaker": "mother",
+    "evidence": "My feet have started swelling a lot",
+    "msg": 1,
+    "confidence": "high",
+    "why": "Current symptom in pregnancy.",
+    "replaces": null
+   },
+   {
+    "field": "edd",
+    "value": "2027-01-14",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "The doctor said 14 January.",
+    "msg": 3,
+    "confidence": "high",
+    "why": "Doctor's date replaces the one on file.",
+    "replaces": "2027-01-28"
+   },
+   {
+    "field": "location",
+    "value": "Faridpur village, Bareilly, Uttar Pradesh",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "We live in Faridpur village, near Bareilly.",
+    "msg": 3,
+    "confidence": "medium",
+    "why": "Adds village to the district on file.",
+    "replaces": "Bareilly, Uttar Pradesh"
+   }
+  ]
+ },
+ "C03": {
+  "items": [
+   {
+    "field": "phone_holder",
+    "value": "mother-in-law",
+    "status": "ready",
+    "speaker": "mother-in-law",
+    "evidence": "This phone is mine, she does not have a phone.",
+    "msg": 3,
+    "confidence": "high",
+    "why": "Stated directly.",
+    "replaces": null
+   },
+   {
+    "field": "edd",
+    "value": "2026-11-06",
+    "status": "review",
+    "speaker": "mother-in-law",
+    "evidence": "The doctor gave the date for the day after tomorrow.",
+    "msg": 1,
+    "confidence": "medium",
+    "why": "Relative date from 4 Nov; differs from the date on file.",
+    "replaces": "2026-11-08"
+   }
+  ]
+ },
+ "C04": {
+  "items": [
+   {
+    "field": "edd",
+    "value": "2026-12-02",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "It is 2 December, the doctor wrote it in my report.",
+    "msg": 3,
+    "confidence": "high",
+    "why": "She corrected her earlier 20 December; latest value used.",
+    "replaces": "2026-12-10"
+   }
+  ]
+ },
+ "C05": {
+  "items": [
+   {
+    "field": "baby_sex",
+    "value": "boy",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "My son is feeding well now",
+    "msg": 3,
+    "confidence": "high",
+    "why": "Her baby is a son.",
+    "replaces": null
+   },
+   {
+    "field": "feeding",
+    "value": "breastfeeding",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "only mother's milk",
+    "msg": 3,
+    "confidence": "high",
+    "why": "Stated directly.",
+    "replaces": null
+   }
+  ]
+ },
+ "C06": {
+  "items": []
+ },
+ "C07": {
+  "items": [
+   {
+    "field": "stage",
+    "value": "loss",
+    "status": "nurse",
+    "speaker": "unknown",
+    "evidence": "The baby did not survive.",
+    "msg": 1,
+    "confidence": "high",
+    "why": "Pregnancy loss is sensitive and needs a nurse.",
+    "replaces": "pregnant"
+   },
+   {
+    "field": "stop_messages",
+    "value": "yes",
+    "status": "nurse",
+    "speaker": "unknown",
+    "evidence": "Please don't send any more messages.",
+    "msg": 2,
+    "confidence": "high",
+    "why": "Request to stop messages needs a nurse.",
+    "replaces": null
+   }
+  ]
+ },
+ "C08": {
+  "items": [
+   {
+    "field": "stage",
+    "value": "delivered",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "I had a baby girl last Tuesday.",
+    "msg": 1,
+    "confidence": "high",
+    "why": "She reports having delivered.",
+    "replaces": "pregnant"
+   },
+   {
+    "field": "baby_dob",
+    "value": "2026-11-03",
+    "status": "review",
+    "speaker": "mother",
+    "evidence": "last Tuesday",
+    "msg": 1,
+    "confidence": "medium",
+    "why": "Relative date; last Tuesday before Thursday 5 Nov is 3 Nov.",
+    "replaces": null
+   },
+   {
+    "field": "delivery_place",
+    "value": "home",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "It was a home delivery, the dai did it.",
+    "msg": 1,
+    "confidence": "high",
+    "why": "Stated directly.",
+    "replaces": null
+   },
+   {
+    "field": "baby_sex",
+    "value": "girl",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "I had a baby girl",
+    "msg": 1,
+    "confidence": "high",
+    "why": "Stated directly.",
+    "replaces": null
+   },
+   {
+    "field": "symptom",
+    "value": "Home delivery with no check yet of mother and newborn by a doctor or nurse",
+    "status": "alert",
+    "speaker": "mother",
+    "evidence": "Not yet.",
+    "msg": 3,
+    "confidence": "high",
+    "why": "Needs a postnatal check now.",
+    "replaces": null
+   }
+  ]
+ },
+ "C09": {
+  "items": [
+   {
+    "field": "stage",
+    "value": "delivered",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "My twin boys were born on 28 October",
+    "msg": 1,
+    "confidence": "high",
+    "why": "She has delivered.",
+    "replaces": "pregnant"
+   },
+   {
+    "field": "baby_dob",
+    "value": "2026-10-28",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "born on 28 October",
+    "msg": 1,
+    "confidence": "high",
+    "why": "Explicit date, year from message timestamp.",
+    "replaces": null
+   },
+   {
+    "field": "num_babies",
+    "value": "2",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "My twin boys",
+    "msg": 1,
+    "confidence": "high",
+    "why": "Twins.",
+    "replaces": null
+   },
+   {
+    "field": "baby_sex",
+    "value": "boys",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "My twin boys",
+    "msg": 1,
+    "confidence": "high",
+    "why": "Both are boys.",
+    "replaces": null
+   },
+   {
+    "field": "delivery_place",
+    "value": "government hospital",
+    "status": "ready",
+    "speaker": "mother",
+    "evidence": "Krishnanagar district hospital",
+    "msg": 1,
+    "confidence": "high",
+    "why": "District hospital is government.",
+    "replaces": null
+   },
+   {
+    "field": "feeding",
+    "value": "mixed",
+    "status": "review",
+    "speaker": "mother",
+    "evidence": "One is breastfeeding, the other also needs formula.",
+    "msg": 3,
+    "confidence": "medium",
+    "why": "Mixed feeding, may be temporary.",
+    "replaces": null
+   }
+  ]
+ },
+ "C10": {
+  "items": []
+ },
+ "C11": {
+  "items": [
+   {
+    "field": "symptom",
+    "value": "Fever since yesterday",
+    "status": "alert",
+    "speaker": "mother",
+    "evidence": "I have had a fever since yesterday",
+    "msg": 1,
+    "confidence": "high",
+    "why": "Postpartum fever needs nurse action now.",
+    "replaces": null
+   },
+   {
+    "field": "symptom",
+    "value": "Lower stomach pain after delivery",
+    "status": "alert",
+    "speaker": "mother",
+    "evidence": "pain in my lower stomach",
+    "msg": 1,
+    "confidence": "high",
+    "why": "Postpartum pain needs nurse action now.",
+    "replaces": null
+   },
+   {
+    "field": "feeding",
+    "value": "mixed",
+    "status": "review",
+    "speaker": "mother",
+    "evidence": "My milk is less, so we are giving the baby formula also.",
+    "msg": 2,
+    "confidence": "medium",
+    "why": "Formula alongside breastfeeding, possibly temporary.",
+    "replaces": null
+   }
+  ]
+ },
+ "C12": {
+  "items": [
+   {
+    "field": "language",
+    "value": "Bhojpuri",
+    "status": "review",
+    "speaker": "mother",
+    "evidence": "Please send them in Bhojpuri",
+    "msg": 1,
+    "confidence": "medium",
+    "why": "Request; nurse only said they would look into it.",
+    "replaces": "Hindi"
+   },
+   {
+    "field": "channel_pref",
+    "value": "voice",
+    "status": "review",
+    "speaker": "mother",
+    "evidence": "or send audio",
+    "msg": 1,
+    "confidence": "low",
+    "why": "Offered as an alternative to Bhojpuri text.",
+    "replaces": "text"
+   },
+   {
+    "field": "location",
+    "value": "Siwan",
+    "status": "review",
+    "speaker": "mother",
+    "evidence": "I have come to my mother's house in Siwan now. The delivery will be here.",
+    "msg": 3,
+    "confidence": "medium",
+    "why": "Temporary stay for the birth; district only.",
+    "replaces": "Patna, Bihar"
+   }
+  ]
+ }
+}

@@ -1,0 +1,259 @@
+{
+ "C01": {
+  "key": [
+   {
+    "field": "phone_holder",
+    "value": "husband",
+    "status": "ready"
+   },
+   {
+    "field": "stage",
+    "value": "delivered",
+    "status": "ready"
+   },
+   {
+    "field": "baby_dob",
+    "value": "2026-11-02",
+    "status": "ready"
+   },
+   {
+    "field": "delivery_place",
+    "value": "government hospital",
+    "status": "ready"
+   },
+   {
+    "field": "baby_sex",
+    "value": "boy",
+    "status": "ready"
+   },
+   {
+    "field": "num_babies",
+    "value": "1",
+    "status": "ready"
+   },
+   {
+    "field": "feeding",
+    "value": "breastfeeding",
+    "status": "ready"
+   }
+  ],
+  "traps": [
+   "'last night' on 3 Nov means the baby was born on 2 Nov, not 3 Nov"
+  ]
+ },
+ "C02": {
+  "key": [
+   {
+    "field": "edd",
+    "value": "2027-01-14",
+    "status": "ready"
+   },
+   {
+    "field": "location",
+    "value": "Faridpur, Bareilly, Uttar Pradesh",
+    "status": "ready"
+   },
+   {
+    "field": "symptom",
+    "value": "swelling of the feet",
+    "status": "alert"
+   }
+  ],
+  "traps": [
+   "'seventh month' alone is not a due date",
+   "the doctor's date replaces the government record's 28 Jan"
+  ]
+ },
+ "C03": {
+  "key": [
+   {
+    "field": "phone_holder",
+    "value": "mother-in-law",
+    "status": "ready"
+   },
+   {
+    "field": "edd",
+    "value": "2026-11-06",
+    "status": "review"
+   }
+  ],
+  "traps": [
+   "'day after tomorrow' is relative and disagrees with the 8 Nov on file, so a person should check it",
+   "reading messages aloud is not the same as asking for voice notes"
+  ]
+ },
+ "C04": {
+  "key": [
+   {
+    "field": "edd",
+    "value": "2026-12-02",
+    "status": "ready"
+   }
+  ],
+  "traps": [
+   "the corrected 2 Dec wins; 20 Dec must not be saved"
+  ]
+ },
+ "C05": {
+  "key": [
+   {
+    "field": "feeding",
+    "value": "breastfeeding",
+    "status": "ready"
+   },
+   {
+    "field": "baby_sex",
+    "value": "boy",
+    "status": "ready"
+   }
+  ],
+  "traps": [
+   "the sister's pregnancy is not Meena's: no stage or due date may be written"
+  ]
+ },
+ "C06": {
+  "key": [],
+  "traps": [
+   "nothing should be written"
+  ]
+ },
+ "C07": {
+  "key": [
+   {
+    "field": "stage",
+    "value": "loss",
+    "status": "nurse"
+   },
+   {
+    "field": "stop_messages",
+    "value": "yes",
+    "status": "nurse"
+   }
+  ],
+  "traps": [
+   "must not be saved as 'delivered' or get a baby date of birth",
+   "a loss is never saved automatically: a nurse or counsellor handles it"
+  ]
+ },
+ "C08": {
+  "key": [
+   {
+    "field": "stage",
+    "value": "delivered",
+    "status": "ready"
+   },
+   {
+    "field": "baby_dob",
+    "value": "2026-11-03",
+    "status": "review"
+   },
+   {
+    "field": "delivery_place",
+    "value": "home",
+    "status": "ready"
+   },
+   {
+    "field": "baby_sex",
+    "value": "girl",
+    "status": "ready"
+   },
+   {
+    "field": "num_babies",
+    "value": "1",
+    "status": "ready"
+   },
+   {
+    "field": "symptom",
+    "value": "home birth, mother and baby not yet checked",
+    "status": "alert"
+   }
+  ],
+  "traps": [
+   "'last Tuesday' said on Thursday 5 Nov could mean 3 Nov or 27 Oct, so a person checks it"
+  ]
+ },
+ "C09": {
+  "key": [
+   {
+    "field": "stage",
+    "value": "delivered",
+    "status": "ready"
+   },
+   {
+    "field": "baby_dob",
+    "value": "2026-10-28",
+    "status": "ready"
+   },
+   {
+    "field": "num_babies",
+    "value": "2",
+    "status": "ready"
+   },
+   {
+    "field": "baby_sex",
+    "value": "boys",
+    "status": "ready"
+   },
+   {
+    "field": "delivery_place",
+    "value": "government hospital",
+    "status": "ready"
+   },
+   {
+    "field": "feeding",
+    "value": "mixed",
+    "status": "ready"
+   }
+  ],
+  "traps": [
+   "twins: two babies, not one"
+  ]
+ },
+ "C10": {
+  "key": [],
+  "traps": [
+   "12 March 2001 is the mother's birth date and must not become a baby date of birth",
+   "'six months' alone is not a due date"
+  ]
+ },
+ "C11": {
+  "key": [
+   {
+    "field": "symptom",
+    "value": "fever and lower abdominal pain after delivery",
+    "status": "alert"
+   },
+   {
+    "field": "feeding",
+    "value": "mixed",
+    "status": "ready"
+   }
+  ],
+  "traps": [
+   "fever is today's symptom, not a lasting profile fact"
+  ]
+ },
+ "C12": {
+  "key": [
+   {
+    "field": "language",
+    "value": "Bhojpuri",
+    "status": "ready"
+   },
+   {
+    "field": "channel_pref",
+    "value": "voice",
+    "status": "review"
+   },
+   {
+    "field": "location",
+    "value": "Siwan, Bihar",
+    "status": "review"
+   }
+  ],
+  "traps": [
+   "'or send audio' is a soft preference, so a person checks it",
+   "staying at her mother's for the birth is temporary and must not silently replace Patna"
+  ]
+ }
+}
