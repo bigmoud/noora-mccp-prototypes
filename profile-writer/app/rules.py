@@ -38,6 +38,8 @@ class Decision:
     lane: str | None = None  # "reviewer" | "clinical" | None
     checks: list[tuple[str, bool, str]] = field(default_factory=list)
     proposal: dict = field(default_factory=dict)
+    route: str = ""        # final outcome after the judge: write | nurse | clinical | ask_family | discard | same | shadow
+    judgement: dict = field(default_factory=dict)
 
     @property
     def reason(self) -> str:
@@ -47,7 +49,7 @@ class Decision:
     def to_dict(self) -> dict:
         return {"signal": self.signal, "value": self.value, "action": self.action, "lane": self.lane,
                 "reason": self.reason, "checks": [{"name": n, "ok": ok, "detail": d} for n, ok, d in self.checks],
-                "proposal": self.proposal}
+                "proposal": self.proposal, "route": self.route, "judgement": self.judgement}
 
 
 def _norm(s: str) -> str:

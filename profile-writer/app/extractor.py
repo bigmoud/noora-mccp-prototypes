@@ -125,26 +125,7 @@ def _validate(raw: dict) -> tuple[str, bool, list[dict]]:
     return speaker, sensitive, clean
 
 
-_ledger_lock = threading.Lock()
-
-
-def spend_so_far() -> float:
-    try:
-        return float(json.loads(settings.spend_ledger.read_text())["usd"])
-    except (OSError, ValueError, KeyError):
-        return 0.0
-
-
-def _record_spend(tin: int, tout: int) -> None:
-    usd = tin / 1e6 * (settings.price_in_per_mtok or 0) + tout / 1e6 * (settings.price_out_per_mtok or 0)
-    with _ledger_lock:
-        data = {"usd": spend_so_far() + usd}
-        try:
-            data["calls"] = json.loads(settings.spend_ledger.read_text()).get("calls", 0) + 1
-        except (OSError, ValueError):
-            data["calls"] = 1
-        settings.spend_ledger.parent.mkdir(parents=True, exist_ok=True)
-        settings.spend_ledger.write_text(json.dumps(data))
+from .llm import call_tool, spend_so_far  # noqa: E402,F401  (spend_so_far re-exported)
 
 
 class ClaudeExtractor:
@@ -155,62 +136,11 @@ class ClaudeExtractor:
 
     def extract(self, text: str, msg_day: date, context: list[tuple[str, str]] | None = None) -> Extraction:
         user_turn = build_user_turn(text, msg_day, context or [])
-        body = {
-            "model": self.model,
-            "max_tokens": 800,
-            "system": SYSTEM_PROMPT,
-            "tools": [TOOL],
-            "tool_choice": {"type": "tool", "name": "record_signals"},
-            "messages": [{"role": "user", "content": user_turn}],
-        }
         out = Extraction(extractor=f"claude:{self.model}:p{PROMPT_VERSION}", sent_to_model=user_turn)
-        if spend_so_far() >= settings.spend_cap_usd:
-            out.error = f"spend cap reached (${settings.spend_cap_usd:.2f}): no call made"
-            return out
-        headers = {
-            "content-type": "application/json",
-            "x-api-key": settings.anthropic_api_key,
-            "anthropic-version": "2023-06-01",
-        }
-        if settings.anthropic_workspace_id:
-            headers["anthropic-workspace-id"] = settings.anthropic_workspace_id
-        t0 = time.time()
-        data = None
-        for attempt in range(2):  # one retry at most: no retry loops
-            try:
-                req = urllib.request.Request(
-                    settings.anthropic_base_url + "/v1/messages",
-                    data=json.dumps(body).encode(),
-                    headers=headers,
-                )
-                with urllib.request.urlopen(req, timeout=40) as resp:
-                    data = json.loads(resp.read())
-                break
-            except urllib.error.HTTPError as e:
-                try:
-                    msg = json.loads(e.read()).get("error", {}).get("message", "")[:160]
-                except Exception:
-                    msg = ""
-                out.error = f"HTTP {e.code} {msg}".strip()
-                if e.code not in (429, 500, 502, 503, 529) or attempt == 1:
-                    break
-                time.sleep(2)
-            except Exception as e:  # network, timeout
-                out.error = type(e).__name__
-                break
-        out.ms = int((time.time() - t0) * 1000)
-        if data is None:
-            return out
-        out.error = ""
-        usage = data.get("usage", {})
-        out.tokens_in = usage.get("input_tokens", 0) + usage.get("cache_read_input_tokens", 0)
-        out.tokens_out = usage.get("output_tokens", 0)
-        _record_spend(out.tokens_in, out.tokens_out)
-        tool_input = next((b.get("input") for b in data.get("content", []) if b.get("type") == "tool_use"), None)
-        if not isinstance(tool_input, dict):
-            out.error = "no tool output"
-            return out
-        out.speaker, out.sensitive_event, out.signals = _validate(tool_input)
+        r = call_tool(SYSTEM_PROMPT, user_turn, TOOL, self.model, max_tokens=1500)
+        out.tokens_in, out.tokens_out, out.ms, out.error = r.tokens_in, r.tokens_out, r.ms, r.error
+        if r.output is not None:
+            out.speaker, out.sensitive_event, out.signals = _validate(r.output)
         return out
 
 

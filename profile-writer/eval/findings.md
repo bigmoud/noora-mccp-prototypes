@@ -95,3 +95,52 @@ are now converted before phone redaction.
   read as the due date. Is that even the right label? Ask Niharika.
 - Speaker (who is writing) 1/4: the model names the phone's owner as the writer (g27, g28)
   and misses the switch to the mother in Devanagari (g30).
+
+---
+
+# AI judge replaces human review (Nov 5, evening)
+
+Direction from the pod: nurses' time is for care, so nobody clicks through every write. An AI
+judge (Claude Sonnet 5.5, a different model from the Haiku extractor) checks every proposed
+write against a yes/no rubric: stated directly · about her · value exactly right · current ·
+no sign of loss · usual phone holder. Code turns the answers into confirm / reject / unsure;
+unsure goes to a nurse inside that family's chat. Clinical cases (loss, high-risk campaign)
+always go to a nurse. Approximate dates never reach the judge: they become a question in the
+Copilot draft.
+
+## Calibration (`eval/run_judge_eval.py`)
+For each case: the answer-key value (correct), the same field with a wrong value (date +7
+days, other phone holder, opposite stage), and tempting writes the key forbids (a sister's
+birth or a loss written as a birth, a borrowed phone, a vague date made exact).
+
+| Version | Change | Wrong proposals confirmed | Correct confirmed | To a nurse | Correct rejected |
+|---|---|---|---|---|---|
+| j1 | first rubric | 1/74 | 39/42 | 5/116 | 0 |
+| j2 | "a range is never an exact date" | **0/74** | 38/42 | 4/116 | 0 |
+| j3 | judge told messages come from her number; policy conflicts routed to a nurse | **0/74** | **40/42** | 4/116 | 0 |
+
+j1's one miss: "2 hafte pehle" accepted as an exact birth date (the rules already block this
+before the judge; fixed in the rubric anyway).
+
+## End to end with the judge (46 cases)
+
+| | Precision | Recall | Wrong writes | Cases needing a nurse |
+|---|---|---|---|---|
+| Extractor + rules (every write human-reviewed) | 100% | 83% | 0 | all |
+| + judge, first run | 97% | 86% | **1** | 11 |
+| + judge, j3 | **100%** | **95%** | **0** | 9 (7 clinical) |
+
+The one wrong write (g10, a five-week due-date correction) was the judge overruling a rule
+that had held it as a conflict with the profile. The judge was right about what the family
+said, but conflicts with what's on file are policy, so they now go to a nurse and the judge
+can't overrule them.
+
+## Caveats
+- I read the judge's output on holdout case g24 while fixing j3, so the holdout split is no
+  longer clean for the judge. Kripesh's 20 cases (dev2): 94% recall, 0 wrong writes.
+- Corrupted proposals are fairly easy (a 7-day shift). Next: harder negatives (±1 day,
+  "kal" past vs future, the mother-in-law's own baby).
+- Extractor miss seen while recording the demo: "Haan ji, yeh meri saas ka hi phone hai"
+  proposed as phone_holder=mother; the judge rejected it, so nothing wrong was written.
+- Judge cost ~$0.013 per message with proposals (reasoning tokens); ~$0.004 averaged over all
+  messages. Worth testing Haiku as judge against the same calibration set.

@@ -6,17 +6,18 @@ These are **prototypes on simulated data**: one small, testable problem we can s
 
 ## What's here
 
-### `profile-writer/`: WhatsApp message → profile, live
-A family's WhatsApp message goes through privacy checks, Claude Haiku 5.5 proposes four profile signals (who holds the phone, delivered or not, baby's date of birth, due date), and plain-code rules decide what is written to the profile, held for a person, or dropped. Every write keeps the family's exact words. Following Kripesh's Nov 5 direction, nurses do no data entry: confident writes go live and **non-clinical reviewers check every write afterwards**; anything unclear waits for them, and any mention of a pregnancy loss pauses the family and goes to the **clinical team**.
+### `profile-writer/`: the nurse's inbox, with a profile that writes itself
+A WhatsApp-style inbox for MSEs. As families write, the profile updates on its own: Claude Haiku 5.5 proposes four facts (who holds the phone, delivered or not, baby's DOB, due date), plain-code rules check them, and an **AI judge** (Claude Sonnet 5.5, a yes/no rubric calibrated against our golden set) confirms each write. Nurses only see a **Check before saving** card when the judge can't decide, and a **Clinical review** card for pregnancy loss or high-risk campaigns. The Copilot panel mirrors the UPE fields MSEs use today, with an AI-written summary of the family and a drafted reply in Hindi or English that the nurse edits and sends.
 
-- **Live demo:** a hosted dashboard shows each step as a message arrives, from a real phone through the WhatsApp Cloud API or typed into a simulator. **Replay** mode plays a recorded run with no server, as the backup.
-- Writes follow UPE: `condition_area` moves `ANC_EDD` → `PNC_DOB` only together with the baby's DOB, in one recorded write. High-risk (HRPW) and SNCU families are never switched automatically.
-- Eval on 46 synthetic cases (Hinglish, Devanagari, English, draft Marathi/Kannada/Telugu/Punjabi): **100% precision, 83% recall, 0 wrong writes**, $0.00033 per message. 37 tests.
-- Start with [`profile-writer/README.md`](profile-writer/README.md); safety and privacy design in [`SAFETY.md`](profile-writer/SAFETY.md); hosting in [`docs/DEPLOY.md`](profile-writer/docs/DEPLOY.md); WhatsApp in [`docs/WHATSAPP.md`](profile-writer/docs/WHATSAPP.md).
+- Writes follow UPE: `condition_area` moves `ANC_EDD` → `PNC_DOB` only together with the baby's DOB, in one recorded write. HRPW and SNCU families are never switched automatically.
+- Eval on 46 synthetic cases: **100% precision, 95% recall, 0 wrong writes**; 9 cases needed a nurse (7 of them clinical). Judge calibration: **0 of 74** wrong proposals confirmed.
+- Works offline (recorded results from the real pipeline) on GitHub Pages, or live against the server with the WhatsApp Cloud API.
+- Start with [`profile-writer/README.md`](profile-writer/README.md); safety in [`SAFETY.md`](profile-writer/SAFETY.md); demo script in [`DEMO.md`](profile-writer/DEMO.md).
 
 ```bash
-cd profile-writer && python3 -m app.server          # dashboard + simulator (standard library only)
+cd profile-writer && python3 -m app.server          # inbox + Family phone simulator (standard library only)
 python3 -m eval.run_eval --extractor claude --split all
+python3 -m eval.run_judge_eval
 ```
 
 ### `profile-writer/nurse-page/`: the earlier nurse-facing version
@@ -41,5 +42,5 @@ An interactive page showing six fictional women moving through one approved, due
 ## Rules we follow
 - Simulated, pod-written or de-identified/paraphrased data only. Noora has agreed that de-identified or paraphrased messages can go to Claude; real production messages stay inside Noora's systems. Noora's de-identified samples go only in the git-ignored `profile-writer/eval/golden/noora/`.
 - Clinical content (stretches, warning signs, emergency numbers) is a placeholder until Noora's clinical team signs it off.
-- No profile write without passing the code rules and keeping its source words. Nurses don't validate extractions (Kripesh, Nov 5); non-clinical reviewers check every write afterwards, and pregnancy-loss cases go to the clinical team. Nothing is ever sent to a family without a person pressing Send.
+- No profile write without passing the code rules and the AI judge, and keeping its source words. Nurses don't validate routine extractions (Kripesh, Nov 5); they see only what the judge couldn't decide and clinical cases. Nothing is ever sent to a family without a person pressing Send.
 - No API keys in the repo: `.env` is git-ignored, and the Pages and Netlify builds refuse to publish anything that looks like a key.

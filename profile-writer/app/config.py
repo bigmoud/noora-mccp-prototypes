@@ -60,6 +60,9 @@ class Settings:
     spend_cap_usd = _float("SPEND_CAP_USD", 5.0)
     spend_ledger = Path(os.environ.get("SPEND_LEDGER", ROOT / "data" / "spend_ledger.json"))
     extractor_model = os.environ.get("EXTRACTOR_MODEL", "claude-haiku-5-5")
+    # The judge is a different, stronger model so its mistakes are less likely to match the extractor's.
+    judge_model = os.environ.get("JUDGE_MODEL", "claude-sonnet-5-5")
+    copilot_model = os.environ.get("COPILOT_MODEL", "claude-haiku-5-5")
     # "claude" uses the API; "baseline" is the keyword extractor (no data leaves the laptop).
     extractor = os.environ.get("EXTRACTOR", "claude" if anthropic_api_key else "baseline")
     # Claude Haiku 5.5 list prices (prompts under 100k tokens), Nov 2026. Override if you change model.

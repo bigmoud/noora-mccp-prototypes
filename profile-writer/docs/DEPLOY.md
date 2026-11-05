@@ -3,13 +3,13 @@
 Two parts, hosted separately:
 
 ```
- web/  (static dashboard)               app/  (Python server)
+ web/  (static inbox page)              app/  (Python server)
  GitHub Pages or Netlify  ──HTTPS──▶    Render, or your laptop + a tunnel
-   Replay mode: no server needed          /api  (dashboard data, token-protected)
-   Live mode: Connect → server URL+token  /webhook  (WhatsApp, Meta-signed)
+   offline demo: no server needed          /api  (dashboard data, token-protected)
+   live: gear → server address + token   /webhook  (WhatsApp, Meta-signed)
 ```
 
-The dashboard is public but holds nothing secret: Replay shows a recorded run on synthetic
+The dashboard is public but holds nothing secret: the offline demo plays back a recorded run on synthetic
 chats, and Live mode needs the server's access token, which you type in at demo time. It
 is kept only in that browser tab.
 
@@ -17,7 +17,7 @@ is kept only in that browser tab.
 
 **GitHub Pages** (public repo, or a paid GitHub plan for private repos):
 1. A repo admin opens *Settings → Pages → Source* and picks **GitHub Actions**.
-2. Merge to `main`. The workflow `.github/workflows/pages.yml` (repo root) publishes `profile-writer/web/`.
+2. Merge to `main`. The workflow `.github/workflows/pages.yml` publishes `web/`.
    To deploy from another branch: *Settings → Environments → github-pages*, add the branch,
    then run the workflow by hand (*Actions → Deploy dashboard → Run workflow*).
 3. The site is at `https://<owner>.github.io/<repo>/`.
@@ -26,7 +26,7 @@ is kept only in that browser tab.
 pick the repo and branch. `netlify.toml` already sets the publish folder to `web`. Or drag
 the `web/` folder onto app.netlify.com/drop for a one-off copy.
 
-Either way the build refuses to publish if anything in `web/` looks like an API key. (`netlify.toml` and `render.yaml` sit at the repo root and point into `profile-writer/`.)
+Either way the build refuses to publish if anything in `web/` looks like an API key.
 
 ## 2. Server
 
@@ -52,23 +52,23 @@ WhatsApp webhook. The token is printed in the terminal.
 
 ## 3. Connect
 
-Open the hosted dashboard → **Connect to live server** → paste the server URL and
-`DASHBOARD_TOKEN` → *Connect*. The bar turns blue and says "Live · connected to …".
+Open the hosted page → gear icon → paste the server address and `DASHBOARD_TOKEN` → *Connect*.
+The gear then shows "Connected to …".
 "Couldn't connect" almost always means `ALLOWED_ORIGINS` doesn't match the frontend's
 address exactly.
 
-## 4. Refresh the replay (optional)
+## 4. Refresh the offline demo (optional)
 
-After changing the prompt or rules, re-record so Replay matches the code:
+After changing the prompt or rules, re-record so the offline demo matches the code:
 ```bash
-python3 -m scripts.record_replay      # uses Claude if ANTHROPIC_API_KEY is set (~$0.004)
+python3 -m scripts.record_demo        # uses Claude if ANTHROPIC_API_KEY is set (~$0.10)
 ```
 It runs the demo script through the real pipeline on a throwaway database and rewrites
-`web/replay.json`.
+`web/demo.json`.
 
 ## Plan B, in order
 
 1. Live WhatsApp on the phone →
 2. Live server, messages typed into the dashboard's simulator →
-3. **Replay** (no internet needed beyond loading the page) →
+3. **Offline demo** (the hosted page with no server connected) →
 4. Screen recording.

@@ -10,7 +10,7 @@ os.environ.setdefault("PSEUDONYM_KEY", "test-key")
 os.environ.setdefault("WHATSAPP_APP_SECRET", "test-secret")
 os.environ.setdefault("ALLOWED_TEST_NUMBERS", "919800000001")
 
-from app import dates, privacy, rules, whatsapp  # noqa: E402
+from app import dates, judge, privacy, rules, whatsapp  # noqa: E402
 from app.extractor import BaselineExtractor, _validate  # noqa: E402
 from app.pipeline import assess, process_inbound, review  # noqa: E402
 from app.store import Store  # noqa: E402
@@ -140,6 +140,15 @@ class Rules(unittest.TestCase):
         d = decide([prop("stage", "delivered", "delivery ho gayi")], "delivery ho gayi", rollout_mode="shadow")
         self.assertEqual(d["stage"].action, "shadow")
 
+    def test_judge_verdict_is_decided_in_code(self):
+        yes = {k: "yes" for k, _ in judge.RUBRIC}
+        self.assertEqual(judge.verdict_from(dict(yes, usual_holder="n/a"), "baby_dob"), "confirm")
+        self.assertEqual(judge.verdict_from(dict(yes, value_right="no"), "baby_dob"), "reject")
+        self.assertEqual(judge.verdict_from(dict(yes, her="unsure"), "stage"), "unsure")
+        self.assertEqual(judge.verdict_from(dict(yes, usual_holder="no"), "phone_holder"), "reject")
+        self.assertEqual(judge.verdict_from(dict(yes, usual_holder="no"), "stage"), "confirm")  # n/a for stage
+        self.assertEqual(judge.verdict_from({}, "stage"), "unsure")  # missing answers never confirm
+
     def test_schema_validation_drops_unknown(self):
         _, _, sigs = _validate({"speaker": "boss", "signals": [{"signal": "address", "value": "x"}, {"signal": "stage", "value": "delivered"}]})
         self.assertEqual([s["signal"] for s in sigs], ["stage"])
@@ -162,8 +171,17 @@ class Webhook(unittest.TestCase):
         self.assertNotIn("Real Name", json.dumps(msgs))
 
 
+def fake_judge(verdict):
+    def run(text, msg_day, context, profile, proposals, model=None):
+        return judge.JudgeRun([judge.Judgement(verdict, reason="test") for _ in proposals], judge="judge:test")
+    return run
+
+
 class Pipeline(unittest.TestCase):
     def setUp(self):
+        self._real_judge = judge.judge
+        judge.judge = fake_judge("confirm")
+        self.addCleanup(setattr, judge, "judge", self._real_judge)
         self.s = Store(":memory:")
         self.uid = privacy.pseudonym("sim-t")
         self.s.upsert_family(self.uid, "T", "ANC_EDD")
@@ -174,7 +192,7 @@ class Pipeline(unittest.TestCase):
                         extractor=BaselineExtractor())
         self.assertEqual(self.s.family(self.uid)["condition_area"], "PNC_DOB")
         dob = self.s.active_facts(self.uid)["baby_dob"]
-        review(self.s, dob["id"], "revert", "tester")
+        review(self.s, dob["id"], "revert")
         self.assertEqual(self.s.family(self.uid)["condition_area"], "ANC_EDD")
         self.assertEqual(len(self.s.q("SELECT * FROM golden_pending")), 1)
 
@@ -211,10 +229,51 @@ class Pipeline(unittest.TestCase):
     def test_loss_pauses_family_and_flags_clinical(self):
         process_inbound(self.s, self.uid, "Doctor ne bola bachcha nahi raha", extractor=BaselineExtractor())
         self.assertEqual(self.s.family(self.uid)["paused"], 1)
-        q = self.s.queue()
-        self.assertTrue(any(f["lane"] == "clinical" for f in q))
-        with self.assertRaises(PermissionError):
-            review(self.s, q[0]["id"], "reject", "data team")
+        q = self.s.queue(self.uid)
+        self.assertTrue(q and all(f["lane"] == "clinical" for f in q))
+        for f in q:
+            review(self.s, f["id"], "dismiss")
+        self.assertEqual(self.s.family(self.uid)["paused"], 0)
+
+    def test_judge_unsure_goes_to_nurse_not_profile(self):
+        judge.judge = fake_judge("unsure")
+        process_inbound(self.s, self.uid, "Main uska pati hoon. Delivery ho gayi pichhle mangalvar ko",
+                        ts="2026-11-05T10:00:00+00:00", extractor=BaselineExtractor())
+        self.assertNotIn("baby_dob", self.s.profile(self.uid))
+        self.assertEqual(self.s.family(self.uid)["condition_area"], "ANC_EDD")
+        held = {f["signal"]: f["lane"] for f in self.s.queue(self.uid)}
+        self.assertEqual(held.get("baby_dob"), "nurse")
+        f = next(x for x in self.s.queue(self.uid) if x["signal"] == "baby_dob")
+        review(self.s, f["id"], "confirm")
+        review(self.s, next(x for x in self.s.queue(self.uid) if x["signal"] == "stage")["id"], "confirm")
+        self.assertEqual(self.s.family(self.uid)["condition_area"], "PNC_DOB")
+        self.assertGreaterEqual(len(self.s.q("SELECT * FROM golden_pending")), 2)  # nurse decisions become test cases
+
+    def test_judge_reject_drops_the_write(self):
+        judge.judge = fake_judge("reject")
+        process_inbound(self.s, self.uid, "Delivery ho gayi pichhle mangalvar ko", ts="2026-11-05T10:00:00+00:00",
+                        extractor=BaselineExtractor())
+        self.assertNotIn("baby_dob", self.s.profile(self.uid))
+        self.assertEqual(self.s.queue(self.uid), [])
+
+    def test_no_judge_means_a_person_decides(self):
+        judge.judge = self._real_judge  # no API key in tests: the real judge can't run
+        process_inbound(self.s, self.uid, "Delivery ho gayi pichhle mangalvar ko", ts="2026-11-05T10:00:00+00:00",
+                        extractor=BaselineExtractor())
+        self.assertNotIn("baby_dob", self.s.profile(self.uid))
+        self.assertTrue(any(f["signal"] == "baby_dob" for f in self.s.queue(self.uid)))
+
+    def test_approximate_date_asks_the_family_not_the_nurse(self):
+        process_inbound(self.s, self.uid, "Baby hua, 2 hafte pehle", ts="2026-11-05T10:00:00+00:00",
+                        extractor=BaselineExtractor())
+        self.assertFalse(any(f["signal"] == "baby_dob" for f in self.s.queue(self.uid)))
+        cp = self.s.copilot(self.uid)
+        self.assertIn("the baby's exact date of birth", cp["still_needed"])
+
+    def test_copilot_draft_is_never_sent(self):
+        process_inbound(self.s, self.uid, "Delivery ho gayi pichhle mangalvar ko", extractor=BaselineExtractor())
+        self.assertTrue(self.s.copilot(self.uid)["reply"])
+        self.assertEqual(self.s.q("SELECT COUNT(*) n FROM messages WHERE direction='out'")[0]["n"], 0)
 
     def test_erase(self):
         process_inbound(self.s, self.uid, "hello", extractor=BaselineExtractor())
@@ -239,3 +298,23 @@ class Pipeline(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NurseFacing(unittest.TestCase):
+    def setUp(self):
+        self._real = judge.judge
+        judge.judge = fake_judge("confirm")
+        self.addCleanup(setattr, judge, "judge", self._real)
+        self.s = Store(":memory:")
+        self.uid = privacy.pseudonym("sim-n")
+        self.s.upsert_family(self.uid, "N", "ANC_EDD")
+        self.s.add_fact(self.uid, "stage", "pregnant", "active", None, None, "(onboarding)", "", "", [], "", "onboarding", "approved")
+        self.s.add_fact(self.uid, "due_date", "2027-01-19", "active", None, None, "(onboarding)", "", "", [], "", "onboarding", "approved")
+
+    def test_far_from_due_date_goes_to_nurse_in_plain_words_and_is_not_reasked(self):
+        process_inbound(self.s, self.uid, "Delivery ho gayi pichhle mangalvar ko", ts="2026-11-05T10:00:00+00:00",
+                        extractor=BaselineExtractor())
+        held = [f for f in self.s.queue(self.uid) if f["signal"] == "baby_dob"]
+        self.assertTrue(held and held[0]["lane"] == "nurse")
+        self.assertIn("far from her due date (19/01/2027)", held[0]["reason"])
+        self.assertNotIn("the baby's exact date of birth", self.s.copilot(self.uid)["still_needed"])

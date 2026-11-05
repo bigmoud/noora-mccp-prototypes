@@ -17,7 +17,11 @@ from .config import settings
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS families (
   uid TEXT PRIMARY KEY, label TEXT, base_condition_area TEXT DEFAULT 'ANC_EDD', condition_area TEXT DEFAULT 'ANC_EDD',
-  consent INTEGER DEFAULT 1, paused INTEGER DEFAULT 0, synthetic INTEGER DEFAULT 1, created_at TEXT);
+  consent INTEGER DEFAULT 1, paused INTEGER DEFAULT 0, synthetic INTEGER DEFAULT 1, created_at TEXT,
+  name TEXT, state TEXT, language TEXT, noora_program TEXT, onboarding_method TEXT, onboarding_date TEXT,
+  high_risk TEXT, last_read_id INTEGER DEFAULT 0);
+CREATE TABLE IF NOT EXISTS copilot (
+  uid TEXT PRIMARY KEY, bio TEXT, reply TEXT, language TEXT, still_needed TEXT, message_id INTEGER, ts TEXT, model TEXT);
 CREATE TABLE IF NOT EXISTS contacts (uid TEXT PRIMARY KEY, phone TEXT);
 CREATE TABLE IF NOT EXISTS messages (
   id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, direction TEXT, author TEXT, text TEXT,
@@ -81,10 +85,27 @@ class Store:
 
     # ------------------------------------------------------------ families
     def upsert_family(self, uid: str, label: str, condition_area: str = "ANC_EDD", consent: bool = True,
-                      synthetic: bool = True):
-        self.x("""INSERT INTO families (uid, label, base_condition_area, condition_area, consent, synthetic, created_at)
-                  VALUES (?,?,?,?,?,?,?) ON CONFLICT(uid) DO NOTHING""",
-               (uid, label, condition_area, condition_area, int(consent), int(synthetic), now()))
+                      synthetic: bool = True, **details):
+        self.x("""INSERT INTO families (uid, label, base_condition_area, condition_area, consent, synthetic, created_at,
+                  name, state, language, noora_program, onboarding_method, onboarding_date, high_risk)
+                  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(uid) DO NOTHING""",
+               (uid, label, condition_area, condition_area, int(consent), int(synthetic), now(),
+                details.get("name", label), details.get("state"), details.get("language"), details.get("noora_program"),
+                details.get("onboarding_method"), details.get("onboarding_date"), details.get("high_risk")))
+
+    def set_copilot(self, uid: str, bio: str, reply: str, language: str, still_needed: list, message_id, model: str):
+        self.x("""INSERT INTO copilot (uid, bio, reply, language, still_needed, message_id, ts, model)
+                  VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(uid) DO UPDATE SET bio=excluded.bio, reply=excluded.reply,
+                  language=excluded.language, still_needed=excluded.still_needed, message_id=excluded.message_id,
+                  ts=excluded.ts, model=excluded.model""",
+               (uid, bio, reply, language, json.dumps(still_needed), message_id, now(), model))
+
+    def copilot(self, uid: str) -> dict | None:
+        rows = self.q("SELECT * FROM copilot WHERE uid=?", (uid,))
+        if not rows:
+            return None
+        rows[0]["still_needed"] = json.loads(rows[0]["still_needed"] or "[]")
+        return rows[0]
 
     def family(self, uid: str) -> dict | None:
         rows = self.q("SELECT * FROM families WHERE uid=?", (uid,))
@@ -149,10 +170,14 @@ class Store:
         self.x("UPDATE facts SET status='superseded', replaced_by=? WHERE uid=? AND signal=? AND status='active' AND id<>?",
                (new_id, uid, signal, new_id))
 
-    def queue(self) -> list[dict]:
-        return self.q("""SELECT f.*, fam.label FROM facts f JOIN families fam ON fam.uid=f.uid
-                         WHERE (f.status='active' AND f.review_status='pending') OR f.status='held'
-                         ORDER BY CASE f.lane WHEN 'clinical' THEN 0 ELSE 1 END, f.id DESC""")
+    def queue(self, uid: str | None = None) -> list[dict]:
+        """What needs a nurse: things the AI judge couldn't decide, and clinical cases."""
+        sql = """SELECT f.*, fam.label FROM facts f JOIN families fam ON fam.uid=f.uid WHERE f.status='held'"""
+        args: tuple = ()
+        if uid:
+            sql += " AND f.uid=?"
+            args = (uid,)
+        return self.q(sql + " ORDER BY CASE f.lane WHEN 'clinical' THEN 0 ELSE 1 END, f.id DESC", args)
 
     def recompute_condition_area(self, uid: str) -> tuple[str, str]:
         """Condition area + a date is the campaign (Noora UPE). The only switch made here is
@@ -222,7 +247,7 @@ class Store:
     def erase_family(self, uid: str) -> None:
         """Right to erasure: remove everything about this family except a content-free audit line."""
         with self.lock:
-            for table in ("messages", "facts", "traces", "contacts", "golden_pending", "upe_writes", "families"):
+            for table in ("messages", "facts", "traces", "contacts", "golden_pending", "upe_writes", "copilot", "families"):
                 self.db.execute(f"DELETE FROM {table} WHERE uid=?", (uid,))
             self.db.commit()
         self.audit(uid, "erased")
@@ -241,6 +266,7 @@ class Store:
 
     def reset(self) -> None:
         with self.lock:
-            for table in ("families", "contacts", "messages", "facts", "traces", "audit", "golden_pending", "usage", "upe_writes"):
+            for table in ("families", "contacts", "messages", "facts", "traces", "audit", "golden_pending", "usage", "upe_writes",
+                          "copilot"):
                 self.db.execute(f"DELETE FROM {table}")
             self.db.commit()

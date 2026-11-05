@@ -4,7 +4,7 @@ The live demo sends messages from a real phone to a WhatsApp number that our ser
 listens to. Use **synthetic messages from your own phones only**. Never forward or retype
 a real family's message.
 
-If any of this fails on demo day, the dashboard's **Replay** mode shows the same pipeline
+If any of this fails on demo day, the hosted page's offline demo shows the same screens
 from a recorded run, with no WhatsApp and no server (see `DEPLOY.md`).
 
 ## Which number should we use?
@@ -86,7 +86,7 @@ the dashboard, the server side is fine and any problem is on Meta's side.
 | Nurse reply fails, error 131047 | 24-hour window closed | Reply from the phone first |
 | Error 190 | Token expired | New temporary token, restart |
 | Error 131030 | Recipient not on the test number's list | Add and verify the phone (step 3) |
-| Anything else | | Switch the dashboard to **Replay** and carry on |
+| Anything else | | Switch to the offline demo tab and carry on |
 
 Meta's interface changes often. If a menu name above doesn't match, the WhatsApp
 *Getting started* guide in Meta's developer docs has the current path.
