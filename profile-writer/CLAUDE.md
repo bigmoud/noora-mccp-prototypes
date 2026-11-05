@@ -21,10 +21,13 @@ rules decide what is written. Python standard library only: do not add dependenc
 - `app/extractor.py`: Claude call (one forced tool) and the offline keyword baseline
 - `app/rules.py`: write rules; every decision lists its checks
 - `app/privacy.py`: pseudonyms, redaction, allowlist, loss/emergency/injection guards
-- `app/pipeline.py`: `assess()` (shared by live and eval) and `process_inbound()`
+- `app/pipeline.py`: `assess()` (shared by live and eval), `process_inbound()`, nurse actions
+- `app/judge.py`: AI judge rubric; the verdict is computed in code, never taken from the model
+- `app/copilot.py`: summary + draft reply; never sends
+- `app/view.py`: what the nurse's screen shows
 - `app/store.py`: SQLite, append-only facts, audit log without content
-- `app/server.py` + `app/static/index.html`: dashboard, simulator, webhook
-- `eval/`: golden set (cases and answer key kept apart) and `run_eval.py`
+- `app/server.py` + `web/index.html`: inbox UI, simulator, webhook; `web/demo.json` is the offline demo
+- `eval/`: golden set (cases and answer key kept apart), `run_eval.py`, `run_judge_eval.py`
 - `tests/`: `python3 -m unittest -v` must pass before any commit
 
 ## Changing the extractor

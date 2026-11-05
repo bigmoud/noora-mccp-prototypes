@@ -39,12 +39,14 @@ class ClaudeClient(unittest.TestCase):
     def setUpClass(cls):
         cls.srv = HTTPServer(("127.0.0.1", 0), FakeAnthropic)
         threading.Thread(target=cls.srv.serve_forever, daemon=True).start()
+        cls._saved = (settings.anthropic_base_url, settings.anthropic_api_key)
         settings.anthropic_base_url = f"http://127.0.0.1:{cls.srv.server_port}"
         settings.anthropic_api_key = "test"
 
     @classmethod
     def tearDownClass(cls):
         cls.srv.shutdown()
+        settings.anthropic_base_url, settings.anthropic_api_key = cls._saved
 
     def test_request_and_parse(self):
         out = ClaudeExtractor("claude-test").extract("Meri wife ki delivery ho gayi", date(2026, 11, 5),

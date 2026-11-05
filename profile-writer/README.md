@@ -1,124 +1,99 @@
-# Noora profile writer (prototype)
+# Profile writer
 
-When a family mentions in ordinary WhatsApp chat that she has delivered, the baby's
-birth date, her due date, or that the husband holds the phone, that fact never reaches
-her profile unless she tapped the right button. So she keeps getting pregnancy
-messages, replies go to the wrong person, and the next nurse asks again.
+When a family mentions in ordinary WhatsApp chat that she has delivered, the baby's birth
+date, her due date, or that the husband holds the phone, that fact never reaches her
+profile unless she tapped the right button. So she keeps getting pregnancy messages,
+replies go to the wrong person, and the next nurse asks again.
 
-This prototype reads each message and proposes those four facts. Writes follow Noora's
-UPE: the campaign is condition area + a date, so moving her from ANC_EDD to PNC_DOB is
-always written together with the baby's DOB, in one recorded UPE write. Plain-code rules write
-the confident ones with the exact words they came from, hold the unclear ones, and drop
-the rest. Non-clinical reviewers check every write afterwards, so nurses do no data entry.
-Built for Noora Health's Mobile Care Companion by Claude Corps fellows. **Synthetic data only.**
+The profile writer reads each message, saves those facts with the family's own words as
+the source, and keeps nurses out of data entry. Built for Noora Health's Mobile Care
+Companion by Claude Corps fellows. **Synthetic data only.**
 
-- How it stays safe and private: [SAFETY.md](SAFETY.md)
-- How to run the demo for reviewers: [DEMO.md](DEMO.md)
-- Hosting the dashboard and server: [docs/DEPLOY.md](docs/DEPLOY.md)
-- Connecting WhatsApp (test number or your own): [docs/WHATSAPP.md](docs/WHATSAPP.md)
+## What the nurse sees
 
-## Three ways to show it
+The demo is the nurse's inbox: WhatsApp chats on the left, the conversation in the middle,
+and the Copilot panel on the right with a short AI-written summary of the family, the
+profile fields MSEs already use (condition area, due date, baby DOB, baby age…) and a
+drafted reply in Hindi or English. The profile updates on its own as families write;
+a nurse only sees a **Check before saving** card when the AI couldn't decide, and a
+**Clinical review** card for pregnancy loss or high-risk campaigns.
 
-| Mode | Needs | Use when |
-|---|---|---|
-| **Replay** | Just the hosted page (`web/`) | Backup, or anyone browsing the link. Plays a recorded run of the real pipeline (Claude Haiku 5.5, synthetic chats) step by step |
-| **Live, simulator** | Hosted page + server | Type family messages into the dashboard and watch each step happen |
-| **Live, WhatsApp** | Hosted page + server + Meta test number | Send from a real phone; the dashboard updates as it's processed |
+## How a message is handled
 
-## Run it (2 minutes, no accounts needed)
-
-Needs Python 3.10+. No packages to install.
-
-```bash
-cp .env.example .env          # optional: add ANTHROPIC_API_KEY to use Claude
-python3 -m app.server
+```
+message → privacy (pseudonym, redaction) → keyword guards (loss, danger signs, injection)
+        → extractor (Claude Haiku 5.5) proposes facts → write rules (code)
+        → AI judge (Claude Sonnet 5.5, yes/no rubric) → saved | nurse | ask the family | dropped
+        → one profile write record (condition area ANC_EDD → PNC_DOB only together with the baby's DOB)
+        → Copilot summary + draft reply (the nurse edits and presses Send)
 ```
 
-Open the link it prints (it carries an access token). Or open `web/index.html` from any
-static host and use **Connect to live server**. Pick a family, use the script
-buttons under the chat, and watch the middle column show every step. Without an API key
-it uses an offline keyword baseline, so nothing leaves your laptop.
+- **Code decides, not the model.** The quote must be in the message, dates are re-checked by
+  our own date maths, someone else's baby is dropped, approximate dates become a question in
+  the draft reply instead of a write.
+- **The judge reviews every write** against a fixed rubric; code turns its answers into a
+  verdict. It can't overrule a conflict with what's on file (a five-week due-date change goes
+  to a nurse). Every nurse decision becomes a candidate test case.
+- **Never automatic:** sending a message, switching a high-risk family's campaign, anything
+  after a possible pregnancy loss.
 
-## Live WhatsApp demo
+Details: [SAFETY.md](SAFETY.md) · demo script: [DEMO.md](DEMO.md) · hosting:
+[docs/DEPLOY.md](docs/DEPLOY.md) · WhatsApp: [docs/WHATSAPP.md](docs/WHATSAPP.md) · eval log:
+[eval/findings.md](eval/findings.md)
 
-Your own phones and synthetic messages only. Meta's test mode allows up to 5 verified
-recipient numbers and needs no company registration.
+## Results (46 synthetic cases, Hinglish, Devanagari, English, draft Marathi/Kannada/Telugu/Punjabi)
 
-1. **Meta app.** At developers.facebook.com create an app (type *Business*) and add the
-   *WhatsApp* product. On *API Setup* note the **temporary access token**, the
-   **Phone number ID**, and the free **test number**. Add your phones as recipients
-   and verify each one with the code.
-2. **App secret.** *App settings → Basic → App secret.* It signs every webhook.
-3. **.env.** Set `WHATSAPP_LIVE=true`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`,
-   `WHATSAPP_APP_SECRET`, a `WHATSAPP_VERIFY_TOKEN` you make up, and
-   `ALLOWED_TEST_NUMBERS` (your phones, e.g. `919800000001,14155550123`).
-4. **Tunnel.** `python3 -m app.server`, then in another terminal `ngrok http 8000`.
-5. **Webhook.** In *WhatsApp → Configuration* set the callback URL to
-   `https://<your-ngrok-host>/webhook` with your verify token, then subscribe to the
-   **messages** field.
-6. **Open the chat.** From *API Setup*, send the `hello_world` template to your phone,
-   then reply from the phone. Your reply opens WhatsApp's 24-hour window, appears on the
-   dashboard as "Live tester ••••0123", and runs through the pipeline in about a second
-   (a few seconds with Claude).
+| | Precision | Recall | Wrong writes | Needed a nurse | Cost / message |
+|---|---|---|---|---|---|
+| Keyword baseline | 100% | 42% | 0 | — | $0 |
+| Haiku extractor + rules | 100% | 83% | 0 | — (human review of every write) | $0.0003 |
+| **+ Sonnet judge** | **100%** | **95%** | **0** | 9 of 46 (7 are clinical cases) | ~$0.004 + Copilot $0.0005 |
 
-The temporary token expires after 24 hours: make a fresh one on demo morning. Messages
-from numbers not on the allowlist are dropped without being stored.
+Judge calibration: shown 116 proposals (correct, deliberately corrupted, and tempting-but-wrong),
+it confirmed **0 of 74 wrong ones**, confirmed 95% of correct ones automatically, and sent 3% to
+a nurse (`python3 -m eval.run_judge_eval`). Small synthetic set written by us; see the limits in
+`eval/findings.md`.
 
-Test the live path without Meta: `python3 -m scripts.send_test_webhook "Meri wife ki delivery kal hui"`
-sends a correctly signed, Meta-shaped webhook to your local server.
+## Run it
 
-## Eval
+Python 3.10+, no packages to install.
 
 ```bash
-python3 -m eval.run_eval                         # offline baseline, dev split
-python3 -m eval.run_eval --extractor claude      # Claude (needs key), dev split
-python3 -m eval.run_eval --extractor claude --split holdout   # rarely
+cp .env.example .env              # add ANTHROPIC_API_KEY (the offline baseline runs without one)
+python3 -m app.server             # open the link it prints
 ```
 
-Writes `eval/out/results.md` (precision, recall, wrong writes, safety cases, worst miss,
-cost per message) and `eval/out/runs.jsonl` (one record per case with the full trace).
-Scores what reaches the profile, not what the model proposed. The answer key
-(`eval/golden/answer_key.jsonl`) is kept apart from the cases and never shown to the model.
+Use **Family phone** (bottom left) to send a message as the family in the open chat. Without
+a server, the hosted page (`web/`) runs an **offline demo**: the same screens, playing back
+results recorded from the real pipeline for the suggested messages.
 
-Results on 46 synthetic cases (details and the tuning log in `eval/findings.md`):
+| | Command |
+|---|---|
+| Tests (44) | `python3 -m unittest` |
+| Extractor eval | `python3 -m eval.run_eval --extractor claude --split all` |
+| Judge calibration | `python3 -m eval.run_judge_eval` |
+| Re-record the offline demo | `python3 -m scripts.record_demo` |
+| Single-file offline page | `python3 -m scripts.build_offline_page` |
+| Signed test webhook | `python3 -m scripts.send_test_webhook "Meri delivery kal hui"` |
 
-| Extractor | Precision | Recall | Wrong writes | Cost / message |
-|---|---|---|---|---|
-| Keyword baseline (all 46) | 100% | 36% | 0 | $0 |
-| Claude Haiku 5.5 (all 46) | 100% | 83% | 0 | $0.00033 |
-| Haiku, held-out 6 | 100% | 75% | 0 | |
-| Haiku, 20 new cases from Kripesh's review (untuned) | 100% | 88% | 0 | |
-
-Noora's real de-identified samples go in `eval/golden/noora/` (git-ignored, kept out of
-zips): `python3 -m eval.run_eval --extractor claude --golden eval/golden/noora --split all`.
-
-Every API call is checked against `SPEND_CAP_USD` (default $5) first; past it, no request is sent.
-
-## Tests
-
-```bash
-python3 -m unittest -v      # 37 tests: privacy, rules, UPE writes, webhook, pipeline, Claude client, spend cap, access
-```
+Every Claude call checks `SPEND_CAP_USD` (default $5) first; past it, nothing is sent.
 
 ## Layout
 
 | Path | What |
 |---|---|
-| `app/extractor.py` | Claude extractor (one forced tool, JSON schema) and keyword baseline |
-| `app/rules.py` | Write rules. Each decision lists the checks it passed or failed |
-| `app/privacy.py` | Pseudonyms, redaction, allowlist, loss / emergency / injection guards |
-| `app/dates.py` | Reads Hindi/English date phrases to cross-check the model |
-| `app/pipeline.py` | `assess()` (shared by live and eval), `process_inbound()`, reviewer actions |
-| `app/store.py` | SQLite: append-only facts, audit log without content, erasure, retention |
-| `app/server.py` | API, simulator, signed webhook, live updates; CORS for the hosted dashboard |
-| `web/` | The dashboard (static: GitHub Pages / Netlify) and `replay.json` |
-| `scripts/record_replay.py` | Re-records `web/replay.json` from the real pipeline |
-| `render.yaml`, `netlify.toml`, `.github/workflows/pages.yml` | Hosting |
-| `app/assistant.py` | What the next nurse sees (reads the profile only) |
-| `eval/` | Golden set (cases and answer key apart) and runner |
-| `scripts/send_test_webhook.py` | Signed fake webhook for testing the live path |
+| `app/extractor.py` | Claude extractor and keyword baseline |
+| `app/rules.py` | Write rules; every decision lists its checks |
+| `app/judge.py` | AI judge: rubric, verdict decided in code |
+| `app/copilot.py` | Family summary and draft reply (stand-in for Noora's Copilot) |
+| `app/pipeline.py` | `assess()` (shared by live and eval), `process_inbound()`, nurse actions |
+| `app/privacy.py` | Pseudonyms, redaction, allowlist, loss / danger / injection guards |
+| `app/view.py` | What the nurse's screen shows |
+| `app/store.py`, `app/server.py`, `app/whatsapp.py` | SQLite store, API + webhook, WhatsApp Cloud API |
+| `web/` | The inbox (static) and `demo.json` (offline demo) |
+| `eval/` | Golden set, extractor eval, judge calibration, findings |
 
-## Not built here (on purpose)
+## Not built here
 
-Writing replies or suggesting questions (Noora's team is testing that), the medical
-history store, clinical facts, voice notes, other countries, household IDs.
+Noora's real Copilot and FAQ bank, the medical history store, clinical facts, voice notes,
+other countries, household IDs.

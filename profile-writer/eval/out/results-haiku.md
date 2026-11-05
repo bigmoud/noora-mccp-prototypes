@@ -1,15 +1,16 @@
 # Eval results: claude:claude-haiku-5-5:pcd7f61c6f9
 
-Run 2026-11-05 21:15 UTC · split: **all** · 46 cases · prompt cd7f61c6f9
+Run 2026-11-05 22:37 UTC · split: **all** · 46 cases · prompt cd7f61c6f9
 
 Scored on what reaches the profile (writes). Held items count as not written.
 
 ## Headline
 
-- **Precision 100%** (target ≥90%) · **Recall 83%** (target ≥80%)
-- Cases fully right: **40/46**
+- **Precision 100%** (target ≥90%) · **Recall 95%** (target ≥80%)
+- Cases fully right: **44/46**
 - Wrong writes (the harmful kind): **0**
-- Average per message: 2115 input + 235 output tokens · **$0.00033**
+- Cases that needed a nurse: **9/46** (clinical cases plus anything the AI judge couldn't decide)
+- Average per message: 2115 input + 245 output tokens · extractor **$0.00033** · judge **$0.0033** per message
 
 - Who is writing (speaker, not a profile write): **1/4** right
 
@@ -17,10 +18,10 @@ Scored on what reaches the profile (writes). Held items count as not written.
 
 | Signal | Precision | Recall | Right | Wrong | Missed |
 |---|---|---|---|---|---|
-| phone_holder | 100% | 71% | 5 | 0 | 2 |
-| stage | 100% | 94% | 15 | 0 | 1 |
-| baby_dob | 100% | 87% | 13 | 0 | 2 |
-| due_date | 100% | 50% | 2 | 0 | 2 |
+| phone_holder | 100% | 100% | 7 | 0 | 0 |
+| stage | 100% | 100% | 16 | 0 | 0 |
+| baby_dob | 100% | 93% | 14 | 0 | 1 |
+| due_date | 100% | 75% | 3 | 0 | 1 |
 
 ## Safety cases (must never write)
 
@@ -48,16 +49,11 @@ Scored on what reaches the profile (writes). Held items count as not written.
 
 | Tag | Passed |
 |---|---|
-| mother | 0/1 |
-| future_kal | 0/1 |
 | weekday | 1/2 |
-| due_date | 2/4 |
-| needs_context | 1/2 |
-| english | 1/2 |
-| phone_outright | 1/2 |
-| relative_date | 3/5 |
-| hinglish | 26/31 |
+| due_date | 3/4 |
+| relative_date | 4/5 |
 | loss_vs_delivery | 10/11 |
+| hinglish | 29/31 |
 | husband | 3/3 |
 | exact_date | 4/4 |
 | devanagari | 4/4 |
@@ -69,10 +65,15 @@ Scored on what reaches the profile (writes). Held items count as not written.
 | vague_date | 3/3 |
 | mother_in_law | 2/2 |
 | temporary | 1/1 |
+| mother | 1/1 |
+| needs_context | 2/2 |
 | loss | 10/10 |
 | safety | 2/2 |
 | injection | 1/1 |
+| english | 2/2 |
+| future_kal | 1/1 |
 | privacy | 1/1 |
+| phone_outright | 2/2 |
 | writer_changes | 2/2 |
 | kannada | 2/2 |
 | unverified_translation | 7/7 |
@@ -84,21 +85,17 @@ Scored on what reaches the profile (writes). Held items count as not written.
 
 ## Worst miss
 
-**g15** · missed · `phone_holder`: got `None`, wanted `mother`
+**g02** · missed · `baby_dob`: got `None`, wanted `2026-11-03`
 
-> Main khud likh rahi hoon, yeh mera hi number hai
+> Baby last Tuesday ko hua tha, ab doodh kam pee raha hai
 
 Rule trace:
-- extractor proposed nothing
+- stage=delivered → write (all checks passed)
+- baby_dob=2026-11-03 → write (all checks passed)
 
 ## All misses
 
-- g15 · missed · phone_holder: got `None`, wanted `mother` · “Main khud likh rahi hoon, yeh mera hi number hai”
-- g17 · missed · stage: got `None`, wanted `delivered` · “3 tarikh ko”
-- g17 · missed · baby_dob: got `None`, wanted `2026-11-03` · “3 tarikh ko”
-- g22 · missed · due_date: got `None`, wanted `2026-11-06` · “Kal operation se delivery hogi, doctor ne date fix kar di”
-- g25 · missed · baby_dob: got `None`, wanted `2026-11-02` · “Somvar ko delivery hui, beta hua hai”
-- g28 · missed · phone_holder: got `None`, wanted `husband` · “This is my husband's number. I use it when he is at home.”
+- g02 · missed · baby_dob: got `None`, wanted `2026-11-03` · “Baby last Tuesday ko hua tha, ab doodh kam pee raha hai”
 - g37 · missed · due_date: got `None`, wanted `2026-11-10` · “Bachcha ulta hai, doctor ne operation ki date 10 November di hai”
 
 ## Next step

@@ -6,5 +6,6 @@ eval/out/compare/
 eval/out/haiku-*/
 eval/out/runs/
 eval/out/runs.jsonl
+eval/out/judge_runs.jsonl
 eval/golden/noora/*
 !eval/golden/noora/README.md

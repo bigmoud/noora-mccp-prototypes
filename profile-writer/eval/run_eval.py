@@ -58,8 +58,9 @@ def main() -> None:
         profile.setdefault("condition_area", "PNC_DOB" if profile.get("stage") == "delivered" else "ANC_EDD")
         r = assess(msgs[-1]["text"], date.fromisoformat(c["msg_day"]), profile, context, ex)
         ms = int((time.time() - t0) * 1000)
-        writes = {d.signal: d.value for d in r["decisions"] if d.action == "write"}
-        holds = sorted({d.signal for d in r["decisions"] if d.action == "hold"})
+        writes = {d.signal: d.value for d in r["decisions"] if d.route == "write"}
+        holds = sorted({d.signal for d in r["decisions"] if d.route in ("nurse", "clinical", "ask_family")})
+        nurse = sorted({d.signal for d in r["decisions"] if d.route in ("nurse", "clinical")})
         expected = k.get("writes", {})
 
         misses = []
@@ -89,12 +90,13 @@ def main() -> None:
             "variables": {"extractor": e.extractor, "split": c["split"], "tags": k.get("tags", [])},
             "trace": {"sent_to_model": e.sent_to_model, "removed": r["removed"], "guards": r["guards"],
                       "proposals": e.signals, "decisions": [d.to_dict() for d in r["decisions"]], "error": e.error},
-            "output": {"writes": writes, "holds": holds, "sensitive": r["sensitive"]},
+            "output": {"writes": writes, "holds": holds, "nurse": nurse, "sensitive": r["sensitive"]},
             "expected": {"writes": expected, "holds": k.get("holds", []), "sensitive": bool(k.get("sensitive")),
                          "speaker": k.get("speaker")},
             "speaker": e.speaker,
             "pass": not misses, "misses": misses,
             "tokens": {"in": e.tokens_in, "out": e.tokens_out}, "ms": ms,
+            "judge_cost": r["judge"].cost_usd if r["judge"] else 0.0,
         })
 
     (out_dir / "runs.jsonl").write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in runs) + "\n", encoding="utf-8")
@@ -134,8 +136,11 @@ def render(runs: list[dict], tally: dict, args) -> str:
          f"- **Precision {pct(P)}** (target ≥{TARGET_P:.0%}) · **Recall {pct(R)}** (target ≥{TARGET_R:.0%})",
          f"- Cases fully right: **{passed}/{len(runs)}**",
          f"- Wrong writes (the harmful kind): **{len(wrong)}**",
+         f"- Cases that needed a nurse: **{sum(1 for r in runs if r['output']['nurse'])}/{len(runs)}** "
+         f"(clinical cases plus anything the AI judge couldn't decide)",
          f"- Average per message: {tin // n} input + {tout // n} output tokens"
-         + (f" · **${cost:.5f}**" if cost is not None else " · set PRICE_INPUT_PER_MTOK / PRICE_OUTPUT_PER_MTOK for cost"),
+         + (f" · extractor **${cost:.5f}**" if cost is not None else "")
+         + f" · judge **${sum(r.get('judge_cost', 0) for r in runs) / n:.4f}** per message",
          "", "## By signal", "", "| Signal | Precision | Recall | Right | Wrong | Missed |", "|---|---|---|---|---|---|"]
     for s in SIGNALS:
         t = tally[s]

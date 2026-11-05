@@ -16,9 +16,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from . import assistant, pipeline, privacy, whatsapp
+from . import pipeline, privacy, view, whatsapp
 from .config import settings
-from .extractor import PROMPT_VERSION, spend_so_far
+from .llm import spend_so_far
 from .seed import seed
 from .store import Store, now
 
@@ -37,50 +37,36 @@ def publish(kind: str, data: dict) -> None:
                 pass
 
 
+PROCESSING: set[str] = set()  # families whose latest message is still going through the pipeline
+
+
 def _config_view() -> dict:
     return {
-        "mode": "live WhatsApp" if settings.whatsapp_live else "simulator",
-        "extractor": settings.extractor, "model": settings.extractor_model if settings.extractor == "claude" else None,
-        "prompt_version": PROMPT_VERSION,
+        "live_whatsapp": settings.whatsapp_live,
         "rollout_mode": store.get_setting("rollout_mode", settings.rollout_mode),
         "kill_switch": store.get_setting("kill_switch", "off"),
-        "allowlisted_numbers": [privacy.mask_phone(n) for n in sorted(settings.allowed_numbers)],
-        "retention_hours": settings.message_retention_hours,
-        "daily_token_cap": settings.daily_token_cap,
-        "prices_set": settings.price_in_per_mtok is not None,
         "spend_usd": round(spend_so_far(), 4), "spend_cap_usd": settings.spend_cap_usd,
     }
 
 
 def state(uid: str | None) -> dict:
-    fams = store.families()
-    for f in fams:
-        f["mask"] = privacy.mask_phone(store.contact(f["uid"]) or "") if store.contact(f["uid"]) else "simulated"
-    uid = uid or (fams[0]["uid"] if fams else None)
-    selected = None
-    if uid and store.family(uid):
-        facts = store.q("SELECT * FROM facts WHERE uid=? ORDER BY id DESC", (uid,))
-        for f in facts:
-            f["checks"] = json.loads(f["checks"] or "[]")
-        selected = {
-            "family": store.family(uid), "messages": store.messages(uid), "facts": facts,
-            "profile": store.active_facts(uid), "nurse": assistant.nurse_view(store, uid),
-            "traces": store.traces(uid, 8), "upe_writes": store.upe_writes(uid, 10),
-        }
-    q = store.queue()
-    for f in q:
-        f["checks"] = json.loads(f["checks"] or "[]")
-        msg = store.q("SELECT redacted_text, ts FROM messages WHERE id=?", (f["message_id"],)) if f["message_id"] else []
-        # Reviewers see the single message the fact came from (redacted), never the whole chat or the number.
-        f["message"] = msg[0]["redacted_text"] if msg else ""
-        f["message_day"] = msg[0]["ts"][:10] if msg else ""
-    usage = store.usage_today()
-    return {
-        "config": _config_view(), "families": fams, "uid": uid, "selected": selected, "queue": q,
-        "golden": store.q("SELECT * FROM golden_pending ORDER BY id DESC"),
-        "audit": store.q("SELECT * FROM audit ORDER BY id DESC LIMIT 60"),
-        "usage": usage,
-    }
+    fams = view.families(store, PROCESSING)
+    if not uid or not store.family(uid):
+        uid = fams[0]["uid"] if fams else None
+    return {"config": _config_view(), "families": fams, "uid": uid,
+            "chat": view.chat(store, uid, PROCESSING) if uid else None}
+
+
+def _process(uid: str, text: str, ts: str | None = None, wa_id: str | None = None) -> None:
+    PROCESSING.add(uid)
+    publish("processing", {"uid": uid})
+    try:
+        pipeline.process_inbound(store, uid, text, ts, wa_id, publish=publish)
+    except Exception as e:  # never log message content
+        store.audit(uid, "pipeline_error", error=type(e).__name__)
+    finally:
+        PROCESSING.discard(uid)
+        publish("profile", {"uid": uid})
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -157,6 +143,8 @@ class Handler(BaseHTTPRequestHandler):
         if not self._authed():
             return self._send(401, "Open the dashboard link printed in the terminal (it carries the access token).",
                               "text/plain")
+        if url.path == "/demo.json" and (STATIC / "demo.json").exists():
+            return self._send(200, (STATIC / "demo.json").read_bytes(), "application/json")
         if url.path in ("/", "/index.html"):
             cookie = (f"npw_token={settings.dashboard_token}; HttpOnly; SameSite=Strict; Path=/"
                       + ("; Secure" if self.headers.get("X-Forwarded-Proto") == "https" else ""))
@@ -235,13 +223,16 @@ class Handler(BaseHTTPRequestHandler):
             text = str(body.get("text", "")).strip()
             if not text:
                 raise ValueError("empty message")
-            threading.Thread(target=pipeline.process_inbound, args=(store, uid, text),
-                             kwargs={"publish": publish, "wa_id": "sim-" + uuid.uuid4().hex}, daemon=True).start()
+            threading.Thread(target=_process, args=(uid, text, None, "sim-" + uuid.uuid4().hex), daemon=True).start()
             return self._send(202, {"ok": True})
+        if path == "/api/read":
+            store.x("UPDATE families SET last_read_id=(SELECT COALESCE(MAX(id),0) FROM messages WHERE uid=?) WHERE uid=?",
+                    (body["uid"], body["uid"]))
+            return self._send(200, {"ok": True})
         if path == "/api/reply":
             return self._reply(body)
         if path == "/api/review":
-            f = pipeline.review(store, int(body["fact_id"]), body["action"], str(body.get("reviewer", "")),
+            f = pipeline.review(store, int(body["fact_id"]), body["action"], str(body.get("reviewer", "") or "nurse"),
                                 body.get("value"), str(body.get("note", "")), publish=publish)
             return self._send(200, {"ok": True, "fact": f})
         if path == "/api/settings":
@@ -256,6 +247,11 @@ class Handler(BaseHTTPRequestHandler):
                 store.audit(None, "kill_switch", value=v)
             publish("settings", {})
             return self._send(200, _config_view())
+        if path == "/api/copilot":
+            if not store.family(body["uid"]):
+                raise ValueError("unknown family")
+            pipeline.refresh_copilot_async(store, body["uid"], publish)
+            return self._send(202, {"ok": True})
         if path == "/api/golden/deidentified":
             store.x("UPDATE golden_pending SET deidentified=1 WHERE id=?", (int(body["id"]),))
             store.audit(None, "golden_marked_deidentified", id=int(body["id"]), by=str(body.get("by", "")))
@@ -263,6 +259,7 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/reset":
             store.reset()
             seed(store)
+            _warm_copilot()
             publish("reset", {})
             return self._send(200, {"ok": True})
         if path == "/api/purge":
@@ -284,7 +281,13 @@ class Handler(BaseHTTPRequestHandler):
             if not whatsapp.within_service_window(store.last_inbound_ts(uid)):
                 raise PermissionError("outside WhatsApp's 24-hour window: only approved templates may be sent")
             sent, detail = whatsapp.send_text(phone, text)
+            if not sent:  # don't show a message as sent when WhatsApp refused it
+                store.audit(uid, "nurse_reply_failed", detail=detail[:80])
+                return self._send(502, {"error": detail})
         mid = store.add_message(uid, "out", "nurse", text, privacy.redact(text)[0], now(), None)
+        store.x("UPDATE copilot SET reply='' WHERE uid=?", (uid,))  # the draft has been used
+        store.x("UPDATE families SET last_read_id=(SELECT COALESCE(MAX(id),0) FROM messages WHERE uid=?) WHERE uid=?",
+                (uid, uid))
         store.audit(uid, "nurse_reply", sent=sent, detail=detail[:80], by=str(body.get("by", "nurse")))
         publish("message", {"uid": uid, "id": mid, "direction": "out", "author": "nurse", "text": text})
         return self._send(200, {"ok": True, "sent": sent, "detail": detail})
@@ -312,12 +315,12 @@ class Handler(BaseHTTPRequestHandler):
                 continue
             uid = privacy.pseudonym(m["from"])
             if not store.family(uid):
-                store.upsert_family(uid, f"Live tester {privacy.mask_phone(m['from'])} (synthetic)", "ANC_EDD")
+                store.upsert_family(uid, f"Live tester {privacy.mask_phone(m['from'])}", "ANC_EDD",
+                                    name=f"Live tester {privacy.mask_phone(m['from'])}", state="-", language="Hindi")
                 store.set_contact(uid, m["from"])
                 store.audit(uid, "live_family_created")
                 publish("reset", {})
-            threading.Thread(target=pipeline.process_inbound, args=(store, uid, m["text"], m["ts"], m["id"]),
-                             kwargs={"publish": publish}, daemon=True).start()
+            threading.Thread(target=_process, args=(uid, m["text"], m["ts"], m["id"]), daemon=True).start()
         if dropped:
             store.audit(None, "dropped_not_allowlisted", count=dropped)
 
@@ -332,9 +335,17 @@ def _purge_loop():
         time.sleep(600)
 
 
+def _warm_copilot() -> None:
+    """Write a bio and draft for every family that doesn't have one yet (background, a few cents)."""
+    for f in store.families():
+        if not store.copilot(f["uid"]):
+            pipeline.refresh_copilot_async(store, f["uid"], publish)
+
+
 def main():
     if not store.families():
         seed(store)
+    _warm_copilot()
     threading.Thread(target=_purge_loop, daemon=True).start()
     if settings.whatsapp_live:
         missing = [k for k, v in {"WHATSAPP_TOKEN": settings.wa_token, "WHATSAPP_PHONE_NUMBER_ID": settings.wa_phone_number_id,

@@ -39,24 +39,26 @@ allowlist.
                        Claude (one forced tool: record_signals; no other tools)
                               │ JSON proposals → schema check in code
                               ▼
-                       write rules (code) ──▶ write / hold / discard
+                       write rules (code) ──▶ AI judge (rubric; verdict decided in code)
+                              │                  ──▶ write / nurse / ask the family / discard
                               │
              profile store (append-only, with quote) ──▶ program ANC→PNC (code)
                               │
      ┌────────────────────────┼─────────────────────────────┐
-  nurse view (reads only)   reviewer queue (non-clinical,   clinical lane (loss / death
-                            sees 1 redacted message)         mentions; pauses the family)
+  Copilot summary + draft    "Check before saving" card      clinical review (loss / death,
+  (nurse edits and sends)    (only what the judge            high-risk campaign; pauses
+                              couldn't decide)               the family)
                               │
-                     corrections → candidate test cases (exported only once marked de-identified)
+                     nurse decisions → candidate test cases (exported only once marked de-identified)
 ```
 
 ## 3. Harm check (Claude Corps five failure modes)
 
 | Failure mode | Risk | Harm to | Mitigation (E = enforced, A = asked) | Next step |
 |---|---|---|---|---|
-| **Exposed private data** | Phone numbers, names or health details leak through logs, prompts, screenshots or the reviewer view | Families; Noora's trust and legal standing | E: pseudonym on arrival; number stored in one table, shown masked. E: regex redaction before the API. E: WhatsApp profile name never read. E: audit log has no message text. E: messages deleted after 72h; erase-on-request. E: reviewers see one redacted message, not the chat. E: dashboard token, `HttpOnly` cookie, CSRF header, bound to localhost. | Names and villages in free text are **not** redacted: ask Sreeram whether Noora has an NER step; confirm zero-data-retention terms for Noora's API account. |
+| **Exposed private data** | Phone numbers, names or health details leak through logs, prompts or screenshots | Families; Noora's trust and legal standing | E: pseudonym on arrival; number stored in one table, shown masked. E: regex redaction before the API. E: WhatsApp profile name never read. E: audit log has no message text. E: messages deleted after 72h; erase-on-request. E: reviewers see one redacted message, not the chat. E: dashboard token, `HttpOnly` cookie, CSRF header, bound to localhost. | Names and villages in free text are **not** redacted: ask Sreeram whether Noora has an NER step; confirm zero-data-retention terms for Noora's API account. |
 | | Real family data gets into the demo, eval or slides | Families | E: live mode only processes allowlisted test phones; others dropped unread. E: golden candidates can't be exported until marked de-identified. A: CLAUDE.md rule for coding agents. | Kripesh (Nov 5, in writing): de-identified or paraphrased messages may go to Claude; real production messages stay inside Noora's systems. His real samples go in the git-ignored `eval/golden/noora/`, never in a zip or slide. [ASK] Does "inside our systems" allow Claude under Noora's own API account or cloud, or does production need another route? |
-| **Said the wrong thing** | Wrong birth date or stage written → wrong messages for weeks | Mother and baby | E: quote must be found in the message. E: our own date maths must agree with the model's within 1 day. E: approximate dates held. E: plausibility (birth not in the future, not >1 year ago, within -10/+4 weeks of due date). E: conflicts with the profile held. E: medium confidence held, low dropped. E: every write reviewed afterwards; revert restores the program. | Kripesh/Niharika: per signal, is a wrong write or a missed write worse? This sets the thresholds. |
+| **Said the wrong thing** | Wrong birth date or stage written → wrong messages for weeks | Mother and baby | E: quote must be found in the message. E: our own date maths must agree with the model's within 1 day. E: approximate dates held. E: plausibility (birth not in the future, not >1 year ago, within -10/+4 weeks of due date). E: conflicts with the profile held. E: medium confidence held, low dropped. E: an independent AI judge (a different model, never shown the extractor's confidence) checks every write against a yes/no rubric; code turns its answers into a verdict; unsure goes to a nurse; it can't overrule conflicts with the profile. Calibrated: 0 of 74 wrong proposals confirmed. | Kripesh/Niharika: per signal, is a wrong write or a missed write worse? This sets the thresholds. |
 | | Facts about someone else (a sister's delivery) land on her profile | Mother | E: `subject` must be the registered mother, else dropped. Eval has 4 such cases. | Add more relative/neighbour phrasings once real examples exist. |
 | | Baby-care messages after a stillbirth or neonatal death (Kripesh: "the mistake that actually hurts") | Mother, at her most vulnerable | E: keyword guard (Hinglish, Devanagari, English; **draft** Marathi, Kannada, Telugu, Punjabi) **plus** model flag; 14 loss-vs-delivery eval cases, including twins where one died; either one holds everything in a clinical lane and pauses automatic updates for that family. Non-clinical reviewers can't clear it. | Niharika to review the word list and the clinical-lane process; decide what the program should do. |
 | | Wrong campaign switch | Mother | E: only ANC_EDD → PNC_DOB, and only written together with the baby's DOB in one transaction, as Noora's delivery flow does. HRPW, SNCU and others are never switched; a new due date on PNC_DOB is held (may be a new pregnancy). E: every switch is in a UPE write record and undone if the DOB is reverted. | MSEs confirm with the family before switching by hand (SOP). Here the family's own words are the confirmation; vague ones are held. Kripesh to agree. |
@@ -72,7 +74,7 @@ allowlist.
 
 | Risk | Mitigation |
 |---|---|
-| Public page exposes data | The page holds no secrets. Replay is a recorded run on synthetic chats; the build refuses to publish anything that looks like a key. |
+| Public page exposes data | The page holds no secrets. The offline demo plays back a recorded run on synthetic chats; the build refuses to publish anything that looks like a key. |
 | Someone else's site calls our server | E: CORS only for `ALLOWED_ORIGINS`; every API call needs the access token in a header (constant-time compare); POSTs also need a custom header. |
 | Token leaks | Typed in at demo time, kept in that browser tab only (sessionStorage), sent in a header, never in a URL; the server never logs query strings. Rotate it after the demo. |
 
@@ -84,13 +86,14 @@ Only **asks:** the system prompt (chat is data, copy exact words, be unsure when
 date cross-check; plausibility and conflict rules; subject rule; keyword guards for loss,
 emergency and injection; rollout mode (shadow / review-first / auto + audit); kill switch;
 allowlist; webhook signature; pseudonyms; redaction; retention purge; erasure; token cap
-and rate limits; reviewer roles (clinical lane); human-only sending.
+and rate limits; the AI judge's rubric verdict computed in code; clinical cases always to a nurse; human-only sending.
 
 ## 5. Rollout ladder
 
 1. **Shadow:** extract and log, write nothing. Compare with what MSEs asked and the families answered.
-2. **Review first:** every write waits for a reviewer. Measures reviewer load and agreement.
-3. **Auto + audit:** confident writes go live, every write reviewed afterwards; held items wait.
+2. **Review first:** every write waits for a nurse. Measures how often the judge and the nurse agree.
+3. **Automatic, AI-checked:** the judge confirms writes; nurses see only what it couldn't decide and clinical cases.
+
 
 Move up a step only when the eval meets the target on a held-out set written by someone
 other than the person tuning the prompt (target from Kripesh: ≥90% precision, ≥80%
@@ -138,7 +141,11 @@ replies.
 - Text messages only (no voice, which many families use). India, Hindi/Hinglish only.
 - One phone = one family. Households that share or switch numbers aren't handled.
 - Keyword guards will miss some phrasings and raise some false alarms.
-- Reviewer fatigue and bias are not measured yet. Track agreement between two reviewers on a sample.
+- The judge and the extractor are both Claude; a different model family as judge, or a sample
+  of confirmed writes re-checked by nurses each week, would catch errors they share.
+- The judge costs ~10× the extractor per message (Sonnet with reasoning); ~$40/day at 10,000
+  messages. Run it only on messages with proposed writes (already the case) and test Haiku as judge.
+- The Copilot draft is a stand-in with unsigned clinical wording; the nurse always edits and sends.
 - SQLite and a laptop server: fine for a demo, not for 65k daily users.
 
 ## 9. Sources
