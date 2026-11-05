@@ -6,22 +6,24 @@ These are **prototypes on simulated data**: one small, testable problem we can s
 
 ## What's here
 
-### `profile-writer/`: scan a chat, save what lasts
-Claude reads a family's WhatsApp conversation and pulls out facts about the mother and baby: stage, baby's date of birth, due date, who holds the phone, language, location and more. Each fact gets a status: one-click **ready**, **check first**, **nurse only**, or **alert** (never saved). Nurses save facts to the profile with one click, with the family's exact words as the source.
+### `profile-writer/`: WhatsApp message → profile, live
+A family's WhatsApp message goes through privacy checks, Claude Haiku 5.5 proposes four profile signals (who holds the phone, delivered or not, baby's date of birth, due date), and plain-code rules decide what is written to the profile, held for a person, or dropped. Every write keeps the family's exact words. Following Kripesh's Nov 5 direction, nurses do no data entry: confident writes go live and **non-clinical reviewers check every write afterwards**; anything unclear waits for them, and any mention of a pregnancy loss pauses the family and goes to the **clinical team**.
 
-- `conversations.json`: 19 simulated English conversations, each built around a trap (husband reports the birth, whose phone it is said outright, the writer changing mid-chat, a sister's pregnancy, a corrected due date, four kinds of pregnancy loss, a birth with no date, twins and more).
-- `answer_key.json`: the hidden answer key. The extractor never sees it.
-- `extractor_prompt.md`: the extractor's instructions (also used by the page's live scan).
-- `score.py`: scores the extractions and writes `scores.json` and `results.md`.
-- `profile-writer.html`: the nurse page. It's built from `template.html` with the data embedded.
-- `runs/`: earlier runs, kept for comparison.
-
-Latest run (turn 3, 19 chats): **45 of 49** facts exactly right. 0 lasting facts lost, 0 wrong facts marked one-click ready, 0 nurse alerts missed, **0 of 4 pregnancy losses marked as a birth**, and the switch to postnatal decided right in 19 of 19 chats. The full table and turn log are in `profile-writer/results.md`.
-
-Profiles use the fields of Noora's UPE (User Profile) as Kripesh described them. Exact field names and allowed values are still to confirm from the onboarding doc. Following Noora's delivery flow, a birth moves `condition_area` from `ANC_EDD` to `PNC_DOB` only together with the baby's date of birth; the page enforces this, and a birth with no date stays on pregnancy messages until the family gives one.
+- **Live demo:** a hosted dashboard shows each step as a message arrives, from a real phone through the WhatsApp Cloud API or typed into a simulator. **Replay** mode plays a recorded run with no server, as the backup.
+- Writes follow UPE: `condition_area` moves `ANC_EDD` → `PNC_DOB` only together with the baby's DOB, in one recorded write. High-risk (HRPW) and SNCU families are never switched automatically.
+- Eval on 46 synthetic cases (Hinglish, Devanagari, English, draft Marathi/Kannada/Telugu/Punjabi): **100% precision, 83% recall, 0 wrong writes**, $0.00033 per message. 37 tests.
+- Start with [`profile-writer/README.md`](profile-writer/README.md); safety and privacy design in [`SAFETY.md`](profile-writer/SAFETY.md); hosting in [`docs/DEPLOY.md`](profile-writer/docs/DEPLOY.md); WhatsApp in [`docs/WHATSAPP.md`](profile-writer/docs/WHATSAPP.md).
 
 ```bash
-cd profile-writer && python3 score.py
+cd profile-writer && python3 -m app.server          # dashboard + simulator (standard library only)
+python3 -m eval.run_eval --extractor claude --split all
+```
+
+### `profile-writer/nurse-page/`: the earlier nurse-facing version
+Moud's first profile writer: Claude reads a whole conversation and pulls out a wider set of facts (stage, baby's DOB, due date, who holds the phone, language, location, delivery place, feeding, symptom alerts). Each fact gets a status (one-click **ready**, **check first**, **nurse only**, **alert**) and a nurse saves it with one click. 19 simulated English conversations built around traps, a hidden answer key and `score.py`. Latest run: **45 of 49** facts exactly right, 0 of 4 pregnancy losses marked as a birth. See `nurse-page/results.md`.
+
+```bash
+cd profile-writer/nurse-page && python3 score.py
 ```
 
 ### `stretch-eval/`: eval for stretch-reminder messages
@@ -37,6 +39,7 @@ cd stretch-eval && python3 run_eval.py --judge judge_labels.json
 An interactive page showing six fictional women moving through one approved, due-date-based timeline. It shows how late, out-of-order or missing answers fill personalization slots without ever holding up approved content.
 
 ## Rules we follow
-- Simulated, pod-written or de-identified/paraphrased data only. Noora has agreed that de-identified or paraphrased messages can go to Claude; real production messages stay inside Noora's systems.
+- Simulated, pod-written or de-identified/paraphrased data only. Noora has agreed that de-identified or paraphrased messages can go to Claude; real production messages stay inside Noora's systems. Noora's de-identified samples go only in the git-ignored `profile-writer/eval/golden/noora/`.
 - Clinical content (stretches, warning signs, emergency numbers) is a placeholder until Noora's clinical team signs it off.
-- A human approves every write to a family's profile.
+- No profile write without passing the code rules and keeping its source words. Nurses don't validate extractions (Kripesh, Nov 5); non-clinical reviewers check every write afterwards, and pregnancy-loss cases go to the clinical team. Nothing is ever sent to a family without a person pressing Send.
+- No API keys in the repo: `.env` is git-ignored, and the Pages and Netlify builds refuse to publish anything that looks like a key.

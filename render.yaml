@@ -1,0 +1,38 @@
+# Render blueprint for the profile-writer server (API + WhatsApp webhook).
+# Render → New → Blueprint → pick this repo. Fill the "sync: false" values in the dashboard.
+services:
+  - type: web
+    name: noora-profile-writer
+    runtime: python
+    rootDir: profile-writer
+    plan: free
+    buildCommand: "python3 --version"      # standard library only: nothing to install
+    startCommand: "python3 -m app.server"
+    healthCheckPath: /healthz
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: DASHBOARD_TOKEN
+        generateValue: true                 # copy it from Render into the dashboard's Connect box
+      - key: PSEUDONYM_KEY
+        generateValue: true
+      - key: ALLOWED_ORIGINS                # e.g. https://bigmoud.github.io,https://your-site.netlify.app
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: EXTRACTOR_MODEL
+        value: claude-haiku-5-5
+      - key: SPEND_CAP_USD
+        value: "5"
+      - key: WHATSAPP_LIVE
+        value: "false"                      # set to true once the WhatsApp values below are filled
+      - key: WHATSAPP_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_APP_SECRET
+        sync: false
+      - key: WHATSAPP_VERIFY_TOKEN
+        sync: false
+      - key: ALLOWED_TEST_NUMBERS
+        sync: false

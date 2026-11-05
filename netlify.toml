@@ -1,0 +1,5 @@
+# Netlify alternative to GitHub Pages (works with private repos on the free plan).
+[build]
+  base = "profile-writer"
+  publish = "web"
+  command = "! grep -rIE 'sk-ant-|EAAG[A-Za-z0-9]{20,}' web/"
