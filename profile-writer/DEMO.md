@@ -5,7 +5,7 @@ Show it as the product: this is the nurse's screen. Keep the explanations for th
 ## Before you start
 
 - [ ] Server running (Render or laptop) with `ANTHROPIC_API_KEY`; hosted page connected (gear → server address + token)
-- [ ] Gear → **Reset demo**, so all five families start fresh
+- [ ] Gear → **Reset demo**, so all six families start fresh
 - [ ] For WhatsApp: fresh token, `WHATSAPP_LIVE=true`, your phone allowlisted, `hello_world` sent and replied to
 - [ ] A second tab with the hosted page **not** connected: it runs the offline demo, as the backup
 - [ ] Browser zoom 110–125%
