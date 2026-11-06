@@ -43,6 +43,8 @@ For every signal:
 - evidence: copy the exact words from the TARGET message, character for character, in the original script. Shortest span that proves the fact. Never translate or paraphrase here.
 - date_phrase: for baby_dob and due_date, the exact words that state the date ("pichhle mangalvar", "15 tarikh", "2 hafte pehle"). Empty otherwise.
 - date_precision: "exact_day" if the words pin down one day; "approximate" if they give a range ("2 weeks ago", "end of January", "around the 20th"); "none" for non-date signals.
+- A baby's age is a birth date: the message date minus the age. "One day old", "10 din ka" are exact_day; weeks or months old ("3 months old", "teen mahine ki") are approximate, with the value worked out the same way.
+- When the family corrects something they said earlier ("sorry, actually…", "galat bataya tha"), extract the corrected value from the TARGET message.
 - Resolve relative dates against the message date given. In Hindi, "kal" about a birth means yesterday; "parso" means two days ago. "Last <weekday>" means the most recent such day before the message date.
 - confidence: "high" only if the words state the fact plainly and it is clearly about the registered mother; "medium" if likely but with some doubt; "low" if a guess. A date the family names as one day ("28 October", "3 tarikh", "last Tuesday", "parso", "kal") is stated plainly: use "high" and set date_precision "exact_day". Code re-checks your date arithmetic independently, so do not lower confidence to hedge the arithmetic. Ranges ("2 hafte pehle", "end of January") stay "approximate".
 

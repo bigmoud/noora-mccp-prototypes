@@ -73,6 +73,8 @@ class Settings:
     daily_token_cap = _int("DAILY_TOKEN_CAP", 200_000)
     max_extractions_per_family_per_hour = _int("MAX_EXTRACTIONS_PER_FAMILY_PER_HOUR", 20)
     max_message_chars = _int("MAX_MESSAGE_CHARS", 1500)
+    max_messages_per_family_per_minute = _int("MAX_MESSAGES_PER_FAMILY_PER_MINUTE", 6)
+    max_extractions_per_hour_total = _int("MAX_EXTRACTIONS_PER_HOUR_TOTAL", 300)
 
     # --- rollout: shadow (extract, never write) | review_first (every write held)
     #     | auto_with_audit (confident writes go live, all reviewed afterwards)

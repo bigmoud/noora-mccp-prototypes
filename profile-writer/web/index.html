@@ -114,6 +114,7 @@ button{cursor:pointer}
 .b .t svg{width:16px;height:11px;color:var(--tick)}
 .sys{align-self:center;max-width:80%;margin:6px 0;background:var(--sysnote);color:var(--sysnote-ink);font-size:12.5px;padding:5px 12px;border-radius:8px;
   box-shadow:var(--shadow);text-align:center}
+.sys.alert{background:var(--red-soft);color:var(--red);border:1px solid var(--red-line);font-weight:500}
 .typing{align-self:flex-start;background:var(--in);border-radius:8px;border-top-left-radius:0;box-shadow:var(--shadow);padding:8px 12px;color:var(--meta);font-size:13px;
   display:flex;align-items:center;gap:8px;margin-top:4px}
 .dots{display:inline-flex;gap:3px}
@@ -403,9 +404,9 @@ function offlineAct(n, action, value){
 function render(){ if (!S) return; renderList(); renderChat(); renderCopilot(); renderHow(); }
 function renderList(){
   const box=$("#list"); box.replaceChildren();
-  const needsN = S.families.filter(f=>f.needs).length;
+  const needsN = S.families.filter(f=>f.needs || f.alert).length;
   $("#fNeeds").textContent = needsN ? `Needs check (${needsN})` : "Needs check";
-  const fams = S.families.filter(f => (filter==="all" || f.needs) && (!query || f.name.toLowerCase().includes(query)));
+  const fams = S.families.filter(f => (filter==="all" || f.needs || f.alert) && (!query || f.name.toLowerCase().includes(query)));
   if (!fams.length) box.append(h("p",{class:"muted", style:"padding:16px"}, filter==="needs" ? "Nothing waiting for you." : "No chats."));
   for (const f of fams){
     const unread = f.uid!==uid && f.unread>0;
@@ -415,7 +416,8 @@ function renderList(){
         f.processing ? h("div",{class:"pv busy"}, "Copilot is reading…")
                      : h("div",{class:"pv"}, f.last_out ? svg(TICKS) : null, f.last_out ? " " : "", f.last || "")),
       h("div",{class:"side"+(unread?" unread":"")}, listTime(f.last_ts),
-        f.needs ? h("span",{class:"flag"+(f.clinical?" red":"")}, f.clinical ? "Clinical" : "Check") : null,
+        f.alert ? h("span",{class:"flag red"}, f.alert)
+          : f.needs ? h("span",{class:"flag"+(f.clinical?" red":"")}, f.clinical ? "Clinical" : "Check") : null,
         unread ? h("span",{class:"badge"}, f.unread) : null)));
   }
 }
@@ -430,7 +432,7 @@ function renderChat(){
   let lastDay = "";
   for (const it of items){
     const d = dayLabel(it.ts); if (d && d!==lastDay){ box.append(h("div",{class:"day"}, d)); lastDay = d; }
-    if (it.k==="n"){ box.append(h("div",{class:"sys"}, it.n.text)); continue; }
+    if (it.k==="n"){ box.append(h("div",{class:"sys"+(it.n.alert?" alert":"")}, it.n.text)); continue; }
     const m = it.m;
     box.append(h("div",{class:"b "+m.dir}, m.text, h("span",{class:"t"}, m.auto ? "Automatic · " : "", hhmm(m.ts), m.dir==="out" ? svg(TICKS) : null)));
   }

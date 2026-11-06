@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS golden_pending (
   msg_day TEXT, signal TEXT, wrong_value TEXT, correct_value TEXT, reviewer TEXT, deidentified INTEGER DEFAULT 0);
 CREATE TABLE IF NOT EXISTS upe_writes (
   id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, ts TEXT, message_id INTEGER, payload TEXT);
+CREATE TABLE IF NOT EXISTS flags (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, ts TEXT, kind TEXT, message_id INTEGER, detail TEXT);
 CREATE TABLE IF NOT EXISTS usage (day TEXT PRIMARY KEY, tokens_in INTEGER, tokens_out INTEGER, calls INTEGER);
 CREATE TABLE IF NOT EXISTS settings_kv (k TEXT PRIMARY KEY, v TEXT);
 """
@@ -141,6 +143,22 @@ class Store:
     def last_inbound_ts(self, uid: str) -> str | None:
         rows = self.q("SELECT ts FROM messages WHERE uid=? AND direction='in' ORDER BY id DESC LIMIT 1", (uid,))
         return rows[0]["ts"] if rows else None
+
+    def add_flag(self, uid: str, kind: str, message_id=None, detail: str = "") -> None:
+        """Safety flags the nurse sees in the chat. Never holds message text."""
+        self.x("INSERT INTO flags (uid, ts, kind, message_id, detail) VALUES (?,?,?,?,?)",
+               (uid, now(), kind, message_id, detail[:200]))
+
+    def flags(self, uid: str, limit: int = 20) -> list[dict]:
+        return self.q("SELECT * FROM flags WHERE uid=? ORDER BY id DESC LIMIT ?", (uid, limit))[::-1]
+
+    def inbound_since(self, uid: str, since_iso: str) -> list[dict]:
+        return self.q("SELECT id, text, ts FROM messages WHERE uid=? AND direction='in' AND ts>=? ORDER BY id",
+                      (uid, since_iso))
+
+    def recent_extractions_all(self, minutes: int = 60) -> int:
+        since = (datetime.now(timezone.utc) - timedelta(minutes=minutes)).isoformat()
+        return self.q("SELECT COUNT(*) n FROM traces WHERE ts>=?", (since,))[0]["n"]
 
     def recent_extractions(self, uid: str, minutes: int = 60) -> int:
         since = (datetime.now(timezone.utc) - timedelta(minutes=minutes)).isoformat()
@@ -247,7 +265,8 @@ class Store:
     def erase_family(self, uid: str) -> None:
         """Right to erasure: remove everything about this family except a content-free audit line."""
         with self.lock:
-            for table in ("messages", "facts", "traces", "contacts", "golden_pending", "upe_writes", "copilot", "families"):
+            for table in ("messages", "facts", "traces", "contacts", "golden_pending", "upe_writes", "copilot", "flags",
+                          "families"):
                 self.db.execute(f"DELETE FROM {table} WHERE uid=?", (uid,))
             self.db.commit()
         self.audit(uid, "erased")

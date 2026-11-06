@@ -9,9 +9,10 @@ dashboard can open on request.
 """
 from __future__ import annotations
 
+import json
 import threading
 import time
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Callable
 
 from . import copilot as copilot_mod
@@ -26,7 +27,8 @@ Publish = Callable[[str, dict], None]
 CLINICAL_CHECKS = {"campaign allows automatic update", "sensitive"}
 # Conflicts with what's already on file are policy questions for a person, not something the
 # judge may overrule (a family's 5-week due-date correction re-times every message).
-POLICY_CHECKS = {"no conflict with profile", "plausible date", "fits her due date"}
+POLICY_CHECKS = {"no conflict with profile", "plausible date", "fits her due date",
+                 "reads like a family message"}  # instructions or data requests: a person decides, not the judge
 NEEDED_TEXT = {"baby_dob": "the baby's exact date of birth", "due_date": "the exact due date the doctor gave"}
 
 
@@ -55,18 +57,19 @@ def assess(text: str, msg_day: date, profile: dict[str, str], context: list[tupl
     clipped, _ = privacy.clip(text)
     redacted, kinds = privacy.redact(clipped)
     guards = {"emergency_words": privacy.mentions_danger(clipped), "loss_words": privacy.mentions_loss(clipped),
-              "instruction_like": privacy.looks_like_injection(clipped)}
+              "instruction_like": privacy.looks_like_injection(clipped),
+              "asks_for_others_data": privacy.asks_for_others_data(clipped)}
     extraction = extractor.extract(redacted, msg_day, context)
     sensitive = extraction.sensitive_event or guards["loss_words"]
     decisions = rules.decide(extraction.signals, redacted, msg_day, profile, sensitive=sensitive,
                              family_paused=family_paused, rollout_mode=rollout_mode,
-                             suspicious=guards["instruction_like"])
+                             suspicious=guards["instruction_like"] or guards["asks_for_others_data"])
     to_judge = [d for d in decisions if route_of(d) == "judge"]
     jr = None
     if to_judge and use_judge:
         jr = judge_mod.judge(redacted, msg_day, context, profile,
-                             [{"signal": d.signal, "value": d.value, "evidence": d.proposal.get("evidence", "")}
-                              for d in to_judge])
+                             [{"signal": d.signal, "value": d.value, "evidence": d.proposal.get("evidence", ""),
+                               "precision": d.precision} for d in to_judge])
     for d in decisions:
         r = route_of(d)
         if r == "judge":
@@ -126,6 +129,21 @@ def process_inbound(store: Store, uid: str, text: str, ts: str | None = None, wa
         skip = "kill switch on"
     elif store.recent_extractions(uid) >= settings.max_extractions_per_family_per_hour:
         skip = "hourly limit for this family reached"
+    elif store.recent_extractions_all() >= settings.max_extractions_per_hour_total:
+        skip = "hourly limit for the whole service reached"
+    else:
+        # Spam and floods are stopped here, before they cost a model call or a nurse's attention.
+        minute_ago = (datetime.fromisoformat(ts) - timedelta(seconds=60)).isoformat()
+        burst = store.inbound_since(uid, minute_ago)
+        earlier = store.q("""SELECT text, ts FROM messages WHERE uid=? AND direction='in' AND id<? AND purged=0
+                             ORDER BY id DESC LIMIT 1""", (uid, mid))
+        if earlier and _same_text(earlier[0]["text"], clipped) and \
+                datetime.fromisoformat(ts) - datetime.fromisoformat(earlier[0]["ts"]) < timedelta(minutes=10):
+            skip = "repeat of the previous message"
+        elif len(burst) > settings.max_messages_per_family_per_minute:
+            skip = "too many messages in one minute"
+            if not store.q("SELECT 1 FROM flags WHERE uid=? AND kind='flood' AND ts>=?", (uid, minute_ago)):
+                store.add_flag(uid, "flood", mid)
     if skip:
         step("skipped", reason=skip)
         trace = {"uid": uid, "message_id": mid, "steps": steps, "decisions": []}
@@ -144,6 +162,11 @@ def process_inbound(store: Store, uid: str, text: str, ts: str | None = None, wa
     extraction, decisions, jr = result["extraction"], result["decisions"], result["judge"]
     store.add_usage(extraction.tokens_in, extraction.tokens_out)
     step("guards", **result["guards"])
+    g = result["guards"]
+    for kind, on in (("danger", g["emergency_words"]), ("data_request", g["asks_for_others_data"]),
+                     ("instructions", g["instruction_like"])):
+        if on:
+            store.add_flag(uid, kind, mid)
     step("extractor", extractor=extraction.extractor, sent=extraction.sent_to_model, speaker=extraction.speaker,
          sensitive_event=extraction.sensitive_event, proposals=extraction.signals, tokens_in=extraction.tokens_in,
          tokens_out=extraction.tokens_out, model_ms=extraction.ms,
@@ -187,7 +210,7 @@ def process_inbound(store: Store, uid: str, text: str, ts: str | None = None, wa
             store.audit(uid, f"fact_{d.route}", fact_id=fid, signal=d.signal)
         area_before, area_after = store.recompute_condition_area(uid)
         payload = upe_payload(uid, mid, area_before, area_after, decisions, written, extraction.extractor,
-                              jr.judge if jr else "")
+                              jr.judge if jr else "", before)
         if payload:
             store.add_upe_write(uid, mid, payload)
 
@@ -197,11 +220,13 @@ def process_inbound(store: Store, uid: str, text: str, ts: str | None = None, wa
          rollout=rollout, upe_write=payload)
 
     # --- 5. Copilot: bio for the nurse + a drafted reply (never sent automatically)
-    needed = [NEEDED_TEXT[d.signal] for d in decisions if d.route == "ask_family" and d.signal in NEEDED_TEXT]
-    flags = {"danger": result["guards"]["emergency_words"], "loss": result["sensitive"],
-             "writer": extraction.speaker}
+    needed = [NEEDED_TEXT[d.signal] for d in decisions if d.signal in NEEDED_TEXT
+              and (d.route == "ask_family" or (d.route == "write" and d.precision == "approximate"))]
+    flags = {"danger": g["emergency_words"], "loss": result["sensitive"], "writer": extraction.speaker,
+             "data_request": g["asks_for_others_data"]}
     cp = refresh_copilot(store, uid, mid, needed, flags)
-    step("copilot", model=cp.model, model_ms=cp.ms, cost_usd=cp.cost_usd, error=cp.error)
+    step("copilot", model=cp.model, model_ms=cp.ms, cost_usd=cp.cost_usd, error=cp.error,
+         output_check=cp.blocked or "passed")
 
     trace = {"uid": uid, "message_id": mid, "steps": steps, "decisions": [d.to_dict() for d in decisions],
              "total_ms": int((time.time() - t0) * 1000)}
@@ -209,6 +234,11 @@ def process_inbound(store: Store, uid: str, text: str, ts: str | None = None, wa
     publish("trace", trace)
     publish("profile", {"uid": uid})
     return trace
+
+
+def _same_text(a: str, b: str) -> bool:
+    norm = lambda t: " ".join((t or "").casefold().split())  # noqa: E731
+    return norm(a) == norm(b)
 
 
 def nurse_reason(d: rules.Decision, on_file: dict) -> str:
@@ -221,6 +251,8 @@ def nurse_reason(d: rules.Decision, on_file: dict) -> str:
                 else f"She's on the {on_file.get('condition_area')} campaign, so a nurse confirms changes.")
     if "sensitive" in failed:
         return "Possible pregnancy loss in this chat: a nurse checks before anything changes."
+    if "reads like a family message" in failed:
+        return "This message asks for other people's information or reads like instructions. Check before saving."
     if "fits her due date" in failed:
         return f"This is far from her due date ({nice(edd)}). Please confirm with the family."
     if "no conflict with profile" in failed:
@@ -230,17 +262,35 @@ def nurse_reason(d: rules.Decision, on_file: dict) -> str:
     return ""
 
 
+def is_approximate(fact: dict | None) -> bool:
+    """True for a date written from an age ("3 months old"): shown with ≈ and still asked for."""
+    if not fact:
+        return False
+    checks = fact.get("checks") or "[]"
+    checks = json.loads(checks) if isinstance(checks, str) else checks
+    return any(c.get("name") == "exact day" and str(c.get("detail", "")).startswith("approximate") and c.get("ok")
+               for c in checks)
+
+
 def refresh_copilot(store: Store, uid: str, message_id=None, still_needed=None, flags=None) -> copilot_mod.CopilotOut:
     fam = store.family(uid) or {}
     prof = store.profile(uid)
     chat = [(m["author"], m["redacted_text"]) for m in store.messages(uid, 8) if not m["purged"]]
     awaiting_check = {f["signal"] for f in store.queue(uid)}  # the family already told us: never re-ask these
     still = [x for x in (still_needed or []) if not any(NEEDED_TEXT.get(sg) == x for sg in awaiting_check)]
-    if (prof.get("stage") == "delivered" and not prof.get("baby_dob") and "baby_dob" not in awaiting_check
+    dob = store.active_facts(uid).get("baby_dob")
+    if ((prof.get("stage") == "delivered" and not dob or is_approximate(dob)) and "baby_dob" not in awaiting_check
             and NEEDED_TEXT["baby_dob"] not in still):
         still.append(NEEDED_TEXT["baby_dob"])
-    cp = copilot_mod.draft(fam, prof, chat, still, flags or {"loss": bool(fam.get("paused"))},
-                           datetime.now(timezone.utc).date())
+    if is_approximate(dob):
+        prof = dict(prof, baby_dob_precision="approximate")
+    if flags is None:  # a later refresh (after a nurse action): keep the latest message's safety flags
+        last_in = store.q("SELECT id FROM messages WHERE uid=? AND direction='in' ORDER BY id DESC LIMIT 1", (uid,))
+        kinds = {f["kind"] for f in store.flags(uid) if last_in and f["message_id"] == last_in[0]["id"]}
+        flags = {"loss": bool(fam.get("paused")), "danger": "danger" in kinds, "data_request": "data_request" in kinds}
+    cp = copilot_mod.draft(fam, prof, chat, still, flags, datetime.now(timezone.utc).date())
+    if cp.blocked:
+        store.add_flag(uid, "draft_blocked", message_id, ", ".join(cp.blocked))
     store.add_usage(cp.tokens_in, cp.tokens_out)
     store.set_copilot(uid, cp.bio, cp.reply, cp.language, still, message_id, cp.model)
     return cp
@@ -254,7 +304,7 @@ def refresh_copilot_async(store: Store, uid: str, publish: Publish = _noop) -> N
 
 
 def upe_payload(uid: str, mid: int | None, area_before: str, area_after: str, decisions, written: dict,
-                extractor: str, judge: str = "") -> dict | None:
+                extractor: str, judge: str = "", before: dict | None = None) -> dict | None:
     """What this message would write to Noora's UPE, in one record. Condition area and baby DOB
     travel together. Fields UPE doesn't have yet are listed separately as proposals."""
     by_sig = {d.signal: d for d in decisions}
@@ -264,6 +314,10 @@ def upe_payload(uid: str, mid: int | None, area_before: str, area_after: str, de
     for sig, upe_name in rules.UPE_FIELDS.items():
         if sig in written:
             fields[upe_name] = {"to": by_sig[sig].value}
+            if (before or {}).get(sig):
+                fields[upe_name]["from"] = before[sig]
+            if by_sig[sig].precision == "approximate":
+                fields[upe_name]["precision"] = "approximate"
     for sig in ("phone_holder", "stage"):
         if sig in written and not (sig == "stage" and "condition_area" in fields):
             proposed[sig] = by_sig[sig].value

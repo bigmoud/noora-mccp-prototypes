@@ -24,9 +24,11 @@ MONTHS = {
     7: ["july", "jul", "जुलाई"], 8: ["august", "aug", "अगस्त"], 9: ["september", "sep", "sept", "सितंबर"],
     10: ["october", "oct", "अक्टूबर"], 11: ["november", "nov", "नवंबर"], 12: ["december", "dec", "दिसंबर"],
 }
-_NUM_WORDS = {"ek": 1, "do": 2, "teen": 3, "char": 4, "chaar": 4, "paanch": 5, "panch": 5,
-              "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7,
-              "एक": 1, "दो": 2, "तीन": 3, "चार": 4, "पांच": 5}
+_NUM_WORDS = {"ek": 1, "do": 2, "teen": 3, "char": 4, "chaar": 4, "paanch": 5, "panch": 5, "chhe": 6, "che": 6,
+              "saat": 7, "aath": 8, "nau": 9, "das": 10, "a": 1, "an": 1,
+              "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9,
+              "ten": 10, "eleven": 11, "twelve": 12,
+              "एक": 1, "दो": 2, "तीन": 3, "चार": 4, "पांच": 5, "पाँच": 5, "छह": 6, "सात": 7, "आठ": 8}
 
 
 def _num(token: str) -> int | None:
@@ -122,3 +124,27 @@ def _with_year(d: int, m: int, y: int | None, msg_day: date, past: bool, roll_mo
     if not past and cand < msg_day - timedelta(days=30):
         return _safe(msg_day.year + 1, m, d)
     return cand
+
+
+# A baby's age ("one day old", "10 din ka", "3 months old", "teen mahine ki") read as a birth date.
+# Days pin down one day; weeks and months are ranges, so they come with a tolerance in days.
+_AGE_UNITS = [
+    (r"din|days?|दिन", 1, 0),
+    (r"hafte|hafta|haftay|weeks?|wks?|हफ्ते|हफ़्ते|सप्ताह", 7, 4),
+    (r"mahine|mahina|maheene|months?|महीने|महीना|महिने", 30, 15),
+]
+_AGE_TAIL = r"(?:ka|ki|ke|old|ka hai|ki hai|का|की|के|pehle|pahle|ago|पहले)"
+
+
+def age_to_dob(phrase: str, msg_day: date) -> tuple[date, int] | None:
+    """(birth date, tolerance in days) for an age or 'N units ago' phrase, or None."""
+    p = phrase.lower().strip()
+    for unit, days, tol in _AGE_UNITS:
+        m = re.search(rf"(?<!\w)(\w+)\s*(?:{unit})\s*{_AGE_TAIL}", p)
+        if m and _num(m[1]) is not None:
+            n = _num(m[1])
+            if days == 30:  # calendar months: "3 months old" on 6 Nov is about 6 Aug
+                y, mo = divmod(msg_day.year * 12 + msg_day.month - 1 - n, 12)
+                return _safe(y, mo + 1, min(msg_day.day, 28)) or msg_day - timedelta(days=30 * n), tol
+            return msg_day - timedelta(days=n * days), tol
+    return None
