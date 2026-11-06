@@ -105,6 +105,7 @@ button{cursor:pointer}
 .chat-head .nm{font-weight:500;font-size:16px}
 .chat-head .sub{font-size:13px;color:var(--meta)}
 .chat-head .sub.busy{color:var(--green)}
+.chat-head .grow{flex:1}
 .msgs{flex:1;overflow:auto;padding:16px 6%;display:flex;flex-direction:column;gap:3px}
 .day{align-self:center;margin:10px 0 6px;background:var(--panel);color:var(--meta);font-size:12.5px;padding:5px 12px;border-radius:8px;box-shadow:var(--shadow);text-transform:uppercase}
 .b{max-width:min(65%,520px);padding:6px 8px 4px 9px;border-radius:8px;box-shadow:var(--shadow);white-space:pre-wrap;word-wrap:break-word;font-size:14.2px}
@@ -443,7 +444,8 @@ function renderChat(){
   head.replaceChildren(); box.replaceChildren();
   if (!c){ box.append(h("div",{class:"empty-chat"},"Select a chat")); $("#draftBox").replaceChildren(); return; }
   head.append(avatar(c.name), h("div",{}, h("div",{class:"nm"}, c.name),
-    c.processing ? h("div",{class:"sub busy"},"Copilot is reading the latest message…") : h("div",{class:"sub"}, c.phone)));
+    c.processing ? h("div",{class:"sub busy"},"Copilot is reading the latest message…") : h("div",{class:"sub"}, c.phone)),
+    h("span",{class:"grow"}), clearBtn());
   const items = [...c.messages.map(m=>({k:"m", ts:m.ts, m})), ...c.notices.map(n=>({k:"n", ts:n.ts, n}))]
     .sort((a,b)=> (a.ts||"").localeCompare(b.ts||"") || (a.k===b.k ? (a.k==="m" ? (a.m.id>b.m.id?1:-1) : 0) : a.k==="m"?-1:1));
   let lastDay = "";
@@ -583,6 +585,24 @@ function renderAttach(){
   box.append(h("div",{class:"attach"}, stickerImg(), h("span",{class:"muted"},"Sticker will be sent with this reply"),
     h("button",{class:"x", "aria-label":"Remove sticker", onclick:()=>{ withSticker[uid]=false; renderAttach(); }}, "×")));
 }
+function clearBtn(){
+  // Two taps, no pop-up: the first arms it for 4 seconds, the second clears.
+  const b = h("button",{class:"btn danger", title:"Delete this chat's messages and profile history"}, "Clear chat");
+  let armed=false, t=null;
+  b.onclick = async ()=>{
+    if (!armed){ armed=true; b.textContent="Tap again to clear"; t=setTimeout(()=>{ armed=false; b.textContent="Clear chat"; }, 4000); return; }
+    clearTimeout(t); b.disabled=true;
+    if (MODE==="offline"){
+      const c=OFF.chats[uid]; Object.assign(c,{messages:[], notices:[], needs:[], draft:"", bio:"", draft_sticker:false, trace:null,
+        health:(c.health||[]).map(r=>({field:r.field, value:"-"}))});
+      OFF.local[uid]=[]; Object.assign(OFF.families.find(x=>x.uid===uid),{last:"", unread:0, needs:0, clinical:false, alert:null});
+      toast("Chat cleared"); load(); return;
+    }
+    try { await post("/api/clear",{uid}); withSticker[uid]=false; renderAttach(); toast("Chat cleared"); } catch(e){ toast(e.message); }
+    load();
+  };
+  return b;
+}
 async function sendReply(){
   const t=$("#reply"), text=t.value.trim(); if (!text || !uid) return;
   if (MODE==="offline"){
@@ -629,10 +649,11 @@ function renderSettings(){
   const url = h("input",{type:"url", placeholder:"https://your-server.onrender.com", value:CONN.base||""});
   const tok = h("input",{type:"password", placeholder:"Access token"});
   const connect = async ()=>{
-    const base=url.value.trim().replace(/\/+$/,"");
+    let base=url.value.trim(); try { base = new URL(base).origin; } catch(e){}  // keep only https://host: drops /webhook, ?token=…
     if (!/^https:\/\/|^http:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(base)){ toast("Use an https:// address"); return; }
     const prev={MODE, CONN}; CONN={base, token:tok.value.trim()}; MODE="remote";
     try { const r=await fetch(base+"/api/state",{headers:headers()}); if(!r.ok) throw new Error(r.status===401?"wrong token":"HTTP "+r.status);
+      if (!(r.headers.get("content-type")||"").includes("json")) throw new Error("that address isn't the profile-writer server");
       sset("npw_conn", JSON.stringify(CONN)); uid=null; await load(); startEvents(); $("#setPop").hidden=true; toast("Connected"); renderSim(); }
     catch(e){ MODE=prev.MODE; CONN=prev.CONN; toast("Couldn't connect: "+e.message); }
   };

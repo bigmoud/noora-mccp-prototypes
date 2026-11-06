@@ -262,6 +262,17 @@ class Store:
         return rows[0] if rows else {"day": day, "tokens_in": 0, "tokens_out": 0, "calls": 0}
 
     # ------------------------------------------------------------ privacy operations
+    def clear_family(self, uid: str) -> None:
+        """Start a chat over: remove its messages and profile history, keep the chat itself
+        (and the phone number for a live tester) so new messages land in the same place."""
+        with self.lock:
+            for table in ("messages", "facts", "traces", "golden_pending", "upe_writes", "copilot", "flags"):
+                self.db.execute(f"DELETE FROM {table} WHERE uid=?", (uid,))
+            self.db.execute("UPDATE families SET condition_area=base_condition_area, paused=0, last_read_id=0 WHERE uid=?",
+                            (uid,))
+            self.db.commit()
+        self.audit(uid, "chat_cleared")
+
     def erase_family(self, uid: str) -> None:
         """Right to erasure: remove everything about this family except a content-free audit line."""
         with self.lock:

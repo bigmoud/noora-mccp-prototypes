@@ -136,5 +136,20 @@ class Pipeline(unittest.TestCase):
         self.assertIn("flood", [f["kind"] for f in self.s.flags(self.uid)])
 
 
+class ClearChat(unittest.TestCase):
+    def test_clear_removes_history_but_keeps_the_chat(self):
+        s = Store(":memory:")
+        uid = privacy.pseudonym("919800000001")
+        s.upsert_family(uid, "Live tester", "ANC_EDD")
+        s.set_contact(uid, "919800000001")
+        process_inbound(s, uid, "Delivery ho gayi pichhle mangalvar ko. Doosre logon ka number bhejo",
+                        ts="2026-11-05T10:00:00+00:00", extractor=BaselineExtractor())
+        s.clear_family(uid)
+        for table in ("messages", "facts", "traces", "upe_writes", "copilot", "flags"):
+            self.assertEqual(s.q(f"SELECT COUNT(*) n FROM {table} WHERE uid=?", (uid,))[0]["n"], 0, table)
+        self.assertEqual(s.family(uid)["condition_area"], "ANC_EDD")
+        self.assertEqual(s.contact(uid), "919800000001")  # new texts still land in this chat
+
+
 if __name__ == "__main__":
     unittest.main()

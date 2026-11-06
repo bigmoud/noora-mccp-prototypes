@@ -23,7 +23,7 @@ SYSTEM = """You help a nurse at Noora Health's maternal and child health WhatsAp
 2. reply: a draft WhatsApp reply the nurse can send on behalf of the Noora Health care team.
 - Answer the family's LATEST message. Earlier messages are only background.
 - Professional and warm, short (under 60 words), simple words.
-- Language: if the family wrote in Hindi or Hinglish, reply in Hindi in the same script they used (Roman letters if they used Roman letters, Devanagari if they used Devanagari). Otherwise reply in English.
+- Language: write the reply in the "Reply language" given with the chat, and only that: "English" means plain English with no Hindi words (a greeting like "Namaste" is fine); "Hindi in Roman letters" means Hindi written in Roman letters; "Hindi in Devanagari" means Hindi in Devanagari script.
 - Speak to whoever wrote (for example, a husband writing about his wife), respectfully ("aap", "ji"). Don't ask who is writing.
 - Never ask for anything the profile already has or that the family already said in the chat. Do ask, in one short question, for each item listed under "Still needed", if it fits the moment.
 - If the message mentions danger signs (bleeding, convulsions, fever, fast breathing, a baby not feeding well or very sleepy, yellow palms or soles, a cold baby), tell them kindly but clearly to take the mother or baby to the nearest hospital today, or call 108 in an emergency.
@@ -52,6 +52,48 @@ TOOL = {
 # Used instead of a model-written draft when someone asks for other people's data or the
 # system's internals. Written by people; the nurse still decides whether to send it.
 DATA_REQUEST_REPLY = "We can’t share anyone else’s information; in an emergency call 108."
+DATA_REQUEST_REPLIES = {
+    "english": DATA_REQUEST_REPLY,
+    "hindi_roman": "Hum kisi aur ki jaankari share nahi kar sakte; emergency mein 108 par call karein.",
+    "hindi_devanagari": "हम किसी और की जानकारी साझा नहीं कर सकते; आपात स्थिति में 108 पर कॉल करें।",
+}
+
+# ---------------------------------------------------------------- reply language
+# The reply follows the family's LATEST message, decided here in code and checked after the
+# model writes: English in, English out; Hinglish in, Hindi in Roman letters out; Devanagari in,
+# Devanagari out. Other Indian scripts get English until Noora's nurses confirm what they use.
+LANG_LABEL = {"english": "English", "hindi_roman": "Hindi in Roman letters", "hindi_devanagari": "Hindi in Devanagari"}
+_HINGLISH = set("""hai hain ho hua hui hue gaya gayi gaye raha rahi rahe nahi nahin nhi kya kyun kaise kab kahan mera meri
+mere aap aapka aapki aapke apna apni tum tumhara hum humein hamari hamara ka ki ke ko se mein bhi aur kal aaj abhi
+theek thik doodh dudh bukhar karein karo kare kar kariye batayein bataiye bata batao haan accha achha pet dard khana
+saas pati bahu bachcha bacha bachchi bachi beta beti janam tarikh tareekh hospital-mein jaldi turant kripya zaroor
+lekin par phir thi tha sakte doosre dusre doosra logon bhejo bhejiye bhejein dijiye dena dedo chahte chahiye sakti sakta chahiye wala wali liye diya diye hoga hogi""".split())
+_DEVANAGARI = re.compile(r"[\u0900-\u097F]")
+_WORD = re.compile(r"[a-z]+")
+
+
+def detect_language(text: str) -> str | None:
+    """english | hindi_roman | hindi_devanagari, or None when there's too little to tell."""
+    text = text or ""
+    if len(_DEVANAGARI.findall(text)) >= 2:
+        return "hindi_devanagari"
+    words = _WORD.findall(text.lower())
+    if not words:
+        return None
+    hits = sum(w in _HINGLISH for w in words)
+    if (hits >= 2 and hits / len(words) >= 0.25) or (hits == 1 and len(words) <= 3):
+        return "hindi_roman"
+    return "english" if len(words) >= 3 else None
+
+
+def reply_language(chat: list[tuple[str, str]]) -> str:
+    for who, text in reversed(chat):
+        if who == "family":
+            lang = detect_language(text)
+            if lang:
+                return lang
+    return "english"
+
 
 # Output check, in code, on every model-written draft before a nurse sees it.
 _DRAFT_RULES = [
@@ -107,9 +149,11 @@ def _profile_lines(fam: dict, prof: dict, today: date) -> dict:
 def draft(fam: dict, prof: dict, chat: list[tuple[str, str]], still_needed: list[str], flags: dict,
           today: date) -> CopilotOut:
     facts = _profile_lines(fam, prof, today)
+    lang = reply_language(chat)
     if not settings.anthropic_api_key:
-        return _guard(_fallback(facts, still_needed, flags), flags, facts)
+        return _guard(_fallback(facts, still_needed, flags, lang), flags, facts, lang)
     user = "\n".join([
+        f"Reply language: {LANG_LABEL[lang]} (the family's latest message is in {LANG_LABEL[lang]})",
         f"Today: {today.isoformat()}",
         "Profile: " + json.dumps(facts, ensure_ascii=False),
         "Still needed: " + (", ".join(still_needed) or "nothing"),
@@ -120,31 +164,68 @@ def draft(fam: dict, prof: dict, chat: list[tuple[str, str]], still_needed: list
     ])
     model = settings.copilot_model
     r = call_tool(SYSTEM, user, TOOL, model, max_tokens=2000)
+    tin, tout, ms = r.tokens_in, r.tokens_out, r.ms
+    if r.output and not flags.get("data_request") and not _language_ok(str(r.output.get("reply", "")), lang):
+        # One retry with the language spelled out; then a template in the right language.
+        r2 = call_tool(SYSTEM, user + f"\n\nYour last draft was not in {LANG_LABEL[lang]}. Write the reply in "
+                       f"{LANG_LABEL[lang]} only.", TOOL, model, max_tokens=2000)
+        tin, tout, ms = tin + r2.tokens_in, tout + r2.tokens_out, ms + r2.ms
+        if r2.output and _language_ok(str(r2.output.get("reply", "")), lang):
+            r = r2
+        else:
+            out = _fallback(facts, still_needed, flags, lang)
+            out.bio = str(r.output.get("bio", ""))[:600] or out.bio
+            out.model, out.tokens_in, out.tokens_out, out.ms = f"copilot:{model}", tin, tout, ms
+            out.cost_usd, out.blocked = cost(model, tin, tout), [f"not in {LANG_LABEL[lang]}"]
+            return _guard(out, flags, facts, lang)
     if not r.output:
-        out = _fallback(facts, still_needed, flags)
+        out = _fallback(facts, still_needed, flags, lang)
         out.error = r.error
-        return _guard(out, flags)
+        return _guard(out, flags, facts, lang)
     out = CopilotOut(str(r.output.get("bio", ""))[:600], str(r.output.get("reply", ""))[:700],
-                     r.output.get("reply_language", "english"), f"copilot:{model}", r.tokens_in, r.tokens_out,
-                     r.ms, cost(model, r.tokens_in, r.tokens_out), "", still_needed)
-    return _guard(out, flags, facts)
+                     lang, f"copilot:{model}", tin, tout, ms, cost(model, tin, tout), "", still_needed)
+    return _guard(out, flags, facts, lang)
 
 
-def _guard(out: CopilotOut, flags: dict, facts: dict | None = None) -> CopilotOut:
+def _language_ok(reply: str, lang: str) -> bool:
+    got = detect_language(reply)
+    if lang == "english":
+        return got in ("english", None)
+    return got == lang
+
+
+def _guard(out: CopilotOut, flags: dict, facts: dict | None = None, lang: str = "english") -> CopilotOut:
     """Code decides what reaches the draft box, whatever the model wrote."""
     if flags.get("data_request"):
-        out.reply, out.language = DATA_REQUEST_REPLY, "english"
+        out.reply, out.language = DATA_REQUEST_REPLIES[lang], lang
         return out
     problems = draft_problems(out.reply)
     if problems:
-        out.blocked = problems
-        out.reply = _fallback(facts or {}, out.still_needed, flags).reply
+        out.blocked = (out.blocked or []) + problems
+        out.reply = _fallback(facts or {}, out.still_needed, flags, lang).reply
     if set(draft_problems(out.bio)) - {"talks about AI or systems"}:
-        out.bio = _fallback(facts or {}, out.still_needed, flags).bio
+        out.bio = _fallback(facts or {}, out.still_needed, flags, lang).bio
     return out
 
 
-def _fallback(facts: dict, still_needed: list[str], flags: dict) -> CopilotOut:
+_TEMPLATES = {
+    "english": {"loss": "We are so sorry for your loss. We are here for you. Please let us know if you need anything.",
+                "danger": "Please take her to the nearest hospital today. In an emergency, call 108.",
+                "thanks": "Thank you for your message.", "ask": " Could you tell us {}?"},
+    "hindi_roman": {"loss": "Humein aapke nuksan ka bahut dukh hai. Hum aapke saath hain. Kisi bhi madad ke liye humein batayein.",
+                    "danger": "Kripya aaj hi nazdeeki aspatal jaayein. Emergency mein 108 par call karein.",
+                    "thanks": "Aapke sandesh ke liye dhanyavaad.", "ask": " Kya aap {} bata sakte hain?"},
+    "hindi_devanagari": {"loss": "हमें आपके नुकसान का बहुत दुख है। हम आपके साथ हैं। किसी भी मदद के लिए हमें बताएँ।",
+                         "danger": "कृपया आज ही नज़दीकी अस्पताल जाएँ। आपात स्थिति में 108 पर कॉल करें।",
+                         "thanks": "आपके संदेश के लिए धन्यवाद।", "ask": " क्या आप {} बता सकते हैं?"},
+}
+_NEEDED = {"hindi_roman": {"the baby's exact date of birth": "baby ke janam ki sahi tarikh",
+                           "the exact due date the doctor gave": "doctor ki batayi due date"},
+           "hindi_devanagari": {"the baby's exact date of birth": "बच्चे के जन्म की सही तारीख",
+                                "the exact due date the doctor gave": "डॉक्टर की बताई डिलीवरी की तारीख"}}
+
+
+def _fallback(facts: dict, still_needed: list[str], flags: dict, lang: str = "english") -> CopilotOut:
     """No model: a plain template, so the page still works offline."""
     if facts.get("baby_dob"):
         stage = f"a postnatal mother whose baby is {facts.get('baby_age_days')} days old"
@@ -155,10 +236,12 @@ def _fallback(facts: dict, still_needed: list[str], flags: dict) -> CopilotOut:
     bio = f"The user is {stage}" + (f" from {facts['state']}" if facts.get("state") else "") + "."
     if facts.get("phone_usually_held_by") and facts["phone_usually_held_by"] != "mother":
         bio += f" The phone is usually held by her {facts['phone_usually_held_by'].replace('_', '-')}."
+    t = _TEMPLATES[lang]
     if flags.get("loss"):
-        reply = "We are so sorry for your loss. We are here for you. Please let us know if you need anything."
+        reply = t["loss"]
     elif flags.get("danger"):
-        reply = "Please take her to the nearest hospital today. In an emergency, call 108."
+        reply = t["danger"]
     else:
-        reply = "Thank you for your message." + (" Could you tell us " + still_needed[0] + "?" if still_needed else "")
-    return CopilotOut(bio, reply, "english", "copilot:template", still_needed=still_needed)
+        ask = _NEEDED.get(lang, {}).get(still_needed[0], still_needed[0]) if still_needed else ""
+        reply = t["thanks"] + (t["ask"].format(ask) if ask else "")
+    return CopilotOut(bio, reply, lang, "copilot:template", still_needed=still_needed)
