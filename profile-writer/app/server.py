@@ -259,6 +259,13 @@ class Handler(BaseHTTPRequestHandler):
             store.x("UPDATE golden_pending SET deidentified=1 WHERE id=?", (int(body["id"]),))
             store.audit(None, "golden_marked_deidentified", id=int(body["id"]), by=str(body.get("by", "")))
             return self._send(200, {"ok": True})
+        if path == "/api/clear":
+            if not store.family(body["uid"]):
+                raise ValueError("unknown family")
+            store.clear_family(body["uid"])
+            publish("profile", {"uid": body["uid"]})
+            pipeline.refresh_copilot_async(store, body["uid"], publish)  # a fresh summary for the empty chat
+            return self._send(200, {"ok": True})
         if path == "/api/reset":
             store.reset()
             seed(store)
