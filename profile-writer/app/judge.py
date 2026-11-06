@@ -22,7 +22,7 @@ from .llm import call_tool, cost
 RUBRIC = [
     ("stated", "The family's words in the TARGET message state this fact directly. Not implied, guessed, asked about, or hoped for."),
     ("her", "It is about the registered mother or her own baby, not a sister, neighbour or other relative."),
-    ("value_right", "The value is exactly right, including any date worked out from the message date. A range or estimate (\"2 weeks ago\", \"end of January\", \"around the 20th\") is never an exact date: answer no or unsure."),
+    ("value_right", "The value is exactly right, including any date worked out from the message date. A range or estimate (\"2 weeks ago\", \"end of January\", \"around the 20th\") is never an exact date: answer no or unsure. Exception: a proposal marked APPROXIMATE turns an age (\"3 months old\") into a birth date. Work out the message date minus that age yourself: answer yes only if the value is within 2 weeks of your result, and no if it is further off, even if everything else is right."),
     ("current", "It describes her situation now (a scheduled delivery date counts), not a past pregnancy or a hypothetical."),
     ("no_loss", "Nothing in the conversation suggests a pregnancy loss or a baby's death that would make this write harmful."),
     ("usual_holder", "phone_holder only: this is whose phone it is or who usually uses it, not someone borrowing it today. Answer n/a for other fields."),
@@ -114,7 +114,9 @@ def build_prompt(text: str, msg_day: date, context: list[tuple[str, str]], profi
     lines.append(f'<message from="family" TARGET="true">{text}</message>')
     lines += ["</conversation>", "", "Proposals:"]
     for i, p in enumerate(proposals):
-        lines.append(f'{i}. {p["signal"]} = "{p["value"]}"  (quoted words: "{p.get("evidence", "")}")')
+        mark = "  APPROXIMATE (from an age; replaces a birth date on file that no longer fits)" \
+            if p.get("precision") == "approximate" else ""
+        lines.append(f'{i}. {p["signal"]} = "{p["value"]}"  (quoted words: "{p.get("evidence", "")}"){mark}')
     return "\n".join(lines)
 
 

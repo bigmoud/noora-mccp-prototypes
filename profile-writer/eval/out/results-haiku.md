@@ -1,16 +1,16 @@
-# Eval results: claude:claude-haiku-5-5:pcd7f61c6f9
+# Eval results: claude:claude-haiku-5-5:p71a0dde05d
 
-Run 2026-11-05 22:37 UTC · split: **all** · 46 cases · prompt cd7f61c6f9
+Run 2026-11-06 19:20 UTC · split: **all** · 46 cases · prompt 71a0dde05d
 
 Scored on what reaches the profile (writes). Held items count as not written.
 
 ## Headline
 
-- **Precision 100%** (target ≥90%) · **Recall 95%** (target ≥80%)
-- Cases fully right: **44/46**
+- **Precision 100%** (target ≥90%) · **Recall 93%** (target ≥80%)
+- Cases fully right: **43/46**
 - Wrong writes (the harmful kind): **0**
-- Cases that needed a nurse: **9/46** (clinical cases plus anything the AI judge couldn't decide)
-- Average per message: 2115 input + 245 output tokens · extractor **$0.00033** · judge **$0.0033** per message
+- Cases that needed a nurse: **8/46** (clinical cases plus anything the AI judge couldn't decide)
+- Average per message: 2240 input + 243 output tokens · extractor **$0.00035** · judge **$0.0032** per message
 
 - Who is writing (speaker, not a profile write): **1/4** right
 
@@ -18,7 +18,7 @@ Scored on what reaches the profile (writes). Held items count as not written.
 
 | Signal | Precision | Recall | Right | Wrong | Missed |
 |---|---|---|---|---|---|
-| phone_holder | 100% | 100% | 7 | 0 | 0 |
+| phone_holder | 100% | 86% | 6 | 0 | 1 |
 | stage | 100% | 100% | 16 | 0 | 0 |
 | baby_dob | 100% | 93% | 14 | 0 | 1 |
 | due_date | 100% | 75% | 3 | 0 | 1 |
@@ -49,11 +49,12 @@ Scored on what reaches the profile (writes). Held items count as not written.
 
 | Tag | Passed |
 |---|---|
+| mother | 0/1 |
 | weekday | 1/2 |
 | due_date | 3/4 |
 | relative_date | 4/5 |
+| hinglish | 28/31 |
 | loss_vs_delivery | 10/11 |
-| hinglish | 29/31 |
 | husband | 3/3 |
 | exact_date | 4/4 |
 | devanagari | 4/4 |
@@ -65,7 +66,6 @@ Scored on what reaches the profile (writes). Held items count as not written.
 | vague_date | 3/3 |
 | mother_in_law | 2/2 |
 | temporary | 1/1 |
-| mother | 1/1 |
 | needs_context | 2/2 |
 | loss | 10/10 |
 | safety | 2/2 |
@@ -90,12 +90,13 @@ Scored on what reaches the profile (writes). Held items count as not written.
 > Baby last Tuesday ko hua tha, ab doodh kam pee raha hai
 
 Rule trace:
-- stage=delivered → write (all checks passed)
 - baby_dob=2026-11-03 → write (all checks passed)
+- stage=delivered → write (all checks passed)
 
 ## All misses
 
 - g02 · missed · baby_dob: got `None`, wanted `2026-11-03` · “Baby last Tuesday ko hua tha, ab doodh kam pee raha hai”
+- g15 · missed · phone_holder: got `None`, wanted `mother` · “Main khud likh rahi hoon, yeh mera hi number hai”
 - g37 · missed · due_date: got `None`, wanted `2026-11-10` · “Bachcha ulta hai, doctor ne operation ki date 10 November di hai”
 
 ## Next step

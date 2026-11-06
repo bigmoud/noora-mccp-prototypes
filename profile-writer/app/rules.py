@@ -38,6 +38,7 @@ class Decision:
     lane: str | None = None  # "reviewer" | "clinical" | None
     checks: list[tuple[str, bool, str]] = field(default_factory=list)
     proposal: dict = field(default_factory=dict)
+    precision: str = "exact"  # "approximate" when written from an age like "3 months old"
     route: str = ""        # final outcome after the judge: write | nurse | clinical | ask_family | discard | same | shadow
     judgement: dict = field(default_factory=dict)
 
@@ -49,7 +50,8 @@ class Decision:
     def to_dict(self) -> dict:
         return {"signal": self.signal, "value": self.value, "action": self.action, "lane": self.lane,
                 "reason": self.reason, "checks": [{"name": n, "ok": ok, "detail": d} for n, ok, d in self.checks],
-                "proposal": self.proposal, "route": self.route, "judgement": self.judgement}
+                "proposal": self.proposal, "route": self.route, "judgement": self.judgement,
+                "precision": self.precision}
 
 
 def _norm(s: str) -> str:
@@ -178,15 +180,35 @@ def _check(d: Decision, p: dict, text: str, msg_day: date, profile: dict[str, st
         fail("model confidence", conf or "missing", "discard")
 
     # 5. dates: precision, our own date maths, plausibility
+    current_dob = _parse_iso(profile.get("baby_dob", "")) if sig == "baby_dob" else None
     if sig in ("baby_dob", "due_date"):
         dv = _parse_iso(val)
         phrase = p.get("date_phrase") or ""
-        if p.get("date_precision") != "exact_day":
-            fail("exact day", "approximate date", "hold", "reviewer")
-        else:
+        age = dates.age_to_dob(phrase or ev, msg_day) if sig == "baby_dob" else None
+        exact = p.get("date_precision") == "exact_day" and not (age and age[1])
+        if exact:
             ok("exact day")
+        elif sig == "baby_dob" and current_dob and age:
+            # An age ("3 months old") when a birth date is already on file. If it fits that date,
+            # nothing changes. If it doesn't, the family is correcting us: the newer, honest
+            # approximate date replaces the stale exact one, and the family is still asked for the day.
+            # The date comes from code's own reading of the age, never from the model.
+            approx, tol = age
+            if abs((approx - current_dob).days) <= tol + 3:
+                d.checks.append(("profile already says this", True, f"{current_dob} fits “{phrase or ev}”"))
+                d.action, d.lane = "same", None
+                return
+            d.value, val, dv = approx.isoformat(), approx.isoformat(), approx
+            d.precision = "approximate"
+            ok("exact day", f"approximate (“{phrase or ev}”): replaces {current_dob}; exact day still needed")
+        else:
+            fail("exact day", "approximate date", "hold", "reviewer")
         ours = dates.resolve(phrase or ev, msg_day, past=(sig == "baby_dob")) if (phrase or ev) else None
-        if ours and dv:
+        if ours is None and age and not age[1]:
+            ours = age[0]  # "one day old", "10 din ka"
+        if d.precision == "approximate":
+            ok("date maths agree", f"code reads “{phrase or ev}” as about {dv}")
+        elif ours and dv:
             if abs((ours - dv).days) <= DATE_AGREEMENT_DAYS:
                 ok("date maths agree", f"code reads “{phrase or ev}” as {ours}")
             else:
@@ -201,7 +223,9 @@ def _check(d: Decision, p: dict, text: str, msg_day: date, profile: dict[str, st
             else:
                 ok("plausible date")
             edd = _parse_iso(profile.get("due_date", ""))
-            if edd and not (edd - timedelta(weeks=10) <= dv <= edd + timedelta(weeks=4)):
+            if current_dob:
+                pass  # correcting a birth date already on file: the old due date is history
+            elif edd and not (edd - timedelta(weeks=10) <= dv <= edd + timedelta(weeks=4)):
                 fail("fits her due date", f"birth {dv} is far from due date {edd}", "hold", "reviewer")
             elif edd:
                 ok("fits her due date")
@@ -222,6 +246,9 @@ def _check(d: Decision, p: dict, text: str, msg_day: date, profile: dict[str, st
             ok("no conflict with profile", "pregnant → delivered is the expected next step")
         elif sig == "stage" and current == "delivered" and val == "pregnant":
             fail("no conflict with profile", "profile says delivered", "hold", "reviewer")
+        elif sig == "baby_dob":
+            # The family corrects the birth date: the latest statement wins, after the judge checks it.
+            ok("no conflict with profile", f"family corrects {current} → {val}; the old value is kept in history")
         elif sig == "due_date":
             a, b = _parse_iso(current), _parse_iso(val)
             if a and b and abs((a - b).days) <= DUE_DATE_SMALL_CHANGE_DAYS:

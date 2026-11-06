@@ -5,10 +5,23 @@ from __future__ import annotations
 from datetime import date, datetime, timezone
 
 from . import privacy
+from .config import settings
+from .copilot import DATA_REQUEST_REPLY
+from .pipeline import is_approximate
 from .store import Store
 
 LABEL = {"phone_holder": "Who holds the phone", "stage": "Stage", "baby_dob": "Baby DOB", "due_date": "Expected Due Date",
          "sensitive_event": "Possible pregnancy loss"}
+FLAG_TEXT = {
+    "danger": "Possible danger sign in this message. Please reply first: hospital today or 108.",
+    "data_request": "Asked for other people's information or how the service works inside. Nothing was shared; "
+                    "the suggested reply is a fixed one and any profile change waits for you.",
+    "instructions": "This message reads like instructions to the system. Any profile change waits for you.",
+    "flood": "Many messages in one minute: automatic reading paused for this chat for a minute.",
+    "draft_blocked": "The suggested reply was replaced because it failed a safety check",
+}
+ALERT_LABEL = {"danger": "Urgent", "data_request": "Alert"}
+STICKER_MARK = "[sticker: let me stop you right there]"
 HOLDER = {"mother": "Mother", "husband": "Husband", "mother_in_law": "Mother-in-law", "other_family": "Other family"}
 
 
@@ -54,10 +67,14 @@ def families(store: Store, processing: set[str]) -> list[dict]:
                          (f["uid"], f["last_read_id"] or 0))[0]["n"]
         needs = store.queue(f["uid"])
         phone = store.contact(f["uid"])
+        last_out = store.q("SELECT MAX(ts) t FROM messages WHERE uid=? AND direction='out' AND author<>'auto'",
+                           (f["uid"],))[0]["t"] or ""
+        open_kinds = {x["kind"] for x in store.flags(f["uid"]) if x["ts"] > last_out}
+        alert = next((ALERT_LABEL[k] for k in ("danger", "data_request") if k in open_kinds), None)
         out.append({"uid": f["uid"], "name": f["name"] or f["label"], "condition_area": f["condition_area"],
                     "last": last[0]["text"] if last else "", "last_ts": last[0]["ts"] if last else f["created_at"],
                     "last_out": bool(last and last[0]["direction"] == "out"), "unread": unread,
-                    "needs": len(needs), "clinical": any(n["lane"] == "clinical" for n in needs),
+                    "needs": len(needs), "clinical": any(n["lane"] == "clinical" for n in needs), "alert": alert,
                     "processing": f["uid"] in processing,
                     "phone": privacy.mask_phone(phone) if phone else "+91 ••••• " + f["uid"][-5:].upper()})
     return sorted(out, key=lambda x: x["last_ts"] or "", reverse=True)
@@ -84,8 +101,11 @@ def chat(store: Store, uid: str, processing: set[str]) -> dict | None:
         health += [{"field": "Expected Due Date", "value": "-"}, {"field": "Time until due", "value": "-"},
                    {"field": "Trimester", "value": "-"}]
     if dob:
-        health += [{"field": "Baby DOB", "value": _d(dob["value"]), **_source(dob)},
-                   {"field": "Baby age", "value": _age((today - date.fromisoformat(dob["value"])).days)}]
+        approx = is_approximate(dob)
+        age = _age((today - date.fromisoformat(dob["value"])).days)
+        health += [{"field": "Baby DOB", "value": ("≈ " if approx else "") + _d(dob["value"]), **_source(dob),
+                    **({"note": "approximate: exact date asked"} if approx else {})},
+                   {"field": "Baby age", "value": ("about " if approx else "") + age}]
     else:
         health += [{"field": "Baby DOB", "value": "-"}, {"field": "Baby age", "value": "-"}]
     health.append({"field": "Who holds the phone", "value": HOLDER.get(holder["value"], "-") if holder else "-",
@@ -110,7 +130,9 @@ def chat(store: Store, uid: str, processing: set[str]) -> dict | None:
         bits = []
         f = p.get("upe_fields", {})
         if "baby_dob" in f:
-            bits.append(f"Baby DOB {_d(f['baby_dob'].get('to'))}")
+            bits.append(f"Baby DOB {'≈ ' if f['baby_dob'].get('precision') == 'approximate' else ''}"
+                        f"{_d(f['baby_dob'].get('to'))}"
+                        + (f" (was {_d(f['baby_dob']['from'])})" if f['baby_dob'].get('from') else ""))
         if "expected_due_date" in f:
             bits.append(f"Due date {_d(f['expected_due_date'].get('to'))}")
         if "condition_area" in f:
@@ -121,15 +143,22 @@ def chat(store: Store, uid: str, processing: set[str]) -> dict | None:
             who = "by nurse" if str(p.get("writer", "")).startswith("nurse") else ""
             notices.append({"ts": w["ts"], "text": "Profile updated" + (f" {who}" if who else "") + " · " + " · ".join(bits)})
 
+    for fl in store.flags(uid):
+        text = FLAG_TEXT.get(fl["kind"], fl["kind"])
+        if fl["kind"] == "draft_blocked" and fl["detail"]:
+            text += f" ({fl['detail']})."
+        notices.append({"ts": fl["ts"], "text": text, "alert": fl["kind"] in ALERT_LABEL})
+
     cp = store.copilot(uid) or {}
     traces = store.traces(uid, 1)
     phone = store.contact(uid)
     return {"uid": uid, "name": fam["name"] or fam["label"], "condition_area": area, "paused": bool(fam["paused"]),
             "phone": privacy.mask_phone(phone) if phone else "+91 ••••• " + uid[-5:].upper(),
             "live": bool(phone), "messages": [{"id": m["id"], "dir": m["direction"], "text": m["text"], "ts": m["ts"],
-                                               "auto": m["author"] == "auto"}
+                                               "auto": m["author"] == "auto", "sticker": m["text"] == STICKER_MARK}
                                               for m in store.messages(uid, 80)],
             "notices": notices, "bio": cp.get("bio") or "", "draft": cp.get("reply") or "",
+            "draft_sticker": bool(settings.demo_sticker and cp.get("reply") == DATA_REQUEST_REPLY),
             "draft_language": cp.get("language") or "", "still_needed": cp.get("still_needed") or [],
             "health": health, "details": [{"field": k, "value": v or "-"} for k, v in details], "needs": needs,
             "trace": traces[0]["trace"] if traces else None, "processing": uid in processing}

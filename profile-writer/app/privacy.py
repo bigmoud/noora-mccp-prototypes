@@ -96,7 +96,16 @@ LOSS_WORDS = [
 DANGER_WORDS = [
     r"bleed", r"khoon", r"खून", r"convuls", r"\bfits?\b", r"jhatk", r"दौरा", r"behosh", r"बेहोश",
     r"unconscious", r"not breathing", r"saans nahi", r"सांस नहीं", r"high fever", r"tez bukhar",
-    r"तेज बुखार", r"blurred vision", r"severe (?:pain|headache)",
+    r"तेज बुखार", r"blurred vision", r"severe (?:pain|headache)", r"\bemergency\b", r"आपात",
+    # Newborn danger signs (WHO/IMNCI list the Copilot prompt already uses). Found live on Nov 5:
+    # "My baby is blue and he was born yesterday" raised no flag.
+    rf"(?:{_CHILD}|he|she|lips|hoth|honth)\b(?:\s+\S+){{0,4}}\s+(?:is |looks |turned |ho gaya |pad gaya |pad gayi )?(?:blue|neela|nila|neeli|nili)\b"
+    r"(?!\s+(?:dress|kapd|shirt|frock|blanket|kambal|cloth|colou?r|rang|toy|khilona|cap|topi|socks|jacket|sweater))",
+    r"नीला", r"नीली", r"(?:baby|bachcha|bacha|shishu|बच्चा)\S*(?:\s+\S+){0,3}\s+(?:is )?(?:cold|thanda|thandi|ठंडा)",
+    r"not feeding", r"(?:doodh|dudh|feed)\S*(?:\s+\S+){0,2}\s+(?:nahi|nahin|nhi) (?:pee|pi|le) ?(?:raha|rahi)",
+    r"दूध नहीं", r"very sleepy", r"bahut sust", r"सुस्त", r"(?:saans|breathing)\S*(?:\s+\S+){0,3}\s+(?:tez|fast)",
+    r"(?:fast|tez) (?:breathing|saans)", r"(?:aankh\S*|eyes|skin|twacha|hathel\S*|palms?|soles?|talv\S*|talw\S*|body|sharir)(?:\s+\S+){0,2}\s+(?:peel\S*|yellow)",
+    r"yellow (?:eyes|skin|palms|soles)|peeliya|piliya|jaundice|पीलिया|आंखें पीली|आँखें पीली",
 ]
 OPT_OUT = re.compile(r"^\s*(stop|unsubscribe|band karo|बंद करो)\s*[.!]*\s*$", re.I)
 ERASE = re.compile(r"^\s*(delete my data|mera data (?:delete|hatao|mitao)|मेरा डेटा (?:हटाओ|मिटाओ))\s*[.!]*\s*$", re.I)
@@ -127,13 +136,33 @@ def mentions_danger(text: str) -> bool:
     return bool(_danger_re.search(text))
 
 
+# Asking for other people's data or for the system's internals. The models can't see either
+# (each call holds one family's chat and an output-only tool), but the request itself is a signal:
+# the draft becomes a fixed, human-written reply and any profile write waits for a nurse.
+_OTHERS = r"(?:other|others'?|another|all(?: the)?|every) (?:users?|famil(?:y|ies)|mothers?|mums?|moms?|patients?|people|members?|chats?|women|numbers?|persons?)"
+_DATA_REQUEST = re.compile(
+    rf"{_OTHERS}|(?:numbers?|details|data|information|info|messages|chats|addresses?) (?:of|from) (?:the )?(?:other|others|another|everyone|all)|"
+    r"(?:doosr|dusr)(?:e|on|o)(?: logon| log| mahilaon| mahila| parivar| users| families| mothers)\b(?:\s+\S+){0,2}\s+(?:ka|ki|ke|number|data|details|baat)|"
+    r"kisi aur (?:ka|ki|ke) (?:number|data|details|jaankari)|sab(?:hi)? (?:logon|mahilaon|users) (?:ka|ki|ke)|"
+    r"दूसरों|दूसरे लोग|दूसरी महिला|सबका नंबर|"
+    r"(?:system|your) (?:prompt|instructions|rules|database|code)|\bdatabase\b|api[ _-]?key|password|\badmin(?:istrator)?\b|"
+    r"(?:list|dump|export|show) (?:of )?(?:all|every)", re.I)
+
+
+def asks_for_others_data(text: str) -> bool:
+    return bool(_DATA_REQUEST.search(text))
+
+
 # Text that reads like orders to the system rather than a family talking. Not a complete
 # defence (none exists); it is one enforcing layer on top of the model having no tools
 # and every write passing the rules.
 _INJECTION = re.compile(
     r"ignore (?:all |any )?(?:previous|prior|above|earlier) (?:instructions|rules)|you are now|system prompt|"
     r"\bas an? (?:ai|admin|administrator|developer)\b|set (?:the |her |my )?(?:due date|dob|date of birth|stage|profile)\s+to|"
-    r"mark (?:everyone|all|her|me) (?:as )?(?:delivered|pregnant)|\bjailbreak\b|developer mode", re.I)
+    r"mark (?:everyone|all|her|me) (?:as )?(?:delivered|pregnant)|\bjailbreak\b|developer mode|"
+    r"forget (?:your|all|the|previous|these) (?:rules|instructions)|\bact as\b|pretend (?:you|to be)|"
+    r"new instructions|\boverride\b|^\s*(?:system|assistant)\s*:|</?(?:system|instructions?)>|"
+    r"niyam (?:bhool|bhul|tod)|नियम (?:भूल|तोड़)", re.I | re.M)
 
 
 def looks_like_injection(text: str) -> bool:

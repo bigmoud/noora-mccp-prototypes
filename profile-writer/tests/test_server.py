@@ -86,5 +86,58 @@ class AutoAck(unittest.TestCase):
         self.assertEqual(self.sent, [])
 
 
+class DemoSticker(unittest.TestCase):
+    """The meme sticker goes only with a reply a nurse sends, only when DEMO_STICKER is on."""
+    @classmethod
+    def setUpClass(cls):
+        settings.dashboard_token = "tok-123"
+        cls.srv = ThreadingHTTPServer(("127.0.0.1", 0), server.Handler)
+        threading.Thread(target=cls.srv.serve_forever, daemon=True).start()
+        cls.base = f"http://127.0.0.1:{cls.srv.server_port}"
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.srv.shutdown()
+
+    def setUp(self):
+        from app import privacy, whatsapp
+        self.calls = []
+        for name in ("send_text", "send_sticker"):
+            self.addCleanup(setattr, whatsapp, name, getattr(whatsapp, name))
+        whatsapp.send_text = lambda phone, text: (self.calls.append("text") or (True, "wamid.t"))
+        whatsapp.send_sticker = lambda phone, path: (self.calls.append("sticker") or (True, "wamid.s"))
+        self.addCleanup(setattr, settings, "demo_sticker", settings.demo_sticker)
+        self.uid = privacy.pseudonym("919800000001")
+        server.store.upsert_family(self.uid, "Live tester", "ANC_EDD")
+        server.store.set_contact(self.uid, "919800000001")
+        server.store.add_message(self.uid, "in", "family", "hi", "hi", server.now(), None)
+        self.addCleanup(server.store.erase_family, self.uid)
+
+    def reply(self, sticker):
+        body = json.dumps({"uid": self.uid, "text": "We can’t share anyone else’s information; in an emergency call 108.",
+                           "sticker": sticker}).encode()
+        r = urllib.request.Request(self.base + "/api/reply", method="POST", data=body, headers={
+            "Authorization": "Bearer tok-123", "Content-Type": "application/json", "X-NPW": "1"})
+        with urllib.request.urlopen(r) as resp:
+            return resp.status
+
+    def test_sticker_then_text_when_on(self):
+        settings.demo_sticker = True
+        self.assertEqual(self.reply(True), 200)
+        self.assertEqual(self.calls, ["sticker", "text"])
+
+    def test_never_when_off(self):
+        settings.demo_sticker = False
+        self.reply(True)
+        self.assertEqual(self.calls, ["text"])
+
+    def test_fixed_reply_and_sticker_file(self):
+        from app import copilot
+        self.assertEqual(copilot.DATA_REQUEST_REPLY, "We can’t share anyone else’s information; in an emergency call 108.")
+        data = settings.sticker_path.read_bytes()
+        self.assertTrue(data[:4] == b"RIFF" and data[8:12] == b"WEBP")
+        self.assertLess(len(data), 100_000)  # WhatsApp's limit for a static sticker
+
+
 if __name__ == "__main__":
     unittest.main()

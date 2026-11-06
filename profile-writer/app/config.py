@@ -73,6 +73,8 @@ class Settings:
     daily_token_cap = _int("DAILY_TOKEN_CAP", 200_000)
     max_extractions_per_family_per_hour = _int("MAX_EXTRACTIONS_PER_FAMILY_PER_HOUR", 20)
     max_message_chars = _int("MAX_MESSAGE_CHARS", 1500)
+    max_messages_per_family_per_minute = _int("MAX_MESSAGES_PER_FAMILY_PER_MINUTE", 6)
+    max_extractions_per_hour_total = _int("MAX_EXTRACTIONS_PER_HOUR_TOTAL", 300)
 
     # --- rollout: shadow (extract, never write) | review_first (every write held)
     #     | auto_with_audit (confident writes go live, all reviewed afterwards)
@@ -93,6 +95,10 @@ class Settings:
     # never medical). Medical replies always wait for a nurse to press Send.
     auto_ack = _bool("AUTO_ACK", True)
     auto_ack_cooldown_hours = _float("AUTO_ACK_COOLDOWN_HOURS", 2.0)
+    # Demo only: a meme sticker the nurse can send with the fixed reply to someone fishing for other
+    # families' data. Off unless set; never for real families.
+    demo_sticker = _bool("DEMO_STICKER", False)
+    sticker_path = ROOT / "app" / "assets" / "sticker-stop.webp"
     auto_ack_text = os.environ.get("AUTO_ACK_TEXT",
         "Namaste. Aapka sandesh mil gaya hai, hamari nurse jald hi jawab dengi. "
         "Thank you, we have received your message and a nurse will reply soon. "
