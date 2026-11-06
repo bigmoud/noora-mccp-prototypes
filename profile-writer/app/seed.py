@@ -1,4 +1,4 @@
-"""Five synthetic demo families (history kept inside the 72-hour retention window). Every name, number and message was written by the fellows;
+"""Six synthetic demo families (history kept inside the 72-hour retention window). Every name, number and message was written by the fellows;
 none comes from Noora's users."""
 from __future__ import annotations
 
@@ -67,4 +67,14 @@ def seed(store: Store) -> None:
     _msg(store, e, "nurse", "Namaste Rekha ji! Is hafte baby ki harkat (movement) par dhyan dein. Kam lage toh turant "
                             "hospital jayein.", timedelta(hours=60))
     _msg(store, e, "family", "Ji didi", timedelta(hours=59))
-    store.audit(None, "demo_seeded", families=5)
+
+    # An English-speaking family (English is one of Noora's WhatsApp languages); used to show the demo in English.
+    f = privacy.pseudonym("sim-family-f")
+    store.upsert_family(f, "Anjali Thomas", "ANC_EDD", name="Anjali Thomas", state="Kerala", language="English",
+                        noora_program="MCH Kerala", onboarding_method="Hospital class", onboarding_date="2026-07-28")
+    _fact(store, f, "stage", "pregnant", "(onboarding form)")
+    _fact(store, f, "due_date", (today + 6 * d).isoformat(), "(government RCH record)")
+    _msg(store, f, "nurse", "Hello Anjali! Your due date is close. Please keep your hospital bag ready and message us "
+                            "here if anything worries you.", timedelta(hours=9))
+    _msg(store, f, "family", "Thank you, we will. Everything is fine so far.", timedelta(hours=8))
+    store.audit(None, "demo_seeded", families=6)
