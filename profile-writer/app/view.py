@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import date, datetime, timezone
 
 from . import privacy
+from .config import settings
+from .copilot import DATA_REQUEST_REPLY
 from .pipeline import is_approximate
 from .store import Store
 
@@ -19,6 +21,7 @@ FLAG_TEXT = {
     "draft_blocked": "The suggested reply was replaced because it failed a safety check",
 }
 ALERT_LABEL = {"danger": "Urgent", "data_request": "Alert"}
+STICKER_MARK = "[sticker: let me stop you right there]"
 HOLDER = {"mother": "Mother", "husband": "Husband", "mother_in_law": "Mother-in-law", "other_family": "Other family"}
 
 
@@ -152,9 +155,10 @@ def chat(store: Store, uid: str, processing: set[str]) -> dict | None:
     return {"uid": uid, "name": fam["name"] or fam["label"], "condition_area": area, "paused": bool(fam["paused"]),
             "phone": privacy.mask_phone(phone) if phone else "+91 ••••• " + uid[-5:].upper(),
             "live": bool(phone), "messages": [{"id": m["id"], "dir": m["direction"], "text": m["text"], "ts": m["ts"],
-                                               "auto": m["author"] == "auto"}
+                                               "auto": m["author"] == "auto", "sticker": m["text"] == STICKER_MARK}
                                               for m in store.messages(uid, 80)],
             "notices": notices, "bio": cp.get("bio") or "", "draft": cp.get("reply") or "",
+            "draft_sticker": bool(settings.demo_sticker and cp.get("reply") == DATA_REQUEST_REPLY),
             "draft_language": cp.get("language") or "", "still_needed": cp.get("still_needed") or [],
             "health": health, "details": [{"field": k, "value": v or "-"} for k, v in details], "needs": needs,
             "trace": traces[0]["trace"] if traces else None, "processing": uid in processing}

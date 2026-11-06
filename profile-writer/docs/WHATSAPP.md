@@ -78,6 +78,14 @@ Text the test number from your phone, e.g.
   Medical advice without a qualified person's review is also outside Anthropic's usage policy for
   health.
 
+## Demo sticker (optional)
+Add `DEMO_STICKER=true` to `.env` and restart. When someone asks for other families' data or the
+system's internals, the suggested reply is the fixed line *"We can’t share anyone else’s
+information; in an emergency call 108."* with a "let me stop you right there" sticker. **Use
+reply** attaches it (× removes it), and **Send** delivers the sticker, then the text. Nothing is
+sent without the nurse pressing Send. The sticker lives in `app/assets/`, not `web/`, so it is
+never published on the public demo page. Demo only: never turn this on for real families.
+
 ## When something goes wrong
 
 | What you see | Fix |

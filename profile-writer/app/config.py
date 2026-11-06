@@ -95,6 +95,10 @@ class Settings:
     # never medical). Medical replies always wait for a nurse to press Send.
     auto_ack = _bool("AUTO_ACK", True)
     auto_ack_cooldown_hours = _float("AUTO_ACK_COOLDOWN_HOURS", 2.0)
+    # Demo only: a meme sticker the nurse can send with the fixed reply to someone fishing for other
+    # families' data. Off unless set; never for real families.
+    demo_sticker = _bool("DEMO_STICKER", False)
+    sticker_path = ROOT / "app" / "assets" / "sticker-stop.webp"
     auto_ack_text = os.environ.get("AUTO_ACK_TEXT",
         "Namaste. Aapka sandesh mil gaya hai, hamari nurse jald hi jawab dengi. "
         "Thank you, we have received your message and a nurse will reply soon. "

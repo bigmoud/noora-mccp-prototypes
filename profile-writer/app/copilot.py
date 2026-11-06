@@ -51,10 +51,7 @@ TOOL = {
 
 # Used instead of a model-written draft when someone asks for other people's data or the
 # system's internals. Written by people; the nurse still decides whether to send it.
-DATA_REQUEST_REPLY = ("Namaste. Hum kisi doosre parivar ki jaankari share nahi kar sakte. Agar yeh emergency hai, "
-                      "turant 108 par call karein ya nazdeeki aspatal jaayein. Hamari nurse aapko yahin jawab dengi. "
-                      "We cannot share anyone else's information. In an emergency, call 108 or go to the nearest "
-                      "hospital now.")
+DATA_REQUEST_REPLY = "We can’t share anyone else’s information; in an emergency call 108."
 
 # Output check, in code, on every model-written draft before a nurse sees it.
 _DRAFT_RULES = [
@@ -136,7 +133,7 @@ def draft(fam: dict, prof: dict, chat: list[tuple[str, str]], still_needed: list
 def _guard(out: CopilotOut, flags: dict, facts: dict | None = None) -> CopilotOut:
     """Code decides what reaches the draft box, whatever the model wrote."""
     if flags.get("data_request"):
-        out.reply, out.language = DATA_REQUEST_REPLY, "hindi_roman"
+        out.reply, out.language = DATA_REQUEST_REPLY, "english"
         return out
     problems = draft_problems(out.reply)
     if problems:

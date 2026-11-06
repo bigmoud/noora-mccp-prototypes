@@ -46,6 +46,7 @@ def _config_view() -> dict:
         "rollout_mode": store.get_setting("rollout_mode", settings.rollout_mode),
         "kill_switch": store.get_setting("kill_switch", "off"),
         "spend_usd": round(spend_so_far(), 4), "spend_cap_usd": settings.spend_cap_usd,
+        "demo_sticker": bool(settings.demo_sticker and settings.sticker_path.exists()),
     }
 
 
@@ -92,7 +93,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.send_header("Content-Security-Policy",
                          "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; "
-                         "img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'")
+                         "img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'")
         for k, v in {**self._cors(), **(headers or {})}.items():
             self.send_header(k, v)
         self.end_headers()
@@ -149,6 +150,8 @@ class Handler(BaseHTTPRequestHandler):
             cookie = (f"npw_token={settings.dashboard_token}; HttpOnly; SameSite=Strict; Path=/"
                       + ("; Secure" if self.headers.get("X-Forwarded-Proto") == "https" else ""))
             return self._send(200, (STATIC / "index.html").read_bytes(), "text/html", {"Set-Cookie": cookie})
+        if url.path == "/sticker.webp" and settings.demo_sticker and settings.sticker_path.exists():
+            return self._send(200, settings.sticker_path.read_bytes(), "image/webp")
         if url.path == "/api/state":
             uid = parse_qs(url.query).get("uid", [None])[0]
             return self._send(200, state(uid))
@@ -280,10 +283,18 @@ class Handler(BaseHTTPRequestHandler):
                 raise PermissionError("number not on the test allowlist")
             if not whatsapp.within_service_window(store.last_inbound_ts(uid)):
                 raise PermissionError("outside WhatsApp's 24-hour window: only approved templates may be sent")
+        sticker = bool(body.get("sticker")) and settings.demo_sticker and settings.sticker_path.exists()
+        if phone and sticker:
+            ok, why = whatsapp.send_sticker(phone, settings.sticker_path)
+            store.audit(uid, "nurse_sticker", sent=ok, detail=why[:80])
+            sticker = ok  # the text still goes even if the sticker didn't
+        if phone:
             sent, detail = whatsapp.send_text(phone, text)
             if not sent:  # don't show a message as sent when WhatsApp refused it
                 store.audit(uid, "nurse_reply_failed", detail=detail[:80])
                 return self._send(502, {"error": detail})
+        if sticker:
+            store.add_message(uid, "out", "nurse", view.STICKER_MARK, view.STICKER_MARK, now(), None)
         mid = store.add_message(uid, "out", "nurse", text, privacy.redact(text)[0], now(), None)
         store.x("UPDATE copilot SET reply='' WHERE uid=?", (uid,))  # the draft has been used
         store.x("UPDATE families SET last_read_id=(SELECT COALESCE(MAX(id),0) FROM messages WHERE uid=?) WHERE uid=?",

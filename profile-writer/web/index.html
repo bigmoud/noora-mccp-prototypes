@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <title>Noora Profile Writer</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -112,6 +112,13 @@ button{cursor:pointer}
 .b.out{background:var(--out);align-self:flex-end;border-top-right-radius:0}
 .b .t{float:right;margin:6px 0 -4px 10px;font-size:11px;color:var(--meta);display:inline-flex;gap:3px;align-items:center}
 .b .t svg{width:16px;height:11px;color:var(--tick)}
+.stk{align-self:flex-end;display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin:2px 0}
+.stk img{width:150px;height:150px;display:block}
+.stk .t{font-size:11px;color:var(--meta);background:var(--panel);border-radius:6px;padding:1px 6px;box-shadow:var(--shadow)}
+.draft .stkprev{width:84px;height:84px;display:block;margin:2px 0 6px}
+.attach{display:flex;align-items:center;gap:8px;padding:6px 12px 0;background:var(--bar)}
+.attach img{width:52px;height:52px}
+.attach .x{border:0;background:none;color:var(--meta);font-size:18px;cursor:pointer;line-height:1}
 .sys{align-self:center;max-width:80%;margin:6px 0;background:var(--sysnote);color:var(--sysnote-ink);font-size:12.5px;padding:5px 12px;border-radius:8px;
   box-shadow:var(--shadow);text-align:center}
 .sys.alert{background:var(--red-soft);color:var(--red);border:1px solid var(--red-line);font-weight:500}
@@ -263,6 +270,7 @@ pre{font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;backgrou
       <div class="chat-head" id="chatHead"></div>
       <div class="msgs" id="msgs"></div>
       <div id="draftBox"></div>
+      <div id="attach"></div>
       <div class="composer">
         <textarea id="reply" rows="1" placeholder="Type a message"></textarea>
         <button class="send" id="sendBtn" aria-label="Send">
@@ -336,6 +344,15 @@ let MODE=null, CONN={base:"",token:""}, S=null, uid=null, filter="all", query=""
 let OFF=null;           // offline: {families, chats, scripts, used, local}
 const SUGGEST = {};     // family name → suggested messages (from the recording)
 
+let STICKER=null, stickerTried=false, withSticker={};   // demo sticker: blob URL, and whether the next reply carries it (per chat)
+async function stickerURL(){
+  if (STICKER || stickerTried || MODE==="offline" || !(S && S.config && S.config.demo_sticker)) return STICKER;
+  stickerTried = true;
+  try { const r = await fetch(CONN.base+"/sticker.webp", {headers:headers()}); if (r.ok) STICKER = URL.createObjectURL(await r.blob()); } catch(e){}
+  if (STICKER) render();
+  return STICKER;
+}
+function stickerImg(cls){ if (!STICKER){ stickerURL(); return null; } return h("img",{src:STICKER, class:cls||"", alt:"Sticker: let me stop you right there"}); }
 function headers(extra){ const hd=Object.assign({}, extra||{}); if (MODE==="remote"){ hd.Authorization="Bearer "+CONN.token; hd["ngrok-skip-browser-warning"]="1"; } return hd; }
 async function post(path, body){
   const r = await fetch(CONN.base+path, {method:"POST", headers:headers({"Content-Type":"application/json","X-NPW":"1"}), body:JSON.stringify(body||{})});
@@ -428,12 +445,13 @@ function renderChat(){
   head.append(avatar(c.name), h("div",{}, h("div",{class:"nm"}, c.name),
     c.processing ? h("div",{class:"sub busy"},"Copilot is reading the latest message…") : h("div",{class:"sub"}, c.phone)));
   const items = [...c.messages.map(m=>({k:"m", ts:m.ts, m})), ...c.notices.map(n=>({k:"n", ts:n.ts, n}))]
-    .sort((a,b)=> (a.ts||"").localeCompare(b.ts||"") || (a.k==="m"?-1:1));
+    .sort((a,b)=> (a.ts||"").localeCompare(b.ts||"") || (a.k===b.k ? (a.k==="m" ? (a.m.id>b.m.id?1:-1) : 0) : a.k==="m"?-1:1));
   let lastDay = "";
   for (const it of items){
     const d = dayLabel(it.ts); if (d && d!==lastDay){ box.append(h("div",{class:"day"}, d)); lastDay = d; }
     if (it.k==="n"){ box.append(h("div",{class:"sys"+(it.n.alert?" alert":"")}, it.n.text)); continue; }
     const m = it.m;
+    if (m.sticker){ box.append(h("div",{class:"stk"}, stickerImg() || h("div",{class:"b out"}, "Sticker"), h("span",{class:"t"}, hhmm(m.ts)))); continue; }
     box.append(h("div",{class:"b "+m.dir}, m.text, h("span",{class:"t"}, m.auto ? "Automatic · " : "", hhmm(m.ts), m.dir==="out" ? svg(TICKS) : null)));
   }
   if (c.processing) box.append(h("div",{class:"typing"}, h("span",{class:"dots"}, h("i"),h("i"),h("i")), "Copilot is reading"));
@@ -448,8 +466,10 @@ function renderDraft(){
   box.append(h("div",{class:"draft"},
     h("div",{class:"hd"}, "Copilot suggestion", lang ? h("span",{class:"lang"}, "· "+lang) : null, h("span",{class:"grow"}),
       h("button",{class:"btn", onclick:()=>{ dismissed[uid]=c.draft; renderDraft(); }}, "Dismiss")),
+    c.draft_sticker ? stickerImg("stkprev") : null,
     h("div",{class:"tx"}, c.draft),
-    h("div",{class:"acts"}, h("button",{class:"btn primary", onclick:()=>{ const t=$("#reply"); t.value=c.draft; autosize(t); t.focus(); }}, "Use reply"))));
+    h("div",{class:"acts"}, h("button",{class:"btn primary", onclick:()=>{ const t=$("#reply"); t.value=c.draft; autosize(t); t.focus();
+      if (c.draft_sticker){ withSticker[uid]=true; renderAttach(); } }}, "Use reply"))));
 }
 function renderCopilot(){
   const c=S.chat, box=$("#cpProfile"); box.replaceChildren();
@@ -545,7 +565,7 @@ function renderHow(){
 
 // ------------------------------------------------------------------ actions
 async function select(id){
-  uid = id; $("#reply").value=""; autosize($("#reply")); prevVals = {};
+  uid = id; $("#reply").value=""; autosize($("#reply")); prevVals = {}; renderAttach();
   if (MODE==="offline"){ const f=OFF.families.find(x=>x.uid===id); if (f) f.unread=0; }
   else { post("/api/read",{uid:id}).catch(()=>{}); }
   await load(); renderSim();
@@ -557,6 +577,12 @@ async function act(n, action, value){
   try { await post("/api/review",{fact_id:n.id, action, value}); toast(done); } catch(e){ toast(e.message); }
   load();
 }
+function renderAttach(){
+  const box=$("#attach"); box.replaceChildren();
+  if (!uid || !withSticker[uid] || !STICKER) return;
+  box.append(h("div",{class:"attach"}, stickerImg(), h("span",{class:"muted"},"Sticker will be sent with this reply"),
+    h("button",{class:"x", "aria-label":"Remove sticker", onclick:()=>{ withSticker[uid]=false; renderAttach(); }}, "×")));
+}
 async function sendReply(){
   const t=$("#reply"), text=t.value.trim(); if (!text || !uid) return;
   if (MODE==="offline"){
@@ -566,7 +592,8 @@ async function sendReply(){
     t.value=""; autosize(t); load(); return;
   }
   $("#sendBtn").disabled = true;
-  try { const r = await post("/api/reply",{uid, text}); t.value=""; autosize(t); if (r.sent) toast("Sent on WhatsApp"); }
+  try { const r = await post("/api/reply",{uid, text, sticker: !!withSticker[uid]}); t.value=""; autosize(t);
+        withSticker[uid]=false; renderAttach(); if (r.sent) toast("Sent on WhatsApp"); }
   catch(e){ toast(e.message); }
   $("#sendBtn").disabled = false; load();
 }
