@@ -6,7 +6,7 @@ from datetime import date, datetime, timezone
 
 from . import privacy
 from .config import settings
-from .copilot import DATA_REQUEST_REPLY
+from .copilot import DATA_REQUEST_REPLIES
 from .pipeline import is_approximate
 from .store import Store
 
@@ -158,7 +158,7 @@ def chat(store: Store, uid: str, processing: set[str]) -> dict | None:
                                                "auto": m["author"] == "auto", "sticker": m["text"] == STICKER_MARK}
                                               for m in store.messages(uid, 80)],
             "notices": notices, "bio": cp.get("bio") or "", "draft": cp.get("reply") or "",
-            "draft_sticker": bool(settings.demo_sticker and cp.get("reply") == DATA_REQUEST_REPLY),
+            "draft_sticker": bool(settings.demo_sticker and cp.get("reply") in DATA_REQUEST_REPLIES.values()),
             "draft_language": cp.get("language") or "", "still_needed": cp.get("still_needed") or [],
             "health": health, "details": [{"field": k, "value": v or "-"} for k, v in details], "needs": needs,
             "trace": traces[0]["trace"] if traces else None, "processing": uid in processing}
