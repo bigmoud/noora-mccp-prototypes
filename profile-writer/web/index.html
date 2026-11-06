@@ -629,10 +629,11 @@ function renderSettings(){
   const url = h("input",{type:"url", placeholder:"https://your-server.onrender.com", value:CONN.base||""});
   const tok = h("input",{type:"password", placeholder:"Access token"});
   const connect = async ()=>{
-    const base=url.value.trim().replace(/\/+$/,"");
+    let base=url.value.trim(); try { base = new URL(base).origin; } catch(e){}  // keep only https://host: drops /webhook, ?token=…
     if (!/^https:\/\/|^http:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(base)){ toast("Use an https:// address"); return; }
     const prev={MODE, CONN}; CONN={base, token:tok.value.trim()}; MODE="remote";
     try { const r=await fetch(base+"/api/state",{headers:headers()}); if(!r.ok) throw new Error(r.status===401?"wrong token":"HTTP "+r.status);
+      if (!(r.headers.get("content-type")||"").includes("json")) throw new Error("that address isn't the profile-writer server");
       sset("npw_conn", JSON.stringify(CONN)); uid=null; await load(); startEvents(); $("#setPop").hidden=true; toast("Connected"); renderSim(); }
     catch(e){ MODE=prev.MODE; CONN=prev.CONN; toast("Couldn't connect: "+e.message); }
   };
